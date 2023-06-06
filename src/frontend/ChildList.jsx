@@ -2,7 +2,6 @@ import React from "react";
 import { useAuth } from "./use-auth-client";
 import SwipeToRevealActions from "react-swipe-to-reveal-actions";
 import { set, get } from 'idb-keyval';
-// import BottomNav from "./components/BottomNav";
 import AddChild from "./components/AddChild";
 
 function ChildList() {
@@ -140,7 +139,7 @@ function ChildList() {
 
 
 {children ? 
-
+  <div className="example">
       <ul className="child-list">
       {children.length > 0 &&
           children.map(child => (
@@ -160,9 +159,8 @@ function ChildList() {
           </li>
         ))}
       </ul>
-
+</div>
     : <p>Loading...</p>}
-      {/* <BottomNav /> */}
 
       <h4>Add a child</h4>
         <AddChild 

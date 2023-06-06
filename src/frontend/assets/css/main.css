@@ -25,11 +25,16 @@ main {
   }
 }
 
+.example {
+  text-align: left;
+}
+
 .child-list {
   width: 100%;
   max-width: 400px;
   list-style-type: none;
   margin: 0;
+  padding: 0;
 }
 
 .child-list-item {
@@ -43,7 +48,6 @@ main {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top:-20px;
 }
 
 .edit {
