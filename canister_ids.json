@@ -1,0 +1,13 @@
+{
+  "frontend": {
+    "ic": "vasb2-4yaaa-aaaab-qadoa-cai"
+  },
+  "backend": {
+    "ic": "ivcos-eqaaa-aaaab-qablq-cai",
+    "ic-old": "hihv6-xiaaa-aaaab-qaapa-cai"
+  },
+  "www": {
+    "ic": "jymk4-lyaaa-aaaab-qabma-cai",
+    "ic-old": "hpgtk-2qaaa-aaaab-qaapq-cai"
+  }
+}
