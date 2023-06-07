@@ -120,7 +120,7 @@ function ChildList() {
         log out
       </button>
 
-      <h2>My Children</h2>
+      <h2 className="screen-title light">My Children</h2>
       {/* <button onClick={me}>
         Me
       </button> */}
@@ -155,7 +155,7 @@ function ChildList() {
         <p>Loading...</p>
       )}
 
-      <h4>Add a child</h4>
+      <h2 className="screen-title light">Add a child</h2>
       <AddChild
         handleAddChild={handleAddChild}
         // childID = {selectedChild}
