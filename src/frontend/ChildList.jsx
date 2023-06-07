@@ -116,8 +116,8 @@ function ChildList() {
 
   return (
     <div className='container'>
-      <button id='logout' onClick={logout}>
-        log out
+      <button className="logout" id='logout' onClick={logout}>
+        logout
       </button>
 
       <h2 className="screen-title light">My Children</h2>
