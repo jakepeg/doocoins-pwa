@@ -145,7 +145,7 @@ function ChildList() {
                     handleUpdateOpenItemId={setOpenItemId}
                     openItemId={openItemId}
                     index={index}
-                    key={child.key}
+                    key={child.id}
                   />
                 )
               })}

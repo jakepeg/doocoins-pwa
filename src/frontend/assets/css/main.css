@@ -100,3 +100,29 @@ main {
   font-size: 0.8rem;
   width: auto;
 }
+
+.text-field {
+  border: 2px solid #139EAA;
+  background-color: #446275;
+  border-radius: 6px;
+  color: #fff;
+  padding: 10px;
+  width: 80%;
+  font-size: 20px;
+  text-align: center; 
+}
+
+input[type="text"]::placeholder {
+  color: #ccc; /* Sets the placeholder text color to white */
+}
+
+.button {
+  border: 2px solid #139EAA;
+  background-color: #139EAA;
+  border-radius: 6px;
+  color: #fff;
+  padding: 10px;
+  width: 80%;
+  font-size: 20px;
+  cursor: pointer;
+}

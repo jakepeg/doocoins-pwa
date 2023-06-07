@@ -6,9 +6,9 @@ const AddChild = (props) => {
       <form onSubmit={props.handleAddChild}>
         <div className="form">
           <label htmlFor="child_name">
-            <input type="text" name="child_name" placeholder="Name" />
-          </label>
-        <button className="button" type="submit">Add</button>
+            <input type="text" name="child_name" className="text-field" placeholder="name" />
+          </label><br /><br />
+        <button className="button" type="submit">add child</button>
       </div>
     </form>
   );
