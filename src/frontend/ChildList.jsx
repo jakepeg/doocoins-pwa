@@ -3,11 +3,13 @@ import { useAuth } from './use-auth-client'
 import SwipeToRevealActions from 'react-swipe-to-reveal-actions'
 import { set, get } from 'idb-keyval'
 import AddChild from './components/AddChild'
+import ChildItem from './components/ChildItem'
 
 function ChildList() {
   const [actor, setActor] = React.useState(null)
   const [children, setChildren] = React.useState(null)
   const [newChild, setNewChild] = React.useState(null)
+  const [openItemId, setOpenItemId] = React.useState(null)
 
   const initActor = () => {
     import('../declarations/backend').then((module) => {
@@ -112,42 +114,9 @@ function ChildList() {
     console.log(whoami)
   }
 
-  function handleDelete(id) {
-    console.log('delete clicked for child ' + id)
-  }
-
-  function handleUpdate(id) {
-    console.log('edit clicked for child ' + id)
-  }
-
-  const getActions = (id) => [
-    {
-      content: (
-        <div className='action-btn edit'>
-          <span>EDIT</span>
-        </div>
-      ),
-      onClick: () => handleUpdate(id)
-    },
-    {
-      content: (
-        <div className='action-btn delete'>
-          <span>DELETE</span>
-        </div>
-      ),
-      onClick: () => handleDelete(id)
-    }
-  ]
-
-  const swipeContainerStyles = {
-    backgroundColor: '#FFF',
-    paddingLeft: '1rem'
-  }
-
   return (
-    <div className="container">
-
-<button id="logout" onClick={logout}>
+    <div className='container'>
+      <button id='logout' onClick={logout}>
         log out
       </button>
 
@@ -156,42 +125,43 @@ function ChildList() {
         Me
       </button> */}
 
+      {children ? (
+        <div className='example'>
+          <ul className='child-list'>
+            {children.length > 0 &&
+              children.map((child, index) => {
+                const isItemOpen = openItemId === child.id
+                if (typeof window !== 'undefined') {
+                  // :r0: format from library
+                  const actionsElement = document.getElementById(`:r${index}:`)
+                  if (!isItemOpen && actionsElement) {
+                    actionsElement.style.display = 'none'
+                  }
+                }
 
-
-{children ? 
-  <div className="example">
-      <ul className="child-list">
-      {children.length > 0 &&
-          children.map(child => (
-          <li key={child.id} className="child-list-item">
-          <div>{child.name} {child.balance}</div>
-            <SwipeToRevealActions
-              actionButtons={getActions(child.id)}
-              actionButtonMinWidth={70}
-              containerStyle={swipeContainerStyles}
-              hideDotsButton={true}
-              // hideDotsButton={item.index > 5}
-              // onOpen={() => console.log('Item opened')}
-              // onClose={() => console.log('Item closed')}
-            >
-            </SwipeToRevealActions>
-
-          </li>
-        ))}
-      </ul>
-</div>
-    : <p>Loading...</p>}
+                return (
+                  <ChildItem
+                    child={child}
+                    handleUpdateOpenItemId={setOpenItemId}
+                    openItemId={openItemId}
+                    index={index}
+                    key={child.key}
+                  />
+                )
+              })}
+          </ul>
+        </div>
+      ) : (
+        <p>Loading...</p>
+      )}
 
       <h4>Add a child</h4>
-        <AddChild 
-          handleAddChild = {handleAddChild} 
-          // childID = {selectedChild}
-        />
+      <AddChild
+        handleAddChild={handleAddChild}
+        // childID = {selectedChild}
+      />
     </div>
+  )
+}
 
-
-
-  );
-  }
-
-export default ChildList;
+export default ChildList
