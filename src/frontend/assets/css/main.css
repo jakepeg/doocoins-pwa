@@ -35,10 +35,21 @@ main {
   list-style-type: none;
   margin: 0;
   padding: 0;
+  position: relative;
 }
 
 .child-list-item {
   padding-left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.child-balance {
+  position: absolute;
+  right: 0;
+  z-index: 5;
 }
 
 .action-button {
