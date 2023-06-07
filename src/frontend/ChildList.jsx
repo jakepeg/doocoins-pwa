@@ -136,6 +136,8 @@ function ChildList() {
                   const actionsElement = document.getElementById(`:r${index}:`)
                   if (!isItemOpen && actionsElement) {
                     actionsElement.style.display = 'none'
+                  } else if (isItemOpen && actionsElement) {
+                    actionsElement.style.display = 'block'
                   }
                 }
 
