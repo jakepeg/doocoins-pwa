@@ -1,6 +1,6 @@
 import React from 'react'
 import SwipeToRevealActions from 'react-swipe-to-reveal-actions'
-import EditIcon from '/edit.svg'
+import EditIcon from '/pencil.svg'
 import DeleteIcon from '/delete.svg'
 
 const ChildItem = ({ child, handleUpdateOpenItemId, openItemId, index }) => {
