@@ -90,6 +90,8 @@ main {
 
 .edit img, .delete img {
   padding: 6px;
+  width: 24px;
+  height: auto;
 }
 
 .delete {
