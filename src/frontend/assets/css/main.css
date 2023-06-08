@@ -85,7 +85,11 @@ main {
 }
 
 .edit {
-  background-color: lightskyblue;
+  background-color: #139EAA;
+}
+
+.edit img, .delete img {
+  padding: 6px;
 }
 
 .delete {
@@ -101,13 +105,19 @@ main {
   width: 55px;
 }
 
+.form {
+  min-width: 300px;
+  max-width: 400px;
+  width: 100%;
+}
+
 .text-field {
   border: 2px solid #139EAA;
   background-color: #446275;
   border-radius: 6px;
   color: #fff;
   padding: 10px;
-  width: 80%;
+  min-width: 300px;
   font-size: 20px;
   text-align: center; 
 }
@@ -122,7 +132,16 @@ input[type="text"]::placeholder {
   border-radius: 6px;
   color: #fff;
   padding: 10px;
-  width: 80%;
+  width: 100%;
   font-size: 20px;
   cursor: pointer;
+}
+
+.rstra-action-button {
+  min-width: auto !important;
+  height: auto !important;
+}
+
+.rstra-actions-container div {
+  height: auto !important;
 }

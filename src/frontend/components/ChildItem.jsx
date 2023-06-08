@@ -1,5 +1,7 @@
 import React from 'react'
 import SwipeToRevealActions from 'react-swipe-to-reveal-actions'
+import EditIcon from '/edit.svg'
+import DeleteIcon from '/delete.svg'
 
 const ChildItem = ({ child, handleUpdateOpenItemId, openItemId, index }) => {
   const [showBalance, setShowBalance] = React.useState(true)
@@ -29,7 +31,7 @@ const ChildItem = ({ child, handleUpdateOpenItemId, openItemId, index }) => {
     {
       content: (
         <div className='action-btn edit'>
-          <span>EDIT</span>
+          <img src={EditIcon} alt="edit" />
         </div>
       ),
       onClick: () => handleUpdate(id)
@@ -37,7 +39,7 @@ const ChildItem = ({ child, handleUpdateOpenItemId, openItemId, index }) => {
     {
       content: (
         <div className='action-btn delete'>
-          <span>DELETE</span>
+          <img src={DeleteIcon} alt="delete" />
         </div>
       ),
       onClick: () => handleDelete(id)
@@ -60,7 +62,7 @@ const ChildItem = ({ child, handleUpdateOpenItemId, openItemId, index }) => {
       {showBalance && <div className='child-balance'>{child.balance}</div>}
         <SwipeToRevealActions
           actionButtons={getActions(child.id)}
-          actionButtonMinWidth={70}
+          actionButtonMinWidth={120}
           containerStyle={swipeContainerStyles}
           hideDotsButton={true}
           onOpen={() => toggleBalance(true)}
