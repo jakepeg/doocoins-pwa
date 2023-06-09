@@ -1,169 +1,241 @@
-import React from 'react'
-import { useAuth } from './use-auth-client'
-import SwipeToRevealActions from 'react-swipe-to-reveal-actions'
-import { set, get } from 'idb-keyval'
-import AddChild from './components/AddChild'
-import ChildItem from './components/ChildItem'
+import React from "react";
+import { useAuth } from "./use-auth-client";
+import SwipeToRevealActions from "react-swipe-to-reveal-actions";
+import { set, get } from "idb-keyval";
+import AddChild from "./components/AddChild";
+import ChildItem from "./components/ChildItem";
+import modelStyles from "./components/popup/confirmation_popup.module.css";
+import ConfirmationPopup from "./components/popup/ConfirmationPopup";
 
 function ChildList() {
-  const [actor, setActor] = React.useState(null)
-  const [children, setChildren] = React.useState(null)
-  const [newChild, setNewChild] = React.useState(null)
-  const [openItemId, setOpenItemId] = React.useState(null)
+  const [actor, setActor] = React.useState(null);
+  const [children, setChildren] = React.useState(null);
+  const [newChild, setNewChild] = React.useState(null);
+  const [openItemId, setOpenItemId] = React.useState(null);
+  const [showPopup, setShowPopup] = React.useState({
+    delete: false,
+    edit: false
+  });
+  const [selectedChild, setSelectedChild] = React.useState(null);
 
   const initActor = () => {
-    import('../declarations/backend').then((module) => {
-      const actor = module.createActor(module.canisterId, {})
-      setActor(actor)
-    })
-  }
+    import("../declarations/backend").then((module) => {
+      const actor = module.createActor(module.canisterId, {});
+      setActor(actor);
+    });
+  };
 
   React.useEffect(() => {
-    initActor()
-  }, [])
+    initActor();
+  }, []);
 
   React.useEffect(() => {
-    getChildren()
-  }, [actor])
+    getChildren();
+  }, [actor]);
 
   function getChildren() {
     // Check if IndexedDB already has childList values before calling IC
     // set("balance-2vxsx-fae-3", 100);
-    get('childList').then(async (val) => {
+    get("childList").then(async (val) => {
       if (val === undefined) {
         actor?.getChildren().then(async (returnedChilren) => {
-          if ('ok' in returnedChilren) {
-            const children = Object.values(returnedChilren)
+          if ("ok" in returnedChilren) {
+            const children = Object.values(returnedChilren);
             const updatedChildrenData = await Promise.all(
               children[0].map(async (child) => {
-                const balance = await getBalance(child.id)
+                const balance = await getBalance(child.id);
                 return {
                   ...child,
                   balance: balance
-                }
+                };
               })
-            )
+            );
 
-            setChildren(updatedChildrenData)
-            set('childList', updatedChildrenData)
+            setChildren(updatedChildrenData);
+            set("childList", updatedChildrenData);
           } else {
-            console.error(returnedChilren.err)
+            console.error(returnedChilren.err);
           }
-        })
+        });
       } else {
         const updatedChildrenData = await Promise.all(
           val.map(async (child) => {
-            const balance = await getBalance(child.id)
+            const balance = await getBalance(child.id);
             return {
               ...child,
               balance: balance
-            }
+            };
           })
-        )
-        setChildren(updatedChildrenData)
+        );
+        setChildren(updatedChildrenData);
       }
-    })
+    });
   }
 
   async function getBalance(childID) {
     return new Promise((resolve, reject) => {
-      let bal
-      get('balance-' + childID)
+      let bal;
+      get("balance-" + childID)
         .then((val) => {
           if (val === undefined) {
             actor?.getBalance(childID).then((returnedBalance) => {
-              set('balance-' + childID, parseInt(returnedBalance))
-              resolve(returnedBalance)
-            })
+              set("balance-" + childID, parseInt(returnedBalance));
+              resolve(returnedBalance);
+            });
           } else {
-            bal = val
-            resolve(bal)
+            bal = val;
+            resolve(bal);
           }
         })
         .catch((error) => {
-          reject(error)
-        })
-    })
+          reject(error);
+        });
+    });
   }
 
   function handleAddChild(e) {
-    e.preventDefault()
-    const inputs = e.target.querySelectorAll('input')
-    const child_name = e.target.querySelector('input[name="child_name"]').value
-    const child_object = { name: child_name }
+    e.preventDefault();
+    const inputs = e.target.querySelectorAll("input");
+    const child_name = e.target.querySelector('input[name="child_name"]').value;
+    const child_object = { name: child_name };
     // API call addChild
     actor?.addChild(child_object).then((returnedAddChild) => {
-      if ('ok' in returnedAddChild) {
-        setNewChild(child_name)
+      if ("ok" in returnedAddChild) {
+        setNewChild(child_name);
         // update indexedDB childList
         // update children variable with setChildren
         inputs.forEach((input) => {
-          input.value = ''
-        })
+          input.value = "";
+        });
       } else {
-        console.error(returnedAddChild.err)
+        console.error(returnedAddChild.err);
       }
-    })
-    return false
+    });
+    return false;
   }
 
-  const { whoamiActor, logout } = useAuth()
+  const { whoamiActor, logout } = useAuth();
 
   const me = async () => {
-    const whoami = await whoamiActor.whoami()
-    console.log(whoami)
+    const whoami = await whoamiActor.whoami();
+    console.log(whoami);
+  };
+
+  const handleTogglePopup = (isOpen, child, popup) => {
+    setSelectedChild(child);
+    setShowPopup((prevState) => ({ ...prevState, [popup]: isOpen }));
+  };
+
+  const handleCloseDeletePopup = () => {
+    setShowPopup((prevState) => ({ ...prevState, ["delete"]: false }))
+  }
+
+  const handleCloseEditPopup = () => {
+    setShowPopup((prevState) => ({ ...prevState, ["edit"]: false }))
   }
 
   return (
-    <div className='container'>
-      <button className="logout" id='logout' onClick={logout}>
-        logout
-      </button>
+    <>
+      {showPopup.delete && (
+        <ConfirmationPopup handleClosePopup={handleCloseDeletePopup}>
+          <h4 className={modelStyles.popup_title}>
+            Delete {selectedChild.name}
+          </h4>
+          <button
+            className={modelStyles.popup_delete_action_btn}
+            onClick={handleCloseDeletePopup}
+          >
+            DELETE
+          </button>
+          <p
+            className={modelStyles.popup_cancel_action_btn}
+            onClick={handleCloseDeletePopup}
+          >
+            cancel
+          </p>
+        </ConfirmationPopup>
+      )}
+      {showPopup.edit && (
+        <ConfirmationPopup handleClosePopup={handleCloseEditPopup}>
+          <h4 className={modelStyles.popup_title}>Edit {selectedChild.name}</h4>
+          <input
+            type="text"
+            name="child_name"
+            style={{ marginTop: "18px" }}
+            className={`text-field ${modelStyles.popup_input_edit_field}`}
+            value={selectedChild.name}
+          />
+          <button
+            className={modelStyles.popup_edit_action_btn}
+            onClick={handleCloseEditPopup}
+          >
+            EDIT
+          </button>
+          <p
+            className={modelStyles.popup_cancel_action_btn}
+            onClick={handleCloseEditPopup}
+          >
+            cancel
+          </p>
+        </ConfirmationPopup>
+      )}
+      <div
+        className={`container ${
+          (showPopup.delete || showPopup.edit) && modelStyles.blur_background
+        }`}
+      >
+        <button className="logout" id="logout" onClick={logout}>
+          logout
+        </button>
 
-      <h2 className="screen-title light">My Children</h2>
-      {/* <button onClick={me}>
+        <h2 className="screen-title light">My Children</h2>
+        {/* <button onClick={me}>
         Me
       </button> */}
 
-      {children ? (
-        <div className='example'>
-          <ul className='child-list'>
-            {children.length > 0 &&
-              children.map((child, index) => {
-                const isItemOpen = openItemId === child.id
-                if (typeof window !== 'undefined') {
-                  // :r0: format from library
-                  const actionsElement = document.getElementById(`:r${index}:`)
-                  if (!isItemOpen && actionsElement) {
-                    actionsElement.style.display = 'none'
-                  } else if (isItemOpen && actionsElement) {
-                    actionsElement.style.display = 'block'
+        {children ? (
+          <div className="example">
+            <ul className="child-list">
+              {children.length > 0 &&
+                children.map((child, index) => {
+                  const isItemOpen = openItemId === child.id;
+                  if (typeof window !== "undefined") {
+                    // :r0: format from library
+                    const actionsElement = document.getElementById(
+                      `:r${index}:`
+                    );
+                    if (!isItemOpen && actionsElement) {
+                      actionsElement.style.display = "none";
+                    } else if (isItemOpen && actionsElement) {
+                      actionsElement.style.display = "block";
+                    }
                   }
-                }
 
-                return (
-                  <ChildItem
-                    child={child}
-                    handleUpdateOpenItemId={setOpenItemId}
-                    openItemId={openItemId}
-                    index={index}
-                    key={child.id}
-                  />
-                )
-              })}
-          </ul>
-        </div>
-      ) : (
-        <p>Loading...</p>
-      )}
+                  return (
+                    <ChildItem
+                      child={child}
+                      handleUpdateOpenItemId={setOpenItemId}
+                      openItemId={openItemId}
+                      index={index}
+                      key={child.id}
+                      handleTogglePopup={handleTogglePopup}
+                    />
+                  );
+                })}
+            </ul>
+          </div>
+        ) : (
+          <p>Loading...</p>
+        )}
 
-      <h2 className="screen-title light">Add a child</h2>
-      <AddChild
-        handleAddChild={handleAddChild}
-        // childID = {selectedChild}
-      />
-    </div>
-  )
+        <h2 className="screen-title light">Add a child</h2>
+        <AddChild
+          handleAddChild={handleAddChild}
+          // childID = {selectedChild}
+        />
+      </div>
+    </>
+  );
 }
 
-export default ChildList
+export default ChildList;
