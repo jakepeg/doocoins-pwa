@@ -1,7 +1,7 @@
 import React from "react";
 import { useAuth } from "./use-auth-client";
 import SwipeToRevealActions from "react-swipe-to-reveal-actions";
-import { set, get } from "idb-keyval";
+import { set, get, del } from "idb-keyval";
 import AddChild from "./components/AddChild";
 import ChildItem from "./components/ChildItem";
 import modelStyles from "./components/popup/confirmation_popup.module.css";
@@ -34,10 +34,9 @@ function ChildList() {
   }, [actor]);
 
   function getChildren() {
-    // Check if IndexedDB already has childList values before calling IC
-    // set("balance-2vxsx-fae-3", 100);
     get("childList").then(async (val) => {
       if (val === undefined) {
+        console.log("getting child list from backend");
         actor?.getChildren().then(async (returnedChilren) => {
           if ("ok" in returnedChilren) {
             const children = Object.values(returnedChilren);
@@ -54,10 +53,11 @@ function ChildList() {
             setChildren(updatedChildrenData);
             set("childList", updatedChildrenData);
           } else {
-            console.error(returnedChilren.err);
+           console.error(returnedChilren.err);
           }
         });
       } else {
+        console.log(val);
         const updatedChildrenData = await Promise.all(
           val.map(async (child) => {
             const balance = await getBalance(child.id);
@@ -68,6 +68,7 @@ function ChildList() {
           })
         );
         setChildren(updatedChildrenData);
+        console.log("getting child list from local storeage - idb-keyval");
       }
     });
   }
@@ -93,6 +94,20 @@ function ChildList() {
     });
   }
 
+  // update the childList after adding a new child
+  async function updateChildList(returnedAddChild) {
+    try {
+      const childList = await get('childList');
+      const updatedChildList = { ...childList, ...returnedAddChild };
+      await set('childList', updatedChildList);
+      setChildren(updatedChildList);
+      console.log('New item added to childList:', updatedChildList);
+    } catch (error) {
+      console.error('Error adding item to childList:', error);
+    }
+  }
+
+  // add a new child
   function handleAddChild(e) {
     e.preventDefault();
     console.log("add child clicked");
@@ -103,11 +118,14 @@ function ChildList() {
     actor?.addChild(child_object).then((returnedAddChild) => {
       if ("ok" in returnedAddChild) {
         setNewChild(child_name);
-        // update indexedDB childList
+        updateChildList(returnedAddChild);
         // update children variable with setChildren
+        // same with balance
+        // re-run getChildren()
         inputs.forEach((input) => {
           input.value = "";
         });
+        console.log(returnedAddChild);
       } else {
         console.error(returnedAddChild.err);
       }
@@ -116,6 +134,12 @@ function ChildList() {
   }
 
   const { whoamiActor, logout } = useAuth();
+
+  function handleLogout() {
+    console.log("handleLogout called");
+    del("childList");
+    logout();
+  }
 
   const me = async () => {
     const whoami = await whoamiActor.whoami();
@@ -185,7 +209,7 @@ function ChildList() {
           (showPopup.delete || showPopup.edit) && modelStyles.blur_background
         }`}
       >
-        <button className="logout" id="logout" onClick={logout}>
+        <button className="logout" id="logout" onClick={handleLogout}>
           logout
         </button>
 
