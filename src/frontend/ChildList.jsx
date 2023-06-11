@@ -36,20 +36,19 @@ function ChildList() {
   function getChildren() {
     get("childList").then(async (val) => {
       if (val === undefined) {
-        console.log("getting child list from backend");
         actor?.getChildren().then(async (returnedChilren) => {
           if ("ok" in returnedChilren) {
             const children = Object.values(returnedChilren);
             const updatedChildrenData = await Promise.all(
               children[0].map(async (child) => {
                 const balance = await getBalance(child.id);
+                // console.log(`FIRST balance`, balance)
                 return {
                   ...child,
                   balance: balance
                 };
               })
             );
-
             setChildren(updatedChildrenData);
             set("childList", updatedChildrenData);
           } else {
@@ -57,10 +56,10 @@ function ChildList() {
           }
         });
       } else {
-        console.log(val);
         const updatedChildrenData = await Promise.all(
-          val.map(async (child) => {
+          Object.values(val).map(async (child) => {
             const balance = await getBalance(child.id);
+            // console.log('second balance', balance)
             return {
               ...child,
               balance: balance
@@ -85,6 +84,7 @@ function ChildList() {
             });
           } else {
             bal = val;
+            console.log('the bal', bal)
             resolve(bal);
           }
         })
@@ -99,9 +99,19 @@ function ChildList() {
     try {
       const childList = await get('childList');
       const updatedChildList = { ...childList, ...returnedAddChild };
-      await set('childList', updatedChildList);
-      setChildren(updatedChildList);
-      console.log('New item added to childList:', updatedChildList);
+
+      const updatedChildrenData = await Promise.all(
+        Object.values(updatedChildList).map(async (child) => {
+          const balance = await getBalance(child.id);
+          return {
+            ...child,
+            balance: balance
+          };
+        })
+      );
+
+      await set('childList', updatedChildrenData);
+      setChildren(updatedChildrenData);
     } catch (error) {
       console.error('Error adding item to childList:', error);
     }
@@ -110,7 +120,6 @@ function ChildList() {
   // add a new child
   function handleAddChild(e) {
     e.preventDefault();
-    console.log("add child clicked");
     const inputs = e.target.querySelectorAll("input");
     const child_name = e.target.querySelector('input[name="child_name"]').value;
     const child_object = { name: child_name };
@@ -125,7 +134,6 @@ function ChildList() {
         inputs.forEach((input) => {
           input.value = "";
         });
-        console.log(returnedAddChild);
       } else {
         console.error(returnedAddChild.err);
       }
@@ -136,7 +144,6 @@ function ChildList() {
   const { whoamiActor, logout } = useAuth();
 
   function handleLogout() {
-    console.log("handleLogout called");
     del("childList");
     logout();
   }
