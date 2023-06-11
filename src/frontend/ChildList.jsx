@@ -95,6 +95,7 @@ function ChildList() {
 
   function handleAddChild(e) {
     e.preventDefault();
+    console.log("add child clicked");
     const inputs = e.target.querySelectorAll("input");
     const child_name = e.target.querySelector('input[name="child_name"]').value;
     const child_object = { name: child_name };

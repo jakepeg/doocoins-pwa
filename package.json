@@ -18,6 +18,7 @@
     "generate": "dfx generate backend"
   },
   "devDependencies": {
+    "@vitejs/plugin-react": "^4.0.0",
     "assert": "2.0.0",
     "buffer": "6.0.3",
     "dotenv": "^16.0.3",

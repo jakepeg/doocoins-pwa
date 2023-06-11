@@ -140,10 +140,11 @@ input[type="text"]::placeholder {
 }
 
 .rstra-action-button {
-  min-width: auto !important;
-  height: auto !important;
+  min-width: 70px !important;
+  height: 35px !important;
+  margin-left: 4px !important;
 }
 
 .rstra-actions-container div {
-  height: auto !important;
+  height: 35px !important;
 }
