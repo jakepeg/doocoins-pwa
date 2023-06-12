@@ -42,6 +42,7 @@ function ChildList() {
             const updatedChildrenData = await Promise.all(
               children[0].map(async (child) => {
                 const balance = await getBalance(child.id);
+                // console.log(`FIRST balance`, balance)
                 return {
                   ...child,
                   balance: balance
@@ -58,6 +59,7 @@ function ChildList() {
         const updatedChildrenData = await Promise.all(
           Object.values(val).map(async (child) => {
             const balance = await getBalance(child.id);
+            // console.log('second balance', balance)
             return {
               ...child,
               balance: balance
@@ -65,6 +67,7 @@ function ChildList() {
           })
         );
         setChildren(updatedChildrenData);
+        console.log("getting child list from local storeage - idb-keyval");
       }
     });
   }
@@ -147,6 +150,7 @@ function ChildList() {
 
   const me = async () => {
     const whoami = await whoamiActor.whoami();
+    console.log(whoami);
   };
 
   const handleTogglePopup = (isOpen, child, popup) => {
@@ -208,10 +212,14 @@ function ChildList() {
         </ConfirmationPopup>
       )}
       <div
-        className={`${
-          (showPopup.delete || showPopup.edit) ? modelStyles.blur_background : undefined
+        className={`container ${
+          (showPopup.delete || showPopup.edit) && modelStyles.blur_background
         }`}
       >
+        <button className="logout" id="logout" onClick={handleLogout}>
+          X
+        </button>
+
         <h2 className="screen-title light">My Children</h2>
         {/* <button onClick={me}>
         Me
