@@ -49,11 +49,15 @@ export const useAuthClient = (options = defaultOptions) => {
   const [identity, setIdentity] = useState(null);
   const [principal, setPrincipal] = useState(null);
   const [whoamiActor, setWhoamiActor] = useState(null);
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     // Initialize AuthClient
+    setIsLoading(true)
     AuthClient.create(options.createOptions).then(async (client) => {
       updateClient(client);
+    }).finally(() => {
+      setIsLoading(false)
     });
   }, []);
 
@@ -100,6 +104,7 @@ export const useAuthClient = (options = defaultOptions) => {
     identity,
     principal,
     whoamiActor,
+    isLoading
   };
 };
 

@@ -37,10 +37,14 @@
     "last 2 edge version"
   ],
   "dependencies": {
+    "@chakra-ui/react": "^2.7.0",
     "@dfinity/agent": "^0.15.6",
     "@dfinity/auth-client": "^0.15.6",
     "@dfinity/candid": "^0.15.6",
     "@dfinity/principal": "^0.15.6",
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
+    "framer-motion": "^10.12.16",
     "idb-keyval": "^6.2.1",
     "lit-html": "^2.4.0",
     "pinia": "^2.0.36",
