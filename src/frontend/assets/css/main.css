@@ -1,6 +1,6 @@
 body {
   font-family: sans-serif;
-  background: #0B334D;
+  background: #000;
 }
 
 .rstra-content-container, .rstra-container {
@@ -27,9 +27,11 @@ main {
 }
 
 .container {
+  background: #0B334D;
   padding: 3.5rem 2.5rem 2rem 2.5rem;
   max-width: 365px;
   min-width: 300px;
+  min-height: 700px;
   flex: 0 0 auto;
   display: flex;
   flex-direction: column;
