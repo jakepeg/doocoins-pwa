@@ -1,8 +1,13 @@
 import React from "react";
-import { useAuth } from "./use-auth-client";
+import { useAuth } from "../use-auth-client";
+import { Navigate } from "react-router-dom";
 
 function LoggedOut() {
-  const { login } = useAuth();
+  const { login, isAuthenticated } = useAuth();
+
+  if (isAuthenticated) {
+    return <Navigate to="/" replace />;
+  }
 
   return (
     <div className="container">
