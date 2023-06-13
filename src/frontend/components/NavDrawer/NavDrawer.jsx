@@ -59,28 +59,7 @@ function NavDrawer() {
               <NavLink to="/">
                 <Link onClick={onClose}>
                   <Text fontSize="xl" color="#0B334D" fontWeight={600}>
-                    Child List
-                  </Text>
-                </Link>
-              </NavLink>
-              <NavLink to="/home">
-                <Link onClick={onClose}>
-                  <Text fontSize="xl" color="#0B334D" fontWeight={600}>
-                    Home
-                  </Text>
-                </Link>
-              </NavLink>
-              <NavLink to="/tasks">
-                <Link onClick={onClose}>
-                  <Text fontSize="xl" color="#0B334D" fontWeight={600}>
-                    Tasks
-                  </Text>
-                </Link>
-              </NavLink>
-              <NavLink to="/rewards">
-                <Link onClick={onClose}>
-                  <Text fontSize="xl" color="#0B334D" fontWeight={600}>
-                    Rewards
+                    My Children
                   </Text>
                 </Link>
               </NavLink>
