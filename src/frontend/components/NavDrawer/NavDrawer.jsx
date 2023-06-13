@@ -84,6 +84,20 @@ function NavDrawer() {
                   </Text>
                 </Link>
               </NavLink>
+              <NavLink to="/about">
+                <Link onClick={onClose}>
+                  <Text fontSize="xl" color="#0B334D" fontWeight={600}>
+                    About
+                  </Text>
+                </Link>
+              </NavLink>
+              <NavLink to="/help">
+                <Link onClick={onClose}>
+                  <Text fontSize="xl" color="#0B334D" fontWeight={600}>
+                    Help
+                  </Text>
+                </Link>
+              </NavLink>
 
               <Divider />
               <Link onClick={logout}>
