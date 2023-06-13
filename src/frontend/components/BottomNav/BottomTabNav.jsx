@@ -34,7 +34,8 @@ function BottomTabNav() {
           zIndex={1}
           height={"auto"}
           margin={"0 auto"}
-          backgroundColor={"#0B334D"}
+          // backgroundColor={"#0B334D"}
+          backgroundColor={"#ffffff"}
         >
           <CustomTabs />
         </Flex>
@@ -80,7 +81,7 @@ function CustomTabs() {
     <Tabs
       style={{
         width: "100%",
-        padding: "20px"
+        padding: "0"
       }}
     >
       <TabList
@@ -89,8 +90,11 @@ function CustomTabs() {
           justifyContent: "space-between",
           alignItems: "center",
           border: "none",
-          maxWidth: "400px",
-          margin: "0 auto"
+          width: "100%",
+          maxWidth: "768px",
+          minWidth: "320px",
+          margin: "0 auto",
+          backgroundColor: "#0B334D"
         }}
       >
         <CustomTab icon={WalletIcon} href="/wallet">
