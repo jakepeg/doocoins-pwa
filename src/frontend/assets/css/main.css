@@ -20,6 +20,11 @@ main {
   text-align: center;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  margin-bottom: 20px;
+}
+
+.push-30 {
+  margin-bottom: 30px;
 }
 
 .light {
@@ -28,7 +33,7 @@ main {
 
 .container {
   background: #0B334D;
-  padding: 3.5rem 2.5rem 2rem 2.5rem;
+  padding: 1rem;
   max-width: 365px;
   min-width: 300px;
   min-height: 100%;
@@ -39,7 +44,6 @@ main {
 
 @media (min-width: 512px) {
   .container {
-    border: 2px var(--grey-100) solid;
     border-radius: 4px;
   }
 }

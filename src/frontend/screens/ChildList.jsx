@@ -252,7 +252,7 @@ function ChildList() {
           <p>Loading...</p>
         )}
 
-        <h2 className="screen-title light">Add a child</h2>
+        <h2 className="screen-title light push-30">Add a child</h2>
         <AddChild
           handleAddChild={handleAddChild}
           // childID = {selectedChild}
