@@ -1,7 +1,7 @@
 import React from "react";
 import SwipeToRevealActions from "react-swipe-to-reveal-actions";
-import EditIcon from "/pencil.svg";
-import DeleteIcon from "/delete.svg";
+import EditIcon from "../assets/images/pencil.svg";
+import DeleteIcon from "../assets/images/delete.svg";
 
 const ChildItem = ({
   child,

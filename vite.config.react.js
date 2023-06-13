@@ -3,7 +3,8 @@ import { defineConfig } from "vite";
 import { VitePWA } from "vite-plugin-pwa";
 import EnvironmentPlugin from "vite-plugin-environment";
 import dotenv from "dotenv";
-import reactRefresh from '@vitejs/plugin-react'
+import reactRefresh from "@vitejs/plugin-react";
+import svgr from "vite-plugin-svgr";
 
 dotenv.config();
 
@@ -70,9 +71,10 @@ export default defineConfig({
     EnvironmentPlugin("all", { prefix: "CANISTER_" }),
     EnvironmentPlugin("all", { prefix: "DFX_" }),
     EnvironmentPlugin({ BACKEND_CANISTER_ID: "" }),
-    VitePWA(manifestForPlugin)
+    VitePWA(manifestForPlugin),
+    svgr()
   ]
-}); 
+});
 
 // import path from "path";
 // import { defineConfig } from "vite";

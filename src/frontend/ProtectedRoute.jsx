@@ -2,6 +2,7 @@ import { Navigate } from "react-router-dom";
 import { useAuth } from "./use-auth-client";
 import NavDrawer from "./components/NavDrawer/NavDrawer";
 import { Box } from "@chakra-ui/react";
+import BottomTabNav from "./components/BottomNav/BottomTabNav";
 
 function ProtectedRoute({ children }) {
   const { isAuthenticated, isLoading } = useAuth();
@@ -14,6 +15,7 @@ function ProtectedRoute({ children }) {
     <Box className="container" gap={5}>
       <NavDrawer />
       {children}
+      <BottomTabNav />
     </Box>
   );
 }

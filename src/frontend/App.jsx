@@ -11,6 +11,8 @@ import Wallet from "./screens/Wallet";
 import NoMatch from "./screens/NoMatch";
 import ProtectedRoute from "./ProtectedRoute";
 import { ChakraProvider } from "@chakra-ui/react";
+import About from "./screens/About";
+import Help from "./screens/Help";
 
 function App() {
   return (
@@ -54,6 +56,22 @@ function App() {
             element={
               <ProtectedRoute>
                 <Wallet />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/about"
+            element={
+              <ProtectedRoute>
+                <About />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/help"
+            element={
+              <ProtectedRoute>
+                <Help />
               </ProtectedRoute>
             }
           />
