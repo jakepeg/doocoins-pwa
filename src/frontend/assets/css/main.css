@@ -28,7 +28,16 @@ main {
 }
 
 .light {
-  color: #fff;
+  color: #F0F7FC;
+}
+
+.light-panel {
+  background-color: #F0F7FC;
+  min-height: 100%;
+}
+
+.dark {
+  color: #0B334D;
 }
 
 .container {
@@ -83,6 +92,31 @@ main {
   position: absolute;
   right: 0;
   z-index: 5;
+}
+
+.dc-img-big {
+  display: inline-block;
+}
+
+.dc-img-small {
+  display: inline-block;
+  width: 20px;
+}
+
+.balance {
+  text-align: center;
+  font-size: 68px;
+  font-weight: 300;
+  color: #ffffff;
+}
+
+.name {
+  text-align: center;
+  font-size: 40px;
+  font-weight: 300;
+  color: #ffffff;
+  margin-top: -30px;
+  margin-bottom: -30px;
 }
 
 .action-button {

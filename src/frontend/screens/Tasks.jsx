@@ -1,15 +1,15 @@
 import * as React from "react";
+import { get } from "idb-keyval";
+import Balance from "../components/Balance";
 import LoadingSpinner from "../components/LoadingSpinner";
-import play from '../assets/images/play.svg';
-import dc from '../assets/images/dc.svg';
+import dc from "../assets/images/dc-thin.svg";
 
 const Tasks = () => {
   const [actor, setActor] = React.useState(null);
   const [tasks, setTasks] = React.useState({});
   const [isLoading, setIsLoading] = React.useState(false);
-
-  // let child = get("selectedChild")
-  let child = "2vxsx-fae-1";
+  // const child = get("selectedChild")
+  const child = "2vxsx-fae-1";
 
   function getTasks() {
     if (child) {
@@ -29,7 +29,6 @@ const Tasks = () => {
 }
 
 // add swiper - delete, edit, approve tasks
-
 function handleTaskComplete(task_id) {
   let r = window.confirm("Is the task complete?");
   if (r == true) {
@@ -48,8 +47,6 @@ function handleTaskComplete(task_id) {
   }
 }
 
-
-
 const initActor = () => {
   import("../../declarations/backend").then((module) => {
     const actor = module.createActor(module.canisterId, {});
@@ -66,16 +63,21 @@ React.useEffect(() => {
 }, [actor]);
 
   return (
-      <>
+<>
+    <Balance />
+
+      <div className="light-panel">
+      <h2 className="screen-title dark">Child name's Tasks (add button)</h2>
             {isLoading ? <LoadingSpinner /> : null}
             {tasks.length > 0 &&
                 tasks[0].map(task => (
-                  <div role="button" className="row" key={parseInt(task.id)} onClick={() => handleTaskComplete(parseInt(task.id))} onKeyDown={() => handleTaskComplete(parseInt(task.id))}>
-                    <div className="col-large"><p className="col-p">{task.name}</p></div>
-                    <div className="col-small"><p className="col-p"><img src={dc} className="dc-img" alt="DooCoins symbol" />{parseInt(task.value)}</p></div>
+                  <div role="button" key={parseInt(task.id)} onClick={() => handleTaskComplete(parseInt(task.id))} onKeyDown={() => handleTaskComplete(parseInt(task.id))}>
+                    <div><p >{task.name}</p></div>
+                    <div><p><img src={dc} className="dc-img-small" alt="DooCoins symbol" />{parseInt(task.value)}</p></div>
                   </div> 
                 ))
             }
+      </div>
       </>
   );
 };
