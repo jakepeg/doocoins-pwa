@@ -8,7 +8,9 @@ const TaskList = (props) => {
   const [tasks, setTasks] = React.useState({});
   const [isLoading, setIsLoading] = React.useState(false);
 
-  function getTasks(child) {
+  // child = get("childList")
+
+  function getTasks() {
     if (child) {
     console.log("getTasks called for child id: "+child);
     setIsLoading(true);
