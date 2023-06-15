@@ -3,7 +3,7 @@ import { useAuth } from "../use-auth-client";
 import { Navigate } from "react-router-dom";
 import { Box, Button, Link, Text } from "@chakra-ui/react";
 import ICBadge from "../assets/images/ic-badge.svg";
-import DCIcon from "../assets/images/dc-white.svg";
+import logo from "../assets/images/logo.svg";
 
 function LoggedOut() {
   const { login, isAuthenticated, isLoading } = useAuth();
@@ -31,7 +31,7 @@ function LoggedOut() {
         px={10}
         style={{ width: "100%" }}
       >
-        <img src={DCIcon} alt="DooCoins" />
+        <img className="logo" src={logo} alt="DooCoins" />
         <Text fontSize="3xl" color={"#fff"}>
           DooCoins
         </Text>
