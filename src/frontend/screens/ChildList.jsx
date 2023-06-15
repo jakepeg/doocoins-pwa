@@ -34,6 +34,8 @@ function ChildList() {
   }, [actor]);
 
   function getChildren() {
+    del("selectedChild") 
+    del("selectedChildName") 
     get("childList").then(async (val) => {
       if (val === undefined) {
         actor?.getChildren().then(async (returnedChilren) => {

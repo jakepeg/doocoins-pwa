@@ -92,6 +92,12 @@ main {
   position: absolute;
   right: 0;
   z-index: 5;
+  display: flex;
+  align-items: center;
+}
+
+.balance-dc-icon {
+  transform: translateY(-2px);
 }
 
 .list-item {
