@@ -17,7 +17,7 @@ const WalletIcon = ({ activeColor, width }) => {
         height="27"
         rx="5.5"
         stroke={activeColor || "white"}
-        stroke-width="3"
+        strokeWidth="3"
       />
       <circle cx="23.5" cy="15.5" r="1.5" fill={activeColor || "white"} />
     </svg>

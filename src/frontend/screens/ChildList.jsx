@@ -81,7 +81,6 @@ function ChildList() {
             });
           } else {
             bal = val;
-            console.log('the bal', bal)
             resolve(bal);
           }
         })

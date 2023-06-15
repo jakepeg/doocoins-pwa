@@ -49,7 +49,8 @@ export default BottomTabNav;
 function CustomTabs() {
   const CustomTab = React.forwardRef((props, ref) => {
     // 1. Reuse the `useTab` hook
-    const tabProps = useTab({ ...props, ref });
+    const { icon, ...restProps } = props;
+    const tabProps = useTab({ ...restProps, ref });
     const isSelected = !!tabProps["aria-selected"];
 
     // 2. Hook into the Tabs `size`, `variant`, props

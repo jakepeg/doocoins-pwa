@@ -17,7 +17,7 @@ const TasksIcon = ({ activeColor, width }) => {
         height="27"
         rx="5.5"
         stroke={activeColor || "white"}
-        stroke-width="3"
+        strokeWidth="3"
       />
       <circle cx="8.5" cy="9.5" r="1.5" fill={activeColor || "white"} />
       <circle cx="8.5" cy="15.5" r="1.5" fill={activeColor || "white"} />
@@ -28,8 +28,8 @@ const TasksIcon = ({ activeColor, width }) => {
         x2="21.5"
         y2="9.5"
         stroke={activeColor || "white"}
-        stroke-width="3"
-        stroke-linecap="round"
+        strokeWidth="3"
+        strokeLinecap="round"
       />
       <line
         x1="13.5"
@@ -37,8 +37,8 @@ const TasksIcon = ({ activeColor, width }) => {
         x2="21.5"
         y2="15.5"
         stroke={activeColor || "white"}
-        stroke-width="3"
-        stroke-linecap="round"
+        strokeWidth="3"
+        strokeLinecap="round"
       />
       <line
         x1="13.5"
@@ -46,8 +46,8 @@ const TasksIcon = ({ activeColor, width }) => {
         x2="21.5"
         y2="21.5"
         stroke={activeColor || "white"}
-        stroke-width="3"
-        stroke-linecap="round"
+        strokeWidth="3"
+        strokeLinecap="round"
       />
     </svg>
   );
