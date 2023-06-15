@@ -68,7 +68,6 @@ main {
 
 .child-list {
   width: 100%;
-  max-width: 400px;
   list-style-type: none;
   margin: 0;
   padding: 0;
@@ -169,7 +168,6 @@ main {
 
 .form {
   min-width: 300px;
-  max-width: 400px;
   width: 100%;
 }
 
@@ -180,6 +178,7 @@ main {
   color: #fff;
   padding: 10px;
   min-width: 300px;
+  width: 100%;
   font-size: 20px;
   text-align: center; 
 }

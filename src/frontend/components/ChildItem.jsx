@@ -2,6 +2,9 @@ import React from "react";
 import SwipeToRevealActions from "react-swipe-to-reveal-actions";
 import EditIcon from "../assets/images/pencil.svg";
 import DeleteIcon from "../assets/images/delete.svg";
+import { Box } from "@chakra-ui/react";
+import { Link } from "react-router-dom";
+import { set } from "idb-keyval";
 
 const ChildItem = ({
   child,
@@ -62,10 +65,19 @@ const ChildItem = ({
     paddingLeft: "1rem"
   };
 
+  const handleSelectChild = () => {
+    set("selectedChild", child.id) 
+    set("selectedChildName", child.name) 
+  }
+
   return (
     <li className="child-list-item">
-      <div style={{ flex: 1 }}>{child.name}</div>
-      {showBalance && <div className="child-balance">{child.balance}</div>}
+      <Link to="/wallet">
+        <Box onClick={handleSelectChild} display="flex" justifyContent={"space-between"} alignItems={"center"}>
+          <Box minWidth={'300px'} textAlign={'left'}>{child.name}</Box>
+          {showBalance && <div className="child-balance">{child.balance}</div>}
+        </Box>
+      </Link>
       <SwipeToRevealActions
         actionButtons={getActions(child.id)}
         actionButtonMinWidth={120}
