@@ -240,7 +240,7 @@ function ChildList() {
                       handleUpdateOpenItemId={setOpenItemId}
                       openItemId={openItemId}
                       index={index}
-                      key={child.id}
+                      key={child.id + index.toString()}
                       handleTogglePopup={handleTogglePopup}
                     />
                   );
