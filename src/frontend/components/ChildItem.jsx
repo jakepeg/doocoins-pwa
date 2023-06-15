@@ -74,7 +74,7 @@ const ChildItem = ({
     <li className="child-list-item">
       <Link to="/wallet">
         <Box onClick={handleSelectChild} display="flex" justifyContent={"space-between"} alignItems={"center"}>
-          <Box minWidth={'300px'} textAlign={'left'}>{child.name}</Box>
+          <Box textAlign={'left'}>{child.name}</Box>
           {showBalance && <div className="child-balance">{child.balance}</div>}
         </Box>
       </Link>

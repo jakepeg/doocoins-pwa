@@ -44,7 +44,7 @@ function ChildList() {
                 const balance = await getBalance(child.id);
                 return {
                   ...child,
-                  balance: balance
+                  balance: parseInt(balance)
                 };
               })
             );
@@ -60,7 +60,7 @@ function ChildList() {
             const balance = await getBalance(child.id);
             return {
               ...child,
-              balance: balance
+              balance: parseInt(balance)
             };
           })
         );
