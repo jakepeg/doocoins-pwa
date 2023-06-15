@@ -2,7 +2,7 @@ import * as React from "react";
 import { get } from "idb-keyval";
 import Balance from "../components/Balance";
 import LoadingSpinner from "../components/LoadingSpinner";
-import dc from "../assets/images/dc-thin.svg";
+import dc from "../assets/images/dc.svg";
 
 const Tasks = () => {
   const [actor, setActor] = React.useState(null);
@@ -67,13 +67,13 @@ React.useEffect(() => {
     <Balance />
 
       <div className="light-panel">
-      <h2 className="screen-title dark">Child name's Tasks (add button)</h2>
+      <h2 className="screen-title dark">Tasks (add button)</h2>
             {isLoading ? <LoadingSpinner /> : null}
             {tasks.length > 0 &&
                 tasks[0].map(task => (
-                  <div role="button" key={parseInt(task.id)} onClick={() => handleTaskComplete(parseInt(task.id))} onKeyDown={() => handleTaskComplete(parseInt(task.id))}>
-                    <div><p >{task.name}</p></div>
-                    <div><p><img src={dc} className="dc-img-small" alt="DooCoins symbol" />{parseInt(task.value)}</p></div>
+                  <div className="list-item" role="button" key={parseInt(task.id)} onClick={() => handleTaskComplete(parseInt(task.id))} onKeyDown={() => handleTaskComplete(parseInt(task.id))}>
+                    <div>{task.name}</div>
+                    <div><img src={dc} className="dc-img-small" alt="DooCoins symbol" />{parseInt(task.value)}</div>
                   </div> 
                 ))
             }
