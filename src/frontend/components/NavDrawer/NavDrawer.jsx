@@ -8,7 +8,7 @@ import {
   Link,
   Stack,
   Text,
-  useDisclosure
+  useDisclosure,
 } from "@chakra-ui/react";
 import { Link as NavLink } from "react-router-dom";
 import React from "react";
@@ -33,7 +33,7 @@ function NavDrawer() {
             role="image"
             aria-label="doocoins"
             src={LogoIcon}
-            style={{ height: "28px", marginLeft: "15px", marginTop: "10px", }}
+            style={{ height: "28px", marginLeft: "15px", marginTop: "10px" }}
           />
         </NavLink>
         <img
@@ -42,7 +42,7 @@ function NavDrawer() {
           ref={btnRef}
           aria-label="open menu"
           src={ProfileIcon}
-          style={{ height: "28px", marginRight: "20px", marginTop: "10px", }}
+          style={{ height: "28px", marginRight: "20px", marginTop: "10px" }}
         />
       </Stack>
       <Drawer
@@ -56,34 +56,40 @@ function NavDrawer() {
           <DrawerCloseButton />
           <DrawerBody>
             <Stack style={{ marginTop: "32px" }} spacing={3}>
-              <NavLink to="/">
-                <Link onClick={onClose}>
-                  <Text fontSize="xl" color="#0B334D" fontWeight={600}>
-                    My Children
-                  </Text>
-                </Link>
-              </NavLink>
-              <NavLink to="/about">
-                <Link onClick={onClose}>
-                  <Text fontSize="xl" color="#0B334D" fontWeight={600}>
-                    About
-                  </Text>
-                </Link>
-              </NavLink>
-              <NavLink to="/help">
-                <Link onClick={onClose}>
-                  <Text fontSize="xl" color="#0B334D" fontWeight={600}>
-                    Help
-                  </Text>
-                </Link>
-              </NavLink>
+              <Text
+                onClick={onClose}
+                fontSize="xl"
+                color="#0B334D"
+                fontWeight={600}
+              >
+                <NavLink to="/">My Children</NavLink>
+              </Text>
+              <Text
+                onClick={onClose}
+                fontSize="xl"
+                color="#0B334D"
+                fontWeight={600}
+              >
+                <NavLink to="/about">About</NavLink>
+              </Text>
+              <Text
+                onClick={onClose}
+                fontSize="xl"
+                color="#0B334D"
+                fontWeight={600}
+              >
+                <NavLink to="/help">Help</NavLink>
+              </Text>
 
               <Divider />
-              <Link onClick={logout}>
-                <Text fontSize="xl" color="#0B334D" fontWeight={600}>
-                  Logout
-                </Text>
-              </Link>
+              <Text
+                onClick={logout}
+                fontSize="xl"
+                color="#0B334D"
+                fontWeight={600}
+              >
+                Logout
+              </Text>
             </Stack>
           </DrawerBody>
         </DrawerContent>
