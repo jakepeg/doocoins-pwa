@@ -48,7 +48,7 @@ export const useAuthClient = (options = defaultOptions) => {
   const [authClient, setAuthClient] = useState(null);
   const [identity, setIdentity] = useState(null);
   const [principal, setPrincipal] = useState(null);
-  const [whoamiActor, setWhoamiActor] = useState(null);
+  const [actor, setActor] = useState(null);
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
@@ -88,7 +88,7 @@ export const useAuthClient = (options = defaultOptions) => {
       },
     });
 
-    setWhoamiActor(actor);
+    setActor(actor);
   }
 
   async function logout() {
@@ -103,7 +103,7 @@ export const useAuthClient = (options = defaultOptions) => {
     authClient,
     identity,
     principal,
-    whoamiActor,
+    actor,
     isLoading
   };
 };

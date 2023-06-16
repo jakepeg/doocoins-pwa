@@ -8,7 +8,7 @@ import modelStyles from "../components/popup/confirmation_popup.module.css";
 import ConfirmationPopup from "../components/popup/ConfirmationPopup";
 
 function ChildList() {
-  const [actor, setActor] = React.useState(null);
+  const {isAuthenticated,actor,logout} = useAuth()
   const [children, setChildren] = React.useState(null);
   const [newChild, setNewChild] = React.useState(null);
   const [openItemId, setOpenItemId] = React.useState(null);
@@ -18,26 +18,19 @@ function ChildList() {
   });
   const [selectedChild, setSelectedChild] = React.useState(null);
 
-  const initActor = () => {
-    import("../../declarations/backend").then((module) => {
-      const actor = module.createActor(module.canisterId, {});
-      setActor(actor);
-    });
-  };
 
-  React.useEffect(() => {
-    initActor();
-  }, []);
 
   React.useEffect(() => {
     getChildren();
   }, [actor]);
 
   function getChildren() {
+    console.log("actor",actor)
     del("selectedChild") 
     del("selectedChildName") 
     get("childList").then(async (val) => {
       if (val === undefined) {
+        console.log("actor",actor)
         actor?.getChildren().then(async (returnedChilren) => {
           if ("ok" in returnedChilren) {
             const children = Object.values(returnedChilren);
@@ -116,12 +109,14 @@ function ChildList() {
   }
 
   // add a new child
-  function handleAddChild(e) {
+  async function handleAddChild(e) {
     e.preventDefault();
     const inputs = e.target.querySelectorAll("input");
     const child_name = e.target.querySelector('input[name="child_name"]').value;
     const child_object = { name: child_name };
     // API call addChild
+    let me = await actor.whoami()
+    console.log("acto in add child",actor,me)
     actor?.addChild(child_object).then((returnedAddChild) => {
       if ("ok" in returnedAddChild) {
         setNewChild(child_name);
@@ -139,16 +134,12 @@ function ChildList() {
     return false;
   }
 
-  const { whoamiActor, logout } = useAuth();
 
   function handleLogout() {
     del("childList");
     logout();
   }
 
-  const me = async () => {
-    const whoami = await whoamiActor.whoami();
-  };
 
   const handleTogglePopup = (isOpen, child, popup) => {
     setSelectedChild(child);
