@@ -149,19 +149,18 @@ main {
   justify-content: center;
 }
 
+.action-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .edit {
   background-color: #139EAA;
 }
 
-.edit img, .delete img {
-  padding: 6px;
-  width: 24px;
-  height: auto;
-}
-
 .delete {
   background-color: #ff3636;
-  color: white;
 }
 
 .logout {
@@ -212,9 +211,12 @@ input[type="text"]::placeholder {
 .rstra-action-button {
   min-width: 70px !important;
   height: 35px !important;
-  margin-left: 4px !important;
 }
 
 .rstra-actions-container div {
   height: 35px !important;
+}
+
+.rstra-actions-container {
+  max-width: 45% !important;
 }

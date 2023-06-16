@@ -1,7 +1,7 @@
 import React from "react";
 import SwipeToRevealActions from "react-swipe-to-reveal-actions";
-import EditIcon from "../assets/images/pencil.svg";
-import DeleteIcon from "../assets/images/delete.svg";
+import { ReactComponent as EditIcon } from "../assets/images/pencil.svg";
+import { ReactComponent as DeleteIcon } from "../assets/images/delete.svg";
 import { Box } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 import { set } from "idb-keyval";
@@ -41,7 +41,7 @@ const ChildItem = ({
     {
       content: (
         <div className="action-btn edit">
-          <img src={EditIcon} alt="edit" />
+          <EditIcon width="22px" height="22px" />
         </div>
       ),
       onClick: () => handleUpdate(id),
@@ -49,7 +49,7 @@ const ChildItem = ({
     {
       content: (
         <div className="action-btn delete">
-          <img src={DeleteIcon} alt="delete" />
+          <DeleteIcon width="22px" height="22px" />
         </div>
       ),
       onClick: () => handleDelete(id),

@@ -52,6 +52,8 @@ function LoggedOut() {
           fontSize={18}
           fontWeight={"medium"}
           py={6}
+          _hover={{}}
+          _active={{}}
         >
           Connect
         </Button>

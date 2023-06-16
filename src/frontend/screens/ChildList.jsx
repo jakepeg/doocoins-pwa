@@ -214,9 +214,6 @@ function ChildList() {
         }`}
       >
         <h2 className="screen-title light">My Children</h2>
-        {/* <button onClick={me}>
-        Me
-      </button> */}
 
         {children ? (
           <div className="example">
