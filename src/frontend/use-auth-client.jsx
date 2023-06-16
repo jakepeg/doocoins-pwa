@@ -30,7 +30,9 @@ const defaultOptions = {
   // },
 
   loginOptions: {
-    identityProvider: NFID_AUTH_URL
+    identityProvider:   process.env.DFX_NETWORK === "ic"
+     ? NFID_AUTH_URL
+       : `http://localhost:4943?canisterId=${process.env.CANISTER_ID_INTERNET_IDENTITY}#authorize`,
   },
 
 
