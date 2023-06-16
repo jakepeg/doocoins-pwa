@@ -8,8 +8,12 @@ const Tasks = () => {
   const [actor, setActor] = React.useState(null);
   const [tasks, setTasks] = React.useState({});
   const [isLoading, setIsLoading] = React.useState(false);
-  const child = get("selectedChild");
+  const child = "";
   // const child = "2vxsx-fae-1";
+
+  get('selectedChild').then((data) => {
+    child = data;
+  })
 
   const childName = "Jake";
   const childBalance = "147";
