@@ -8,8 +8,15 @@ const Tasks = () => {
   const [actor, setActor] = React.useState(null);
   const [tasks, setTasks] = React.useState({});
   const [isLoading, setIsLoading] = React.useState(false);
-  // const child = get("selectedChild")
-  const child = "2vxsx-fae-1";
+  const child = get("selectedChild");
+  // const child = "2vxsx-fae-1";
+
+  const childName = "Jake";
+  const childBalance = "147";
+
+  // const childName = get("selectedChildName");
+  // const childBalance = get("balance-" + child);
+
 
   function getTasks() {
     if (child) {
@@ -64,7 +71,10 @@ React.useEffect(() => {
 
   return (
 <>
-    <Balance />
+    <Balance 
+      childName = {childName}
+      childBalance = {childBalance}
+    />
 
       <div className="light-panel">
       <h2 className="screen-title dark">Tasks (add button)</h2>
