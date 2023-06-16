@@ -4,9 +4,11 @@ import { get } from "idb-keyval";
 import Balance from "../components/Balance";
 import LoadingSpinner from "../components/LoadingSpinner";
 import dc from "../assets/images/dc.svg";
+import { useAuth } from "../use-auth-client";
+
 
 const Wallet = () => {
-  const [actor, setActor] = React.useState(null);
+  const {actor} = useAuth()
   const [transactions, setTransactions] = React.useState({});
   const [currentGoal, setCurrentGoal] = React.useState(null);
   const [isLoading, setIsLoading] = React.useState(true);
@@ -41,16 +43,7 @@ const Wallet = () => {
   }
 }
 
-  const initActor = () => {
-    import("../../declarations/backend").then((module) => {
-      const actor = module.createActor(module.canisterId, {});
-      setActor(actor);
-    });
-  };
 
-  React.useEffect(() => {
-    initActor();
-  }, []);
 
   React.useEffect(() => {
     if (child) getTransactions(child);

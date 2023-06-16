@@ -8,7 +8,7 @@ import modelStyles from "../components/popup/confirmation_popup.module.css";
 import ConfirmationPopup from "../components/popup/ConfirmationPopup";
 
 function ChildList() {
-  const {isAuthenticated,actor,logout} = useAuth()
+  const {actor,logout} = useAuth()
   const [children, setChildren] = React.useState(null);
   const [newChild, setNewChild] = React.useState(null);
   const [openItemId, setOpenItemId] = React.useState(null);
@@ -25,12 +25,10 @@ function ChildList() {
   }, [actor]);
 
   function getChildren() {
-    console.log("actor",actor)
     del("selectedChild") 
     del("selectedChildName") 
     get("childList").then(async (val) => {
       if (val === undefined) {
-        console.log("actor",actor)
         actor?.getChildren().then(async (returnedChilren) => {
           if ("ok" in returnedChilren) {
             const children = Object.values(returnedChilren);
