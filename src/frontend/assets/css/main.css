@@ -115,6 +115,52 @@ main {
   color: #000000;
 }
 
+.title-button {
+  padding-left: 0;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  font-size: 22px;
+  font-weight: 400;
+  text-align: center;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: #0B334D;
+}
+
+.plus-sign {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 3px solid #139EAA;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.plus-sign:before,
+.plus-sign:after {
+  content: "";
+  position: absolute;
+  height: 12px;
+  width: 3px;
+  background-color: #139EAA;
+}
+
+.plus-sign:before {
+  transform: rotate(90deg);
+}
+
+.plus-sign:after {
+  transform: rotate(180deg);
+}
+
+
+
 .dc-img-big {
   display: inline-block;
 }
