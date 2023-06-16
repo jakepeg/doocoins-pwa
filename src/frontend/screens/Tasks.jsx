@@ -9,18 +9,15 @@ const Tasks = () => {
   const [tasks, setTasks] = React.useState({});
   const [isLoading, setIsLoading] = React.useState(false);
   const [child, setChild] = React.useState(null);
-  // const child = "2vxsx-fae-1";
-
-  console.log(`child`, child);
-  const childName = "Jake";
-  const childBalance = "147";
-
-  // const childName = get("selectedChildName");
-  // const childBalance = get("balance-" + child);
 
   React.useEffect(() => {
-    get("selectedChild").then((data) => {
-      setChild(data);
+    get("selectedChild").then(async (data) => {
+      const [balance, name] = await Promise.all([get(`balance-${data}`), get(`selectedChildName`)])
+      setChild({
+        id: data,
+        balance: parseInt(balance),
+        name
+      });
     });
   }, [])
 
@@ -79,7 +76,7 @@ const Tasks = () => {
 
   return (
     <>
-      <Balance childName={childName} childBalance={childBalance} />
+      <Balance childName={child.name} childBalance={child.balance} />
 
       <div className="light-panel">
         <h2 className="screen-title dark">Tasks (add button)</h2>
