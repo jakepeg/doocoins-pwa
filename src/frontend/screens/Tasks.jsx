@@ -84,7 +84,7 @@ const Tasks = () => {
       <Balance childName={child.name} childBalance={child.balance} />
 
       <div className="light-panel">
-        <h2 className="title-button"><span>Tasks</span> <span className="plus-sign"></span></h2>
+        <h2 className="title-button dark"><span>Tasks</span> <span className="plus-sign"></span></h2>
         {isLoading ? <LoadingSpinner /> : null}
         {tasks.length > 0 &&
           tasks[0].map((task) => (

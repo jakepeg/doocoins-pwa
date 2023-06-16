@@ -213,7 +213,7 @@ function ChildList() {
           (showPopup.delete || showPopup.edit) ? modelStyles.blur_background : undefined
         }`}
       >
-        <h2 className="screen-title light">My Children</h2>
+        <h2 className="title-button light"><span>My Children</span> <span className="plus-sign"></span></h2>
 
         {children ? (
           <div className="example">
