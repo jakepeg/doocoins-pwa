@@ -7,6 +7,8 @@ import dc from "../assets/images/dc.svg";
 const Tasks = () => {
   const [actor, setActor] = React.useState(null);
   const [tasks, setTasks] = React.useState({});
+  const [newTask, setNewTask] = React.useState(null);
+  const [taskComplete, setTaskComplete] = React.useState(null);
   const [isLoading, setIsLoading] = React.useState(true);
   const [child, setChild] = React.useState(null);
 
@@ -58,6 +60,26 @@ const Tasks = () => {
     } else {
       console.log("You pressed cancel!");
     }
+  }
+
+  function handleAddTask(e) {
+    e.preventDefault();
+    const inputs = e.target.querySelectorAll("input");
+    const task_name = e.target.querySelector('input[name="task_name"]').value;
+    const task_value = parseInt(e.target.querySelector('input[name="task_value"]').value);
+    const task_object = {name:task_name,value:task_value};
+    // API call addTask
+    actor?.addTask(task_object,selectedChild).then((returnedAddTask) => {
+      if ("ok" in returnedAddTask) {
+        setNewTask(task_name);
+        inputs.forEach((input) => {
+          input.value = "";
+        });
+      } else {
+        console.error(returnedAddTask.err);
+      }
+    });
+    return false;
   }
 
   const initActor = () => {
