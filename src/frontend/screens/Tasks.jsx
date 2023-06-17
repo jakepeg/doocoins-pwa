@@ -7,6 +7,7 @@ import ChildTask from "../components/Tasks/ChildTask";
 import EditDialog from "../components/Dialogs/EditDialog";
 import modelStyles from "../components/popup/confirmation_popup.module.css";
 import DeleteDialog from "../components/Dialogs/DeleteDialog";
+import AddTaskDialog from "../components/Tasks/AddTaskDialog";
 
 const Tasks = () => {
   const { actor } = useAuth();
@@ -19,6 +20,7 @@ const Tasks = () => {
   const [showPopup, setShowPopup] = React.useState({
     delete: false,
     edit: false,
+    add_task: false,
   });
 
   React.useEffect(() => {
@@ -55,27 +57,6 @@ const Tasks = () => {
     }
   }
 
-  // add swiper - delete, edit, approve tasks
-  function handleTaskComplete(task_id) {
-    let r = window.confirm("Is the task complete?");
-    if (r == true) {
-      let dateNum = Math.floor(Date.now() / 1000);
-      let date = dateNum.toString();
-      // API call approveTask
-      actor
-        ?.approveTask(selectedChild, task_id, date)
-        .then((returnedApproveTask) => {
-          if ("ok" in returnedApproveTask) {
-            setTaskComplete(parseInt(task_id));
-          } else {
-            console.error(returnedApproveTask.err);
-          }
-        });
-    } else {
-      console.log("You pressed cancel!");
-    }
-  }
-
   React.useEffect(() => {
     if (child) getTasks(child);
   }, [actor, child]);
@@ -92,13 +73,38 @@ const Tasks = () => {
     setShowPopup((prevState) => ({ ...prevState, ["edit"]: false }));
   };
 
+  const handleToggleAddTaskPopup = () => {
+    setShowPopup((prevState) => ({
+      ...prevState,
+      ["add_task"]: !prevState.add_task,
+    }));
+  };
+
+  const handleSubmitTask = (task) => {
+    if (task) {
+      handleToggleAddTaskPopup();
+      actor.addTask({ value: 0, name: task }, child.id).then((response) => {
+        console.log(`response added`, response);
+        getTasks();
+      });
+    }
+  };
+
   if (isLoading) {
     return <LoadingSpinner />;
   }
 
   return (
     <>
-      <Balance childName={child.name} childBalance={child.balance} />
+      <Balance
+        isModalOpen={
+          showPopup.delete || showPopup.edit || showPopup.add_task
+            ? modelStyles.blur_background
+            : undefined
+        }
+        childName={child.name}
+        childBalance={child.balance}
+      />
       {showPopup.delete && (
         <DeleteDialog
           selectedChild={child}
@@ -111,15 +117,27 @@ const Tasks = () => {
           selectedChild={child}
         />
       )}
+      {showPopup.add_task && (
+        <AddTaskDialog
+          handleSubmitTask={handleSubmitTask}
+          selectedChild={child}
+          handleClosePopup={handleToggleAddTaskPopup}
+        />
+      )}
       <div
         className={`${
-          showPopup.delete || showPopup.edit
+          showPopup.delete || showPopup.edit || showPopup.add_task
             ? modelStyles.blur_background
             : undefined
         }  light-panel`}
       >
         <h2 className="title-button dark">
-          <span>Tasks</span> <span className="plus-sign"></span>
+          <span>Tasks</span>{" "}
+          <span
+            role="button"
+            onClick={handleToggleAddTaskPopup}
+            className="plus-sign"
+          />
         </h2>
         {tasks.length > 0 &&
           tasks[0].map((task) => (

@@ -13,12 +13,12 @@ const Balance = (props) => {
   // const childBalance = "147";
 
   return (
-      <>
-        <p className="name">{props.childName}</p>
+      <div className={props.isModalOpen}>
+        <p className={"name"}>{props.childName}</p>
         {props.childBalance >= 0 &&
           <p className="balance"><img src={dc} className="dc-img-big" alt="DooCoins symbol" />{props.childBalance}</p>
         }
-      </>
+      </div>
   );
 };
 
