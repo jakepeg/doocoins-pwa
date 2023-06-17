@@ -1,6 +1,5 @@
 import React from "react";
 import { useAuth } from "../use-auth-client";
-import SwipeToRevealActions from "react-swipe-to-reveal-actions";
 import { set, get, del } from "idb-keyval";
 import AddChild from "../components/AddChild";
 import ChildItem from "../components/ChildItem";

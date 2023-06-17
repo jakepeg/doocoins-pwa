@@ -7,6 +7,11 @@ import { Link } from "react-router-dom";
 import { set } from "idb-keyval";
 import { ReactComponent as DCIcon } from "../assets/images/dc-white.svg";
 
+export const swipeContainerStyles = {
+  backgroundColor: "#FFF",
+  paddingLeft: "1rem",
+};
+
 const ChildItem = ({
   child,
   handleUpdateOpenItemId,
@@ -61,11 +66,6 @@ const ChildItem = ({
     handleUpdateOpenItemId(isOpen ? child.id : null);
   };
 
-  const swipeContainerStyles = {
-    backgroundColor: "#FFF",
-    paddingLeft: "1rem",
-  };
-
   const handleSelectChild = () => {
     set("selectedChild", child.id);
     set("selectedChildName", child.name);
@@ -84,7 +84,7 @@ const ChildItem = ({
           {showBalance && (
             <div className="child-balance">
               <DCIcon className="balance-dc-icon" width="28px" height="28px" />
-              <p> {child.balance}</p>
+              <p style={{ color: "#fff" }}> {child.balance}</p>
             </div>
           )}
         </Box>

@@ -2,43 +2,55 @@ import * as React from "react";
 import { get } from "idb-keyval";
 import Balance from "../components/Balance";
 import LoadingSpinner from "../components/LoadingSpinner";
-import dc from "../assets/images/dc.svg";
 import { useAuth } from "../use-auth-client";
-
+import ChildTask from "../components/Tasks/ChildTask";
+import EditDialog from "../components/Dialogs/EditDialog";
+import modelStyles from "../components/popup/confirmation_popup.module.css";
+import DeleteDialog from "../components/Dialogs/DeleteDialog";
 
 const Tasks = () => {
-  const {actor} = useAuth()
+  const { actor } = useAuth();
   const [tasks, setTasks] = React.useState({});
   const [newTask, setNewTask] = React.useState(null);
   const [taskComplete, setTaskComplete] = React.useState(null);
   const [isLoading, setIsLoading] = React.useState(true);
   const [child, setChild] = React.useState(null);
+  const [openItemId, setOpenItemId] = React.useState(null);
+  const [showPopup, setShowPopup] = React.useState({
+    delete: false,
+    edit: false,
+  });
 
   React.useEffect(() => {
-    setIsLoading(true)
+    setIsLoading(true);
     get("selectedChild").then(async (data) => {
-      const [balance, name] = await Promise.all([get(`balance-${data}`), get(`selectedChildName`)])
+      const [balance, name] = await Promise.all([
+        get(`balance-${data}`),
+        get(`selectedChildName`),
+      ]);
       setChild({
         id: data,
         balance: parseInt(balance),
-        name
+        name,
       });
-    })
-  }, [])
+    });
+  }, []);
 
   function getTasks() {
     if (child) {
-      console.log("getTasks called for child id: " + child);
       setIsLoading(true);
-      actor?.getTasks(child.id).then((returnedTasks) => {
-        if ("ok" in returnedTasks) {
-          const tasks = Object.values(returnedTasks);
-          setTasks(tasks);
-          setIsLoading(false);
-        } else {
-          console.error(returnedTasks.err);
-        }
-      }).finally(() => setIsLoading(false));;
+      actor
+        ?.getTasks(child.id)
+        .then((returnedTasks) => {
+          if ("ok" in returnedTasks) {
+            const tasks = Object.values(returnedTasks);
+            setTasks(tasks);
+            setIsLoading(false);
+          } else {
+            console.error(returnedTasks.err);
+          }
+        })
+        .finally(() => setIsLoading(false));
       return false;
     }
   }
@@ -64,57 +76,61 @@ const Tasks = () => {
     }
   }
 
-  function handleAddTask(e) {
-    e.preventDefault();
-    const inputs = e.target.querySelectorAll("input");
-    const task_name = e.target.querySelector('input[name="task_name"]').value;
-    const task_value = parseInt(e.target.querySelector('input[name="task_value"]').value);
-    const task_object = {name:task_name,value:task_value};
-    // API call addTask
-    actor?.addTask(task_object,selectedChild).then((returnedAddTask) => {
-      if ("ok" in returnedAddTask) {
-        setNewTask(task_name);
-        inputs.forEach((input) => {
-          input.value = "";
-        });
-      } else {
-        console.error(returnedAddTask.err);
-      }
-    });
-    return false;
-  }
-
-
   React.useEffect(() => {
     if (child) getTasks(child);
   }, [actor, child]);
 
-  if(isLoading) {
-    return  <LoadingSpinner />
+  const handleTogglePopup = (isOpen, child, popup) => {
+    setShowPopup((prevState) => ({ ...prevState, [popup]: isOpen }));
+  };
+
+  const handleCloseDeletePopup = () => {
+    setShowPopup((prevState) => ({ ...prevState, ["delete"]: false }));
+  };
+
+  const handleCloseEditPopup = () => {
+    setShowPopup((prevState) => ({ ...prevState, ["edit"]: false }));
+  };
+
+  if (isLoading) {
+    return <LoadingSpinner />;
   }
 
   return (
     <>
       <Balance childName={child.name} childBalance={child.balance} />
-
-      <div className="light-panel">
-        <h2 className="title-button dark"><span>Tasks</span> <span className="plus-sign"></span></h2>
-        {isLoading ? <LoadingSpinner /> : null}
+      {showPopup.delete && (
+        <DeleteDialog
+          selectedChild={child}
+          handleCloseDeletePopup={handleCloseDeletePopup}
+        />
+      )}
+      {showPopup.edit && (
+        <EditDialog
+          handleCloseEditPopup={handleCloseEditPopup}
+          selectedChild={child}
+        />
+      )}
+      <div
+        className={`${
+          showPopup.delete || showPopup.edit
+            ? modelStyles.blur_background
+            : undefined
+        }  light-panel`}
+      >
+        <h2 className="title-button dark">
+          <span>Tasks</span> <span className="plus-sign"></span>
+        </h2>
         {tasks.length > 0 &&
           tasks[0].map((task) => (
-            <div
-              className="list-item"
-              role="button"
-              key={parseInt(task.id)}
-              onClick={() => handleTaskComplete(parseInt(task.id))}
-              onKeyDown={() => handleTaskComplete(parseInt(task.id))}
-            >
-              <div>{task.name}</div>
-              <div>
-                <img src={dc} className="dc-img-small" alt="DooCoins symbol" />
-                {parseInt(task.value)}
-              </div>
-            </div>
+            <ChildTask
+              key={task.id}
+              task={task}
+              openItemId={openItemId}
+              handleUpdateOpenItemId={setOpenItemId}
+              child={child}
+              handleTogglePopup={handleTogglePopup}
+            />
           ))}
       </div>
     </>

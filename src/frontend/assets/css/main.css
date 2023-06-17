@@ -4,7 +4,8 @@ body {
 }
 
 .rstra-content-container, .rstra-container {
-  background-color: #0B334D!important;
+  background-color: transparent !important;
+  justify-content: end !important;
 }
 
 main {
@@ -102,7 +103,6 @@ main {
 
 .list-item {
   padding-left: 0;
-  margin-bottom: 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -199,6 +199,11 @@ main {
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
+}
+
+.approve {
+  background-color: #0B334D;
 }
 
 .edit {
@@ -260,7 +265,7 @@ input[type="text"]::placeholder {
 }
 
 .rstra-actions-container div {
-  height: 35px !important;
+  height: 35px;
 }
 
 .rstra-actions-container {
