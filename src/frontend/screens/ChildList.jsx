@@ -6,6 +6,8 @@ import ChildItem from "../components/ChildItem";
 import modelStyles from "../components/popup/confirmation_popup.module.css";
 import ConfirmationPopup from "../components/popup/ConfirmationPopup";
 import AddChildDialog from "../components/ChildList/AddChildDialog";
+import DeleteDialog from "../components/Dialogs/DeleteDialog";
+import EditDialog from "../components/Dialogs/EditDialog";
 
 function ChildList() {
   const { actor, logout } = useAuth();
@@ -148,47 +150,16 @@ function ChildList() {
         />
       )}
       {showPopup.delete && (
-        <ConfirmationPopup handleClosePopup={handleCloseDeletePopup}>
-          <h4 className={modelStyles.popup_title}>
-            Delete {selectedChild.name}
-          </h4>
-          <button
-            className={modelStyles.popup_delete_action_btn}
-            onClick={handleCloseDeletePopup}
-          >
-            DELETE
-          </button>
-          <p
-            className={modelStyles.popup_cancel_action_btn}
-            onClick={handleCloseDeletePopup}
-          >
-            cancel
-          </p>
-        </ConfirmationPopup>
+        <DeleteDialog
+          handleCloseDeletePopup={handleCloseDeletePopup}
+          selectedChild={selectedChild}
+        />
       )}
       {showPopup.edit && (
-        <ConfirmationPopup handleClosePopup={handleCloseEditPopup}>
-          <h4 className={modelStyles.popup_title}>Edit {selectedChild.name}</h4>
-          <input
-            type="text"
-            name="child_name"
-            style={{ marginTop: "18px" }}
-            className={`text-field ${modelStyles.popup_input_edit_field}`}
-            value={selectedChild.name}
-          />
-          <button
-            className={modelStyles.popup_edit_action_btn}
-            onClick={handleCloseEditPopup}
-          >
-            EDIT
-          </button>
-          <p
-            className={modelStyles.popup_cancel_action_btn}
-            onClick={handleCloseEditPopup}
-          >
-            cancel
-          </p>
-        </ConfirmationPopup>
+        <EditDialog
+          handleCloseEditPopup={handleCloseEditPopup}
+          selectedChild={selectedChild}
+        />
       )}
       <div
         className={`${
