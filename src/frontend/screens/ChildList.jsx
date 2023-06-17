@@ -5,27 +5,26 @@ import AddChild from "../components/AddChild";
 import ChildItem from "../components/ChildItem";
 import modelStyles from "../components/popup/confirmation_popup.module.css";
 import ConfirmationPopup from "../components/popup/ConfirmationPopup";
+import AddChildDialog from "../components/ChildList/AddChildDialog";
 
 function ChildList() {
-  const {actor,logout} = useAuth()
+  const { actor, logout } = useAuth();
   const [children, setChildren] = React.useState(null);
-  const [newChild, setNewChild] = React.useState(null);
   const [openItemId, setOpenItemId] = React.useState(null);
   const [showPopup, setShowPopup] = React.useState({
     delete: false,
-    edit: false
+    edit: false,
+    add_child: false,
   });
   const [selectedChild, setSelectedChild] = React.useState(null);
-
-
 
   React.useEffect(() => {
     getChildren();
   }, [actor]);
 
   function getChildren() {
-    del("selectedChild") 
-    del("selectedChildName") 
+    del("selectedChild");
+    del("selectedChildName");
     get("childList").then(async (val) => {
       if (val === undefined) {
         actor?.getChildren().then(async (returnedChilren) => {
@@ -36,14 +35,14 @@ function ChildList() {
                 const balance = await getBalance(child.id);
                 return {
                   ...child,
-                  balance: parseInt(balance)
+                  balance: parseInt(balance),
                 };
               })
             );
             setChildren(updatedChildrenData);
             set("childList", updatedChildrenData);
           } else {
-           console.error(returnedChilren.err);
+            console.error(returnedChilren.err);
           }
         });
       } else {
@@ -52,7 +51,7 @@ function ChildList() {
             const balance = await getBalance(child.id);
             return {
               ...child,
-              balance: parseInt(balance)
+              balance: parseInt(balance),
             };
           })
         );
@@ -85,7 +84,7 @@ function ChildList() {
   // update the childList after adding a new child
   async function updateChildList(returnedAddChild) {
     try {
-      const childList = await get('childList');
+      const childList = await get("childList");
       const updatedChildList = { ...childList, ...returnedAddChild };
 
       const updatedChildrenData = await Promise.all(
@@ -93,50 +92,17 @@ function ChildList() {
           const balance = await getBalance(child.id);
           return {
             ...child,
-            balance: parseInt(balance)
+            balance: parseInt(balance),
           };
         })
       );
 
-      await set('childList', updatedChildrenData);
+      await set("childList", updatedChildrenData);
       setChildren(updatedChildrenData);
     } catch (error) {
-      console.error('Error adding item to childList:', error);
+      console.error("Error adding item to childList:", error);
     }
   }
-
-  // add a new child
-  async function handleAddChild(e) {
-    e.preventDefault();
-    const inputs = e.target.querySelectorAll("input");
-    const child_name = e.target.querySelector('input[name="child_name"]').value;
-    const child_object = { name: child_name };
-    // API call addChild
-    let me = await actor.whoami()
-    console.log("acto in add child",actor,me)
-    actor?.addChild(child_object).then((returnedAddChild) => {
-      if ("ok" in returnedAddChild) {
-        setNewChild(child_name);
-        updateChildList(returnedAddChild);
-        // update children variable with setChildren
-        // same with balance
-        // re-run getChildren()
-        inputs.forEach((input) => {
-          input.value = "";
-        });
-      } else {
-        console.error(returnedAddChild.err);
-      }
-    });
-    return false;
-  }
-
-
-  function handleLogout() {
-    del("childList");
-    logout();
-  }
-
 
   const handleTogglePopup = (isOpen, child, popup) => {
     setSelectedChild(child);
@@ -144,15 +110,43 @@ function ChildList() {
   };
 
   const handleCloseDeletePopup = () => {
-    setShowPopup((prevState) => ({ ...prevState, ["delete"]: false }))
-  }
+    setShowPopup((prevState) => ({ ...prevState, ["delete"]: false }));
+  };
 
   const handleCloseEditPopup = () => {
-    setShowPopup((prevState) => ({ ...prevState, ["edit"]: false }))
-  }
+    setShowPopup((prevState) => ({ ...prevState, ["edit"]: false }));
+  };
+
+  const handleToggleAddChildPopup = () => {
+    setShowPopup((prevState) => ({
+      ...prevState,
+      ["add_child"]: !prevState.add_child,
+    }));
+  };
+
+  const handleSubmit = async (childName) => {
+    if (childName) {
+      handleToggleAddChildPopup();
+      const child_object = { name: childName };
+      let me = await actor.whoami();
+      actor?.addChild(child_object).then((returnedAddChild) => {
+        if ("ok" in returnedAddChild) {
+          updateChildList(returnedAddChild);
+        } else {
+          console.error(returnedAddChild.err);
+        }
+      });
+    }
+  };
 
   return (
     <>
+      {showPopup.add_child && (
+        <AddChildDialog
+          handleClosePopup={handleToggleAddChildPopup}
+          handleSubmit={handleSubmit}
+        />
+      )}
       {showPopup.delete && (
         <ConfirmationPopup handleClosePopup={handleCloseDeletePopup}>
           <h4 className={modelStyles.popup_title}>
@@ -198,10 +192,19 @@ function ChildList() {
       )}
       <div
         className={`${
-          (showPopup.delete || showPopup.edit) ? modelStyles.blur_background : undefined
+          showPopup.delete || showPopup.edit || showPopup.add_child
+            ? modelStyles.blur_background
+            : undefined
         }`}
       >
-        <h2 className="title-button light"><span>My Children</span> <span className="plus-sign"></span></h2>
+        <h2 className="title-button light">
+          <span>My Children</span>
+          <span
+            className="plus-sign"
+            role="button"
+            onClick={handleToggleAddChildPopup}
+          />
+        </h2>
 
         {children ? (
           <div className="example">
@@ -237,12 +240,6 @@ function ChildList() {
         ) : (
           <p>Loading...</p>
         )}
-
-        <h2 className="screen-title light push-30">Add a child</h2>
-        <AddChild
-          handleAddChild={handleAddChild}
-          // childID = {selectedChild}
-        />
       </div>
     </>
   );

@@ -6,7 +6,7 @@ import {
   TabList,
   Tabs,
   useMultiStyleConfig,
-  useTab
+  useTab,
 } from "@chakra-ui/react";
 import React from "react";
 import WalletIcon from "./WalletIcon";
@@ -47,11 +47,12 @@ function BottomTabNav() {
 export default BottomTabNav;
 
 function CustomTabs() {
+  const { pathname } = useLocation();
   const CustomTab = React.forwardRef((props, ref) => {
     // 1. Reuse the `useTab` hook
     const { icon, ...restProps } = props;
     const tabProps = useTab({ ...restProps, ref });
-    const isSelected = !!tabProps["aria-selected"];
+    const isSelected = props.href === pathname
 
     // 2. Hook into the Tabs `size`, `variant`, props
     const styles = useMultiStyleConfig("Tabs", tabProps);
@@ -82,7 +83,7 @@ function CustomTabs() {
     <Tabs
       style={{
         width: "100%",
-        padding: "0"
+        padding: "0",
       }}
     >
       <TabList
@@ -95,7 +96,7 @@ function CustomTabs() {
           maxWidth: "768px",
           minWidth: "320px",
           margin: "0 auto",
-          backgroundColor: "#0B334D"
+          backgroundColor: "#0B334D",
         }}
       >
         <CustomTab icon={WalletIcon} href="/wallet">
