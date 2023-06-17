@@ -8,6 +8,7 @@ import ConfirmationPopup from "../components/popup/ConfirmationPopup";
 import AddChildDialog from "../components/ChildList/AddChildDialog";
 import DeleteDialog from "../components/Dialogs/DeleteDialog";
 import EditDialog from "../components/Dialogs/EditDialog";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 function ChildList() {
   const { actor, logout } = useAuth();
@@ -19,6 +20,7 @@ function ChildList() {
     add_child: false,
   });
   const [selectedChild, setSelectedChild] = React.useState(null);
+  const [isLoading, setIsLoading] = React.useState(false);
 
   React.useEffect(() => {
     getChildren();
@@ -27,39 +29,42 @@ function ChildList() {
   function getChildren() {
     del("selectedChild");
     del("selectedChildName");
-    get("childList").then(async (val) => {
-      if (val === undefined) {
-        actor?.getChildren().then(async (returnedChilren) => {
-          if ("ok" in returnedChilren) {
-            const children = Object.values(returnedChilren);
-            const updatedChildrenData = await Promise.all(
-              children[0].map(async (child) => {
-                const balance = await getBalance(child.id);
-                return {
-                  ...child,
-                  balance: parseInt(balance),
-                };
-              })
-            );
-            setChildren(updatedChildrenData);
-            set("childList", updatedChildrenData);
-          } else {
-            console.error(returnedChilren.err);
-          }
-        });
-      } else {
-        const updatedChildrenData = await Promise.all(
-          Object.values(val).map(async (child) => {
-            const balance = await getBalance(child.id);
-            return {
-              ...child,
-              balance: parseInt(balance),
-            };
-          })
-        );
-        setChildren(updatedChildrenData);
-      }
-    });
+    setIsLoading(true);
+    get("childList")
+      .then(async (val) => {
+        if (val === undefined) {
+          actor?.getChildren().then(async (returnedChilren) => {
+            if ("ok" in returnedChilren) {
+              const children = Object.values(returnedChilren);
+              const updatedChildrenData = await Promise.all(
+                children[0].map(async (child) => {
+                  const balance = await getBalance(child.id);
+                  return {
+                    ...child,
+                    balance: parseInt(balance),
+                  };
+                })
+              );
+              setChildren(updatedChildrenData);
+              set("childList", updatedChildrenData);
+            } else {
+              console.error(returnedChilren.err);
+            }
+          });
+        } else {
+          const updatedChildrenData = await Promise.all(
+            Object.values(val).map(async (child) => {
+              const balance = await getBalance(child.id);
+              return {
+                ...child,
+                balance: parseInt(balance),
+              };
+            })
+          );
+          setChildren(updatedChildrenData);
+        }
+      })
+      .finally(() => setIsLoading(false));
   }
 
   async function getBalance(childID) {
@@ -131,15 +136,23 @@ function ChildList() {
       handleToggleAddChildPopup();
       const child_object = { name: childName };
       let me = await actor.whoami();
-      actor?.addChild(child_object).then((returnedAddChild) => {
-        if ("ok" in returnedAddChild) {
-          updateChildList(returnedAddChild);
-        } else {
-          console.error(returnedAddChild.err);
-        }
-      });
+      setIsLoading(true);
+      actor
+        ?.addChild(child_object)
+        .then((returnedAddChild) => {
+          if ("ok" in returnedAddChild) {
+            updateChildList(returnedAddChild);
+          } else {
+            console.error(returnedAddChild.err);
+          }
+        })
+        .finally(() => setIsLoading(false));
     }
   };
+
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
 
   return (
     <>
@@ -166,7 +179,7 @@ function ChildList() {
           showPopup.delete || showPopup.edit || showPopup.add_child
             ? modelStyles.blur_background
             : undefined
-        }`}
+        } child-list-wrapper`}
       >
         <h2 className="title-button light">
           <span>My Children</span>

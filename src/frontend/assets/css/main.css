@@ -51,16 +51,6 @@ main {
   flex: 0 0 auto;
   display: flex;
   flex-direction: column;
-  /* padding-left: 20px;
-  padding-right: 20px;
-  padding: 1rem; */
-}
-
-@media (min-width: 512px) {
-  .container {
-    /* padding-left: 40px;
-    padding-right: 40px; */
-  }
 }
 
 .example {
@@ -270,4 +260,17 @@ input[type="text"]::placeholder {
 
 .rstra-actions-container {
   max-width: 45% !important;
+}
+
+.child-list-wrapper {
+  padding-left: 20px;
+  padding-right: 20px;
+  padding: 1rem;
+}
+
+@media (min-width: 512px) {
+  .container {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
 }
