@@ -11,7 +11,7 @@ const EditDialog = ({ handleCloseEditPopup, selectedChild }) => {
         name="child_name"
         style={{ marginTop: "18px" }}
         className={`text-field ${modelStyles.popup_input_edit_field}`}
-        value={selectedChild.name}
+        defaultValue={selectedChild.name}
       />
       <button
         className={modelStyles.popup_edit_action_btn}

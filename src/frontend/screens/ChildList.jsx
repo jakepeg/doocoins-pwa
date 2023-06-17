@@ -1,7 +1,6 @@
 import React from "react";
 import { useAuth } from "../use-auth-client";
 import { set, get, del } from "idb-keyval";
-import AddChild from "../components/AddChild";
 import ChildItem from "../components/ChildItem";
 import modelStyles from "../components/popup/confirmation_popup.module.css";
 import ConfirmationPopup from "../components/popup/ConfirmationPopup";
@@ -9,6 +8,17 @@ import AddChildDialog from "../components/ChildList/AddChildDialog";
 import DeleteDialog from "../components/Dialogs/DeleteDialog";
 import EditDialog from "../components/Dialogs/EditDialog";
 import LoadingSpinner from "../components/LoadingSpinner";
+import {
+  SwipeableList,
+  Type as ListType,
+  LeadingActions,
+  SwipeAction,
+  TrailingActions,
+  SwipeableListItem,
+} from "react-swipeable-list";
+import { ReactComponent as EditIcon } from "../assets/images/pencil.svg";
+import { ReactComponent as DeleteIcon } from "../assets/images/delete.svg";
+import { Text } from "@chakra-ui/react";
 
 function ChildList() {
   const { actor, logout } = useAuth();
@@ -154,6 +164,31 @@ function ChildList() {
     return <LoadingSpinner />;
   }
 
+  const trailingActions = ({ child }) => (
+    <TrailingActions>
+      <SwipeAction className="edit" onClick={() => handleTogglePopup(true, child, "edit")}>
+        <div className="action-btn ">
+          <div className="ItemColumnCentered">
+            <EditIcon width="22px" height="22px" />
+            <Text fontSize={"xs"} color={"#fff"}>
+              Edit
+            </Text>
+          </div>
+        </div>
+      </SwipeAction>
+      <SwipeAction className="delete" onClick={() => handleTogglePopup(true, child, "delete")}>
+        <div className="action-btn">
+          <div className="ItemColumnCentered">
+            <DeleteIcon width="22px" height="22px" />
+            <Text fontSize={"xs"} color={"#fff"}>
+              Delete
+            </Text>
+          </div>
+        </div>
+      </SwipeAction>
+    </TrailingActions>
+  );
+
   return (
     <>
       {showPopup.add_child && (
@@ -193,32 +228,27 @@ function ChildList() {
         {children ? (
           <div className="example">
             <ul className="child-list">
-              {children.length > 0 &&
-                children.map((child, index) => {
-                  const isItemOpen = openItemId === child.id;
-                  if (typeof window !== "undefined") {
-                    // :r0: format from library
-                    const actionsElement = document.getElementById(
-                      `:r${index}:`
+              <SwipeableList type={ListType.IOS} fullSwipe={false}>
+                {children.length > 0 &&
+                  children.map((child, index) => {
+                    return (
+                      <SwipeableListItem
+                        leadingActions={null}
+                        trailingActions={trailingActions({ child })}
+                        key={child.id}
+                      >
+                        <ChildItem
+                          child={child}
+                          handleUpdateOpenItemId={setOpenItemId}
+                          openItemId={openItemId}
+                          index={index}
+                          key={child.id + index.toString()}
+                          handleTogglePopup={handleTogglePopup}
+                        />
+                      </SwipeableListItem>
                     );
-                    if (!isItemOpen && actionsElement) {
-                      actionsElement.style.display = "none";
-                    } else if (isItemOpen && actionsElement) {
-                      actionsElement.style.display = "block";
-                    }
-                  }
-
-                  return (
-                    <ChildItem
-                      child={child}
-                      handleUpdateOpenItemId={setOpenItemId}
-                      openItemId={openItemId}
-                      index={index}
-                      key={child.id + index.toString()}
-                      handleTogglePopup={handleTogglePopup}
-                    />
-                  );
-                })}
+                  })}
+              </SwipeableList>
             </ul>
           </div>
         ) : (

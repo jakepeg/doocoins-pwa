@@ -1,5 +1,4 @@
-import React from "react";
-import SwipeToRevealActions from "react-swipe-to-reveal-actions";
+import React from "react"; 
 import { ReactComponent as EditIcon } from "../assets/images/pencil.svg";
 import { ReactComponent as DeleteIcon } from "../assets/images/delete.svg";
 import { Box } from "@chakra-ui/react";
@@ -89,14 +88,6 @@ const ChildItem = ({
           )}
         </Box>
       </Link>
-      <SwipeToRevealActions
-        actionButtons={getActions(child.id)}
-        actionButtonMinWidth={120}
-        containerStyle={swipeContainerStyles}
-        hideDotsButton={true}
-        onOpen={() => toggleBalance(true)}
-        onClose={() => toggleBalance(false)}
-      />
     </li>
   );
 };
