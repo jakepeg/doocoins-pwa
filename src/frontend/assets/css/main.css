@@ -67,7 +67,6 @@ main {
 
 .child-list-item {
   padding-left: 0;
-  padding-top: 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -82,8 +81,6 @@ main {
 }
 
 .child-balance {
-  position: absolute;
-  right: 0;
   z-index: 5;
   display: flex;
   align-items: center;
@@ -155,7 +152,6 @@ main {
 
 .dc-img-big {
   display: inline-block;
-  width: 40px;
 }
 
 .dc-img-small {
@@ -259,7 +255,7 @@ input[type="text"]::placeholder {
   color: #fff;
   padding: 10px;
   width: 100%;
-  max-width: 300px;
+  /* width: 228px; */
   font-size: 20px;
   cursor: pointer;
 }
@@ -283,9 +279,13 @@ input[type="text"]::placeholder {
   padding: 1rem;
 }
 
-@media (min-width: 512px) {
-  .container {
-    padding-left: 40px;
-    padding-right: 40px;
-  }
+.swipeable-list-item__content {
+  /* min-height: 50px; */
+  justify-content: space-between;
+  margin-right: 20px;
+}
+
+.swipeable-list-item__content {
+  border-width: 10px 20px 10px 20px;
+  border-color: transparent;
 }

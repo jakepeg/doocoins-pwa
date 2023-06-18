@@ -166,7 +166,10 @@ function ChildList() {
 
   const trailingActions = ({ child }) => (
     <TrailingActions>
-      <SwipeAction className="edit" onClick={() => handleTogglePopup(true, child, "edit")}>
+      <SwipeAction
+        className="edit"
+        onClick={() => handleTogglePopup(true, child, "edit")}
+      >
         <div className="action-btn ">
           <div className="ItemColumnCentered">
             <EditIcon width="22px" height="22px" />
@@ -176,7 +179,10 @@ function ChildList() {
           </div>
         </div>
       </SwipeAction>
-      <SwipeAction className="delete" onClick={() => handleTogglePopup(true, child, "delete")}>
+      <SwipeAction
+        className="delete"
+        onClick={() => handleTogglePopup(true, child, "delete")}
+      >
         <div className="action-btn">
           <div className="ItemColumnCentered">
             <DeleteIcon width="22px" height="22px" />
@@ -214,21 +220,22 @@ function ChildList() {
           showPopup.delete || showPopup.edit || showPopup.add_child
             ? modelStyles.blur_background
             : undefined
-        } child-list-wrapper`}
+        }`}
       >
-        <h2 className="title-button light">
-          <span>My Children</span>
-          <span
-            className="plus-sign"
-            role="button"
-            onClick={handleToggleAddChildPopup}
-          />
-        </h2>
-
+        <div className={`child-list-wrapper`}>
+          <h2 className="title-button light">
+            <span>My Children</span>
+            <span
+              className="plus-sign"
+              role="button"
+              onClick={handleToggleAddChildPopup}
+            />
+          </h2>
+        </div>
         {children ? (
           <div className="example">
             <ul className="child-list">
-              <SwipeableList type={ListType.IOS} fullSwipe={false}>
+              <SwipeableList threshold={0.25} type={ListType.IOS} fullSwipe={false}>
                 {children.length > 0 &&
                   children.map((child, index) => {
                     return (
@@ -242,7 +249,6 @@ function ChildList() {
                           handleUpdateOpenItemId={setOpenItemId}
                           openItemId={openItemId}
                           index={index}
-                          key={child.id + index.toString()}
                           handleTogglePopup={handleTogglePopup}
                         />
                       </SwipeableListItem>

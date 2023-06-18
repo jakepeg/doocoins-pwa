@@ -1,6 +1,4 @@
-import React from "react"; 
-import { ReactComponent as EditIcon } from "../assets/images/pencil.svg";
-import { ReactComponent as DeleteIcon } from "../assets/images/delete.svg";
+import React from "react";
 import { Box } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 import { set } from "idb-keyval";
@@ -11,84 +9,35 @@ export const swipeContainerStyles = {
   paddingLeft: "1rem",
 };
 
-const ChildItem = ({
-  child,
-  handleUpdateOpenItemId,
-  openItemId,
-  index,
-  handleTogglePopup,
-}) => {
-  const [showBalance, setShowBalance] = React.useState(true);
-  const isItemOpen = openItemId === child.id;
-
-  React.useEffect(() => {
-    if (typeof window !== "undefined") {
-      // :r0: format from library
-      const actionsElement = document.getElementById(`:r${index}:`);
-      if (!isItemOpen && actionsElement) {
-        setShowBalance(true);
-      }
-    }
-  }, [isItemOpen]);
-
-  function handleDelete(id) {
-    handleTogglePopup(true, child, "delete");
-    setShowBalance(true);
-  }
-
-  function handleUpdate(id) {
-    handleTogglePopup(true, child, "edit");
-    setShowBalance(true);
-  }
-
-  const getActions = (id) => [
-    {
-      content: (
-        <div className="action-btn edit">
-          <EditIcon width="22px" height="22px" />
-        </div>
-      ),
-      onClick: () => handleUpdate(id),
-    },
-    {
-      content: (
-        <div className="action-btn delete">
-          <DeleteIcon width="22px" height="22px" />
-        </div>
-      ),
-      onClick: () => handleDelete(id),
-    },
-  ];
-
-  const toggleBalance = (isOpen) => {
-    setShowBalance(!isOpen);
-    handleUpdateOpenItemId(isOpen ? child.id : null);
-  };
-
+const ChildItem = ({ child }) => {
   const handleSelectChild = () => {
     set("selectedChild", child.id);
     set("selectedChildName", child.name);
   };
 
   return (
-    <li className="child-list-item">
+    <>
+      <Box
+        onClick={handleSelectChild}
+        display="flex"
+        justifyContent={"space-between"}
+        alignItems={"center"}
+      >
+        <Link to="/wallet">
+          <Box textAlign={"left"} fontSize={"22px"} color={"#fff"}>
+            {child.name}
+          </Box>
+        </Link>
+      </Box>
       <Link to="/wallet">
-        <Box
-          onClick={handleSelectChild}
-          display="flex"
-          justifyContent={"space-between"}
-          alignItems={"center"}
-        >
-          <Box textAlign={"left"}>{child.name}</Box>
-          {showBalance && (
-            <div className="child-balance">
-              <DCIcon className="balance-dc-icon" width="28px" height="28px" />
-              <p style={{ color: "#fff" }}> {child.balance}</p>
-            </div>
-          )}
-        </Box>
+        <div className="child-balance">
+          <DCIcon className="balance-dc-icon" width="1.2em" height="1.2em" />
+          <Box fontSize={"22px"} style={{ color: "#fff" }}>
+            {child.balance}
+          </Box>
+        </div>
       </Link>
-    </li>
+    </>
   );
 };
 
