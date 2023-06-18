@@ -2,6 +2,7 @@ import * as React from "react";
 // import Moment from 'react-moment';
 import { get } from "idb-keyval";
 import Balance from "../components/Balance";
+import Goal from "../components/Goal";
 import LoadingSpinner from "../components/LoadingSpinner";
 import dc from "../assets/images/dc.svg";
 import { useAuth } from "../use-auth-client";
@@ -56,8 +57,8 @@ const Wallet = () => {
   return (
     <>
       <Balance childName={child.name} childBalance={child.balance} />
-
       <div className="light-panel">
+        <Goal />
         <h2 className="title-button dark"><span>Transactions</span></h2>
         {isLoading ? <LoadingSpinner /> : null}
         {transactions.length > 0 &&

@@ -17,7 +17,7 @@ const defaultOptions = {
   createOptions: {
     idleOptions: {
       // Set to true if you do not want idle functionality
-      disableIdle: true,
+      disableIdle: false,
     },
   },
   /**

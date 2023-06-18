@@ -152,6 +152,7 @@ main {
 
 .dc-img-big {
   display: inline-block;
+  width: 41px;
 }
 
 .dc-img-small {
@@ -288,4 +289,33 @@ input[type="text"]::placeholder {
 .swipeable-list-item__content {
   border-width: 10px 20px 10px 20px;
   border-color: transparent;
+}
+
+.goal-progress {
+  width: 130px;
+  height: 130px;
+}
+
+.goal-name {
+  margin-bottom: 20px;
+}
+
+.goal-value {
+  font-size: 1em;
+  text-align: center;
+  margin-top: -50px;
+}
+
+.goal-info {
+  text-align: center;
+}
+
+.goal {
+  display: flex;
+  justify-content: space-evenly;
+  background-color: #ffffff;
+  padding: 20px;
+  margin-bottom: 20px;
+  margin-top: -80px;
+  border-radius: 8px;;
 }
