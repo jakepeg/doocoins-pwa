@@ -1,6 +1,7 @@
 import { AuthClient } from "@dfinity/auth-client";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { canisterId, createActor } from "../declarations/backend";
+import { del } from "idb-keyval";
 
 const AuthContext = createContext();
 
@@ -94,6 +95,7 @@ export const useAuthClient = (options = defaultOptions) => {
   }
 
   async function logout() {
+    del("childList")
     await authClient?.logout();
     await updateClient(authClient);
   }

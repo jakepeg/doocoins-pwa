@@ -232,7 +232,7 @@ function ChildList() {
             />
           </h2>
         </div>
-        {children ? (
+        {children?.length ? (
           <div className="example">
             <ul className="child-list">
               <SwipeableList threshold={0.25} type={ListType.IOS} fullSwipe={false}>
