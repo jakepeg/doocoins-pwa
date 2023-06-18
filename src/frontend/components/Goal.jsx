@@ -1,21 +1,37 @@
 import * as React from "react";
+import { useAuth } from "../use-auth-client";
+import { set, get } from "idb-keyval";
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 
 const Goal = () => {
 
+  const { actor } = useAuth();
   // const [hasGoal, setHasGoal] = React.useState(false);
   // const [goalValue, setGoalValue] = React.useState(null);
   // const [goalName, setGoalName] = React.useState(null);
   // const [goalId, setGoalId] = React.useState(null);
 
+  const hasGoal = true;
+  const goalValue = 200;
+  const goalName = "New Beyblade";
+  const goalId = 123;
+  const balance = 100;
 
-// check if goal is in local storage before calling api
+// check if goal for SELECTED CHILD is in local storage checkGoal()
+// if it is call
+// setGoalState {
+  // setHasGoal(true);
+  // setGoalName(goalName);
+  // setGoalValue(goalValue);
+  // setGoalId(goalId);
+// }
+// if the goal for the selected child isn't in local storage call getCurrentGoal()
+// and set local storage 
 
+// claim goal button should open confirmation confirmation dialog CLAIM / CANCEL
 
- // handleSetGoal(reward_id) on rewards list
-
-  // function getCurrentGoal(child) {
+  // function getCurrentGoal() {
   //   actor?.getCurrentGoal(child).then((returnedGoal) => {
   //     if(returnedGoal > 0) {
   //       let info = goals[0].filter(x => x.id === returnedGoal);
@@ -49,62 +65,41 @@ const Goal = () => {
   //   }
   // }
 
+   // handleSetGoal(reward_id) is on Rewards.jsx
+
   // React.useEffect(() => {
-  //   getCurrentGoal(props.selectedChild);
-  // }, [goals]);
+  //   checkGoal();
+  // }, [actor]);
 
   return (
 
     <div className="goal">
       <div className="goal-info">
-        <p className="goal-name">Quin's goal <br />New Beyblade</p>
-          <button className="claim">Claim</button>
+        <p className="goal-name">Current goal <br />{goalName}</p>
+        {balance >= goalValue && goalValue > 0 &&
+          <button className="claim" onClick={() => handleClaimGoal(parseInt(goalId))}>Claim</button>
+        }
       </div>
+      {hasGoal &&
       <div className="goal-progress">
         <CircularProgressbar 
           strokeWidth="12" 
-          value="100" 
-          maxValue="200" 
-          text="100" 
+          value={balance} 
+          maxValue={goalValue} 
+          text={`${balance}`} 
           styles={buildStyles({
-            strokeLinecap: 'butt', // 'butt' or 'round'
+            strokeLinecap: 'butt',
             textSize: '1.5em',
             pathColor: `hsl(184, 81%, 37%)`,
             textColor: 'hsl(184, 81%, 37%)',
             trailColor: 'hsl(205, 67%, 96%)',
           })}
+
         />
-        <p className="goal-value">of 200</p>
+        <p className="goal-value">of {goalValue}</p>
       </div>
+      }
     </div>
-
-    // <div className="goal">
-    //   <div className="goal-info">
-    //     <p className="goal-name">{goalName}</p>
-    //     {props.balance >= goalValue && goalValue > 0 &&
-    //       <button className="claim" onClick={() => props.handleClaimGoal(parseInt(goalId))}>Claim</button>
-    //     }
-    //   </div>
-    //   {hasGoal &&
-    //   <div className="goal-progress">
-    //     <CircularProgressbar 
-    //       strokeWidth="12" 
-    //       value={props.balance} 
-    //       maxValue={goalValue} 
-    //       text={`${props.balance}`} 
-    //       styles={buildStyles({
-    //         strokeLinecap: 'butt', // 'butt' or 'round'
-    //         textSize: '1.5em',
-    //         pathColor: `hsl(184, 81%, 37%)`,
-    //         textColor: 'hsl(184, 81%, 37%)',
-    //         trailColor: 'hsl(205, 67%, 96%)',
-    //       })}
-
-    //     />
-    //     <p className="goal-value">of {goalValue}</p>
-    //   </div>
-    //   }
-    // </div>
   );
 };
 
