@@ -67,6 +67,7 @@ main {
 
 .child-list-item {
   padding-left: 0;
+  padding-top: 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -257,7 +258,7 @@ input[type="text"]::placeholder {
   color: #fff;
   padding: 10px;
   width: 100%;
-  /* width: 228px; */
+  max-width: 300px;
   font-size: 20px;
   cursor: pointer;
 }
