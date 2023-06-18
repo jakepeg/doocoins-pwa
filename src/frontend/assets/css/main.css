@@ -155,6 +155,7 @@ main {
 
 .dc-img-big {
   display: inline-block;
+  width: 40px;
 }
 
 .dc-img-small {
