@@ -80,10 +80,14 @@ const Tasks = () => {
     }));
   };
 
-  const handleSubmitTask = (task) => {
-    if (task) {
+  const handleSubmitTask = (taskName, value) => {
+    if (taskName) {
+      const task = {
+        name: taskName,
+        value: parseInt(value)
+      }
       handleToggleAddTaskPopup();
-      actor.addTask({ value: 0, name: task }, child.id).then((response) => {
+      actor.addTask(task, child.id).then((response) => {
         console.log(`response added`, response);
         getTasks();
       });
@@ -120,7 +124,6 @@ const Tasks = () => {
       {showPopup.add_task && (
         <AddTaskDialog
           handleSubmitTask={handleSubmitTask}
-          selectedChild={child}
           handleClosePopup={handleToggleAddTaskPopup}
         />
       )}
