@@ -169,6 +169,8 @@ const Tasks = () => {
     </TrailingActions>
   );
 
+  console.log(tasks)
+
   if (isLoading) {
     return <LoadingSpinner />;
   }
@@ -210,11 +212,7 @@ const Tasks = () => {
         } light-panel`}
       >
         <div
-          className={`${
-            showPopup.delete || showPopup.edit || showPopup.add_task
-              ? modelStyles.blur_background
-              : undefined
-          }  panel-header-wrapper`}
+          className={`panel-header-wrapper`}
         >
           <h2 className="title-button dark">
             <span>Tasks</span>{" "}

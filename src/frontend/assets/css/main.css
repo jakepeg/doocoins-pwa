@@ -214,7 +214,7 @@ main {
   align-items: center;
 }
 
-.approve {
+.approve, .claim-option {
   background-color: #0B334D;
 }
 
