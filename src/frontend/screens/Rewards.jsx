@@ -34,6 +34,7 @@ const Rewards = () => {
     edit: false,
     claim: false,
     goal: false,
+    approve: false,
   });
 
   React.useEffect(() => {

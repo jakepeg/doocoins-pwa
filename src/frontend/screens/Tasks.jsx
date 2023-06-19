@@ -19,6 +19,7 @@ import { ReactComponent as ApproveIcon } from "../assets/images/tick.svg";
 import { ReactComponent as EditIcon } from "../assets/images/pencil.svg";
 import { ReactComponent as DeleteIcon } from "../assets/images/delete.svg";
 import { Text } from "@chakra-ui/react";
+import ApproveDialog from "../components/Dialogs/ApproveDialog";
 
 const Tasks = () => {
   const { actor } = useAuth();
@@ -31,6 +32,7 @@ const Tasks = () => {
     delete: false,
     edit: false,
     add_task: false,
+    approve: false,
   });
 
   React.useEffect(() => {
@@ -84,6 +86,13 @@ const Tasks = () => {
     setShowPopup((prevState) => ({ ...prevState, ["edit"]: false }));
   };
 
+  const handleCloseTogglePopup = () => {
+    setShowPopup((prevState) => ({
+      ...prevState,
+      ["approve"]: !prevState.approve,
+    }));
+  };
+
   const handleToggleAddTaskPopup = () => {
     setShowPopup((prevState) => ({
       ...prevState,
@@ -128,7 +137,7 @@ const Tasks = () => {
   const trailingActions = ({ task }) => (
     <TrailingActions>
       <SwipeAction
-        onClick={() => handleTaskComplete(parseInt(task.id))}
+        onClick={() => handleTogglePopup(true, task, "approve")}
         className="approve"
       >
         <div className="action-btn ">
@@ -169,7 +178,11 @@ const Tasks = () => {
     </TrailingActions>
   );
 
-  console.log(tasks)
+  const isModalOpen =
+    showPopup.delete ||
+    showPopup.edit ||
+    showPopup.add_task ||
+    showPopup.approve;
 
   if (isLoading) {
     return <LoadingSpinner />;
@@ -178,11 +191,7 @@ const Tasks = () => {
   return (
     <>
       <Balance
-        isModalOpen={
-          showPopup.delete || showPopup.edit || showPopup.add_task
-            ? modelStyles.blur_background
-            : undefined
-        }
+        isModalOpen={isModalOpen ? modelStyles.blur_background : undefined}
         childName={child.name}
         childBalance={child.balance}
       />
@@ -190,6 +199,13 @@ const Tasks = () => {
         <DeleteDialog
           selectedChild={selectedTask}
           handleCloseDeletePopup={handleCloseDeletePopup}
+        />
+      )}
+      {showPopup.approve && (
+        <ApproveDialog
+          handleClosePopup={handleCloseTogglePopup}
+          selectedItem={selectedTask}
+          handleApprove={() => handleTaskComplete(parseInt(selectedTask.id))}
         />
       )}
       {showPopup.edit && (
@@ -206,14 +222,10 @@ const Tasks = () => {
       )}
       <div
         className={`${
-          showPopup.delete || showPopup.edit || showPopup.add_task
-            ? modelStyles.blur_background
-            : undefined
+          isModalOpen ? modelStyles.blur_background : undefined
         } light-panel`}
       >
-        <div
-          className={`panel-header-wrapper`}
-        >
+        <div className={`panel-header-wrapper`}>
           <h2 className="title-button dark">
             <span>Tasks</span>{" "}
             <span

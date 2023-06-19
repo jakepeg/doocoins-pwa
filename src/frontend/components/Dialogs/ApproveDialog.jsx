@@ -2,19 +2,19 @@ import React from "react";
 import ConfirmationPopup from "../popup/ConfirmationPopup";
 import modelStyles from "../../components/popup/confirmation_popup.module.css";
 
-const DeleteDialog = ({ handleCloseDeletePopup, selectedChild }) => {
+const ApproveDialog = ({ handleApprove, handleClosePopup, selectedItem }) => {
   return (
-    <ConfirmationPopup handleClosePopup={handleCloseDeletePopup}>
-      <h4 className={modelStyles.popup_title}>Delete {selectedChild.name}</h4>
+    <ConfirmationPopup handleClosePopup={handleClosePopup}>
+      <h4 className={modelStyles.popup_title}>Approve {selectedItem.name}</h4>
       <button
         className={modelStyles.popup_delete_action_btn}
-        onClick={handleCloseDeletePopup}
+        onClick={handleApprove}
       >
-        DELETE
+        Approve
       </button>
       <p
         className={modelStyles.popup_cancel_action_btn}
-        onClick={handleCloseDeletePopup}
+        onClick={handleClosePopup}
       >
         Cancel
       </p>
@@ -22,4 +22,4 @@ const DeleteDialog = ({ handleCloseDeletePopup, selectedChild }) => {
   );
 };
 
-export default DeleteDialog;
+export default ApproveDialog;

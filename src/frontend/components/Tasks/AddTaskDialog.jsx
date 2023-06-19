@@ -22,7 +22,7 @@ const AddTaskDialog = ({
       />
       <input
         type="number"
-        name="task"
+        name="value"
         style={{ marginTop: "18px" }}
         className={`text-field ${modelStyles.popup_input_edit_field}`}
         ref={valueRef}
