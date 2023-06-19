@@ -1,7 +1,7 @@
 {
-  "name": "Weather Ups",
-  "short_name": "Weathe Ups",
-  "description": "An app that can show weather forecast for your city.",
+  "short_name": "DooCoins",
+  "name": "DooCoins Kids Rewards dApp",
+  "description": "Children earn DooCoins for good behavior, completing chores and personal achievements. Web3 dApp built on blockchain",
   "icons": [
     {
       "src": "/favicon.ico",
@@ -21,16 +21,22 @@
       "purpose": "maskable"
     },
     {
-      "src": "/logo192.png",
+      "src": "/logo144.png",
       "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/logo1024.png",
+      "sizes": "1024x1024",
       "type": "image/png",
       "purpose": "any"
     }
   ],
-  "theme_color": "#171717",
-  "background_color": "#e8ebf2",
-  "display": "standalone",
-  "scope": "/",
-  "start_url": "/",
-  "orientation": "portrait"
+  theme_color: "#0B334D",
+  background_color: "#0B334D",
+  display: "standalone",
+  scope: "/",
+  start_url: "/",
+  orientation: "portrait"
 }
