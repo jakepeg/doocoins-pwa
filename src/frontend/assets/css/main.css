@@ -35,6 +35,9 @@ main {
 .light-panel {
   background-color: #F0F7FC;
   min-height: 100%;
+}
+
+.panel-header-wrapper {
   padding: 20px;
 }
 
@@ -185,13 +188,20 @@ main {
   justify-content: center;
 }
 
+.swipe-action {
+  padding: 0 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .action-btn {
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
   height: 100%; 
-  padding: 12px;
+  /* padding: 12px; */
   font-weight: 500;
   box-sizing: border-box;
   color: #eee;
