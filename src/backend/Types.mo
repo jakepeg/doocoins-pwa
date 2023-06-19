@@ -3,6 +3,7 @@ module {
     public type Child = {
         name : Text;
         id : Text;
+        archived:Bool;
 
     };
 
@@ -14,6 +15,7 @@ module {
         name : Text;
         value : Nat;
         id : Nat;
+        archived:Bool;
     };
 
     public type TaskCall = {
@@ -26,6 +28,7 @@ module {
         name : Text;
         value : Nat;
         id : Nat;
+        archived:Bool;
     };
 
     public type GoalCall = {

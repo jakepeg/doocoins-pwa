@@ -6,7 +6,8 @@ import Principal "mo:base/Principal";
 import Result "mo:base/Result";
 import Iter "mo:base/Iter";
 import Option "mo:base/Option";
-import Types "./Types"
+import Types "./Types";
+import Buffer "mo:base/Buffer";
 
 actor {
 
@@ -54,6 +55,7 @@ actor {
         let finalChild : Types.Child = {
             name = child.name;
             id = childId;
+            archived=false;
         };
 
         //Initializing task number to this child
@@ -128,6 +130,7 @@ actor {
             name = task.name;
             value = task.value;
             id = finalPointer;
+            archived=false;
         };
         switch (finalPointer) {
             case 0 {
@@ -171,6 +174,7 @@ actor {
 
     public shared (msg) func getChildren() : async Result.Result<[Types.Child], Types.Error> {
         let callerId = msg.caller;
+        let unArchivedChilds:Buffer.Buffer<Types.Child> = Buffer.Buffer<Types.Child>(0);
 
         if (Principal.toText(callerId) == anonId) {
             return #err(#NotAuthorized);
@@ -181,9 +185,16 @@ actor {
             keyPrincipal(callerId),
             Principal.equal,
         );
-
         let allChildrenFormatted = Option.get(allChildren, Trie.empty());
-        return #ok(Trie.toArray(allChildrenFormatted, extractChildren));
+        let agnosticArchivedChildList = Trie.toArray(allChildrenFormatted, extractChildren);
+
+        for(child in agnosticArchivedChildList.vals()){
+            if(child.archived==false){
+                unArchivedChilds.add(child);
+            }
+        };
+
+        return #ok(Buffer.toArray(unArchivedChilds));
     };
 
     //Get the childs tasks
@@ -192,6 +203,7 @@ actor {
 
     public shared (msg) func getTasks(childId : Text) : async Result.Result<[Types.Task], Types.Error> {
         let callerId = msg.caller;
+        let unArchivedChildsTasks:Buffer.Buffer<Types.Task> = Buffer.Buffer<Types.Task>(0);
 
         if (Principal.toText(callerId) == anonId) {
             return #err(#NotAuthorized);
@@ -203,7 +215,14 @@ actor {
             Text.equal,
         );
         let myChildTasksFormatted = Option.get(myChildTasks, Trie.empty());
-        return #ok(Trie.toArray(myChildTasksFormatted, extractTasks));
+        let agnosticArchivedChildTaskList = Trie.toArray(myChildTasksFormatted, extractTasks);
+
+        for(task in agnosticArchivedChildTaskList.vals()){
+            if(task.archived==false){
+                unArchivedChildsTasks.add(task);
+            }
+        };
+        return #ok(Buffer.toArray(unArchivedChildsTasks));
     };
 
     //Add goal
@@ -230,6 +249,7 @@ actor {
             name = goal.name;
             value = goal.value;
             id = finalPointer;
+            archived=false;
         };
 
         switch (finalPointer) {
@@ -301,13 +321,20 @@ actor {
     //----------------------------------------------------------------------------------------------------
 
     public func getGoals(childId : Text) : async Result.Result<[Types.Goal], Types.Error> {
+        let unArchivedGoals:Buffer.Buffer<Types.Goal> = Buffer.Buffer<Types.Goal>(0);
         let myChildGoals = Trie.find(
             childToGoals,
             keyText(childId),
             Text.equal,
         );
         let myChildGoalsFormatted = Option.get(myChildGoals, Trie.empty());
-        return #ok(Trie.toArray(myChildGoalsFormatted, extractGoals));
+        let agnosticArchivedGoalList = Trie.toArray(myChildGoalsFormatted, extractGoals);
+        for(goal in agnosticArchivedGoalList.vals()){
+            if(goal.archived==false){
+                unArchivedGoals.add(goal);
+            }
+        };
+        return #ok(Buffer.toArray(unArchivedGoals));
     };
 
     //Approve a childs task
