@@ -115,8 +115,8 @@ const Tasks = () => {
   };
 
   function handleTaskComplete(task_id) {
-    let r = window.confirm("Is the task complete?");
-    if (r == true) {
+    // let r = window.confirm("Is the task complete?");
+    // if (r == true) {
       let dateNum = Math.floor(Date.now() / 1000);
       let date = dateNum.toString();
       // API call approveTask
@@ -129,9 +129,9 @@ const Tasks = () => {
             console.error(returnedApproveTask.err);
           }
         });
-    } else {
-      console.log("You pressed cancel!");
-    }
+    // } else {
+    //   console.log("You pressed cancel!");
+    // }
   }
 
   const trailingActions = ({ task }) => (

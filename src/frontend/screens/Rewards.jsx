@@ -137,7 +137,7 @@ const Rewards = () => {
     <TrailingActions>
       <SwipeAction
         onClick={() => handleTaskComplete(parseInt(reward.id))}
-        className="claim-option"
+        className="approve"
       >
         <div className="action-btn ">
           <div className="ItemColumnCentered">

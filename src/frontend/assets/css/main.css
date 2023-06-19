@@ -214,8 +214,12 @@ main {
   align-items: center;
 }
 
-.approve, .claim-option {
+.approve {
   background-color: #0B334D;
+}
+
+.claim-option {
+  background-color: #0075C0;
 }
 
 .edit {

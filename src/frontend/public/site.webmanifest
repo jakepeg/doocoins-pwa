@@ -33,10 +33,10 @@
       "purpose": "any"
     }
   ],
-  theme_color: "#0B334D",
-  background_color: "#0B334D",
-  display: "standalone",
-  scope: "/",
-  start_url: "/",
-  orientation: "portrait"
+  "theme_color": "#0B334D",
+  "background_color": "#0B334D",
+  "display": "standalone",
+  "scope": "/",
+  "start_url": "/",
+  "orientation": "portrait"
 }
