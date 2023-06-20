@@ -57,15 +57,17 @@ const Rewards = () => {
     });
   }, []);
 
-  function getRewards() {
+  function getRewards({ disableFullLoader }) {
     if (child) {
       console.log("getRewards called for child id: " + child);
-      setLoader((prevState) => ({ ...prevState, init: true }));
+      if (!disableFullLoader) {
+        setLoader((prevState) => ({ ...prevState, init: true }));
+      }
       actor?.getGoals(child.id).then((returnedRewards) => {
         if ("ok" in returnedRewards) {
           const rewards = Object.values(returnedRewards);
           setRewards(rewards);
-          setLoader((prevState) => ({ ...prevState, init: false }));
+          setLoader((prevState) => ({ ...prevState, init: false, singles: false }));
         } else {
           console.error(returnedRewards.err);
         }
@@ -243,11 +245,12 @@ const Rewards = () => {
         name: rewardName,
         value: parseInt(value),
       };
-      setLoader((prevState) => ({ ...prevState, singles: true }))
+      setLoader((prevState) => ({ ...prevState, singles: true }));
       handleToggleAddRewardPopup();
       actor.addGoal(reward, child.id).then((response) => {
-        setLoader((prevState) => ({ ...prevState, singles: false }))
-        getRewards();
+        if ("ok" in response) {
+          getRewards({ disableFullLoader: true });
+        }
       });
     }
   };
