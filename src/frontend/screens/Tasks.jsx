@@ -114,6 +114,22 @@ const Tasks = () => {
     }
   };
 
+  function updateTask(childID, taskID, taskName, taskValue) {
+    console.log("updateChild called");
+    const task_object = { name: taskName, value: taskValue, id: taskID, archived: false };
+    actor?.updateTask(childID, taskID, task_object).then((response) => {
+      console.log(`task updated`, response);
+    });
+  }
+
+  function deleteTask(childID, taskID, taskName, taskValue) {
+    console.log("updateChild called");
+    const task_object = { name: taskName, value: taskValue, id: taskID, archived: true };
+    actor?.updateTask(childID, taskID, task_object).then((response) => {
+      console.log(`task archived`, response);
+    });
+  }
+
   function handleTaskComplete(task_id) {
     // let r = window.confirm("Is the task complete?");
     // if (r == true) {
