@@ -96,8 +96,7 @@ function CustomTabs() {
           maxWidth: "768px",
           minWidth: "320px",
           margin: "0 auto",
-          backgroundColor: "#0B334D",
-          paddingBottom: "5px",
+          backgroundColor: "#0B334D"
         }}
       >
         <CustomTab icon={WalletIcon} href="/wallet">

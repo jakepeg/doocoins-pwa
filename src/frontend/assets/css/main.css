@@ -337,3 +337,15 @@ input[type="text"]::placeholder {
   margin-top: -80px;
   border-radius: 8px;;
 }
+
+input::-webkit-input-placeholder {/* Chrome/Opera/Safari/Edge */
+	color: grey;
+}
+
+input::-ms-input-placeholder { /* Microsoft Edge */
+   color: grey;
+}
+
+input:-ms-input-placeholder {/* IE 10+ */
+	color: grey;
+}

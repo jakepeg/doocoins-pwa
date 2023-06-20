@@ -20,6 +20,8 @@ import { Text, useToast } from "@chakra-ui/react";
 import DeleteDialog from "../components/Dialogs/DeleteDialog";
 import EditDialog from "../components/Dialogs/EditDialog";
 import AddActionDialog from "../components/Tasks/AddActionDialog";
+import { default as GoalDialog } from "../components/Dialogs/ApproveDialog";
+import { default as ClaimDialog } from "../components/Dialogs/ApproveDialog";
 
 const Rewards = () => {
   const { actor, logout } = useAuth();
@@ -36,7 +38,6 @@ const Rewards = () => {
     edit: false,
     claim: false,
     goal: false,
-    approve: false,
     add_reward: false,
   });
   
@@ -102,6 +103,7 @@ const Rewards = () => {
   };
 
   function handleSetGoal(reward_id) {
+    handleToggleGoalPopup();
     // API call currentGoal
     actor?.currentGoal(child.id, reward_id).then((returnedCurrentGoal) => {
       console.log(`returnedCurrentGoal`, returnedCurrentGoal)
@@ -120,6 +122,7 @@ const Rewards = () => {
   }
 
   function handleClaimReward(reward_id) {
+    handleToggleClaimPopup();
     let r = window.confirm("Are you sure?");
     if (r == true) {
       let dateNum = Math.floor(Date.now() / 1000);
@@ -151,7 +154,7 @@ const Rewards = () => {
   const trailingActions = ({ reward }) => (
     <TrailingActions>
       <SwipeAction
-        onClick={() => handleClaimReward(parseInt(reward.id))}
+        onClick={() => handleTogglePopup(true, reward, 'claim')}
         className="approve"
       >
         <div className="action-btn ">
@@ -164,7 +167,7 @@ const Rewards = () => {
         </div>
       </SwipeAction>
       <SwipeAction
-        onClick={() => handleSetGoal(parseInt(reward.id))}
+        onClick={() => handleTogglePopup(true, reward, 'goal')}
         className="claim-option"
       >
         <div className="action-btn ">
@@ -220,6 +223,20 @@ const Rewards = () => {
     }));
   };
 
+  const handleToggleClaimPopup = () => {
+    setShowPopup((prevState) => ({
+      ...prevState,
+      ["claim"]: !prevState.claim,
+    }));
+  };
+
+  const handleToggleGoalPopup = () => {
+    setShowPopup((prevState) => ({
+      ...prevState,
+      ["goal"]: !prevState.goal,
+    }));
+  };
+
   const handleSubmitReward = (rewardName, value) => {
     if (rewardName) {
       const reward = {
@@ -242,10 +259,6 @@ const Rewards = () => {
     showPopup.goal ||
     showPopup.add_reward;
 
-  if (isLoading) {
-    return <LoadingSpinner />;
-  }
-
   return (
     <>
       {showPopup.delete && (
@@ -258,6 +271,22 @@ const Rewards = () => {
         <EditDialog
           handleCloseEditPopup={handleCloseEditPopup}
           selectedChild={selectedReward}
+        />
+      )}
+      {showPopup.claim && (
+        <ClaimDialog
+          handleClosePopup={handleToggleClaimPopup}
+          selectedItem={selectedReward}
+          handleApprove={() => handleClaimReward(parseInt(selectedReward.id))}
+          submitBtnLabel="Claim Reward"
+        />
+      )}
+      {showPopup.goal && (
+        <GoalDialog
+          handleClosePopup={handleToggleGoalPopup}
+          selectedItem={selectedReward}
+          handleApprove={() => handleSetGoal(parseInt(selectedReward.id))}
+          submitBtnLabel="Set Goal"
         />
       )}
       {showPopup.add_reward && (
