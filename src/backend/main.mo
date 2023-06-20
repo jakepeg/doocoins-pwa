@@ -523,6 +523,27 @@ actor {
         return #ok(());
     };
 
+
+      public shared (msg) func updateGoal(childId : Text, goalId : Nat, updatedGoal : Types.Goal) : async Result.Result<(), Types.Error> {
+
+        let callerId = msg.caller;
+
+        if (Principal.toText(callerId) == anonId) {
+            return #err(#NotAuthorized);
+        };
+
+        let updatedChildToGoals = Trie.put2D(
+            childToGoals,
+            keyText(childId),
+            Text.equal,
+            keyNat(goalId),
+            Nat.equal,
+            updatedGoal,
+        );
+            childToGoals := updatedChildToGoals;
+        return #ok(());
+    };
+
     private func keyPrincipal(x : Principal) : Trie.Key<Principal> {
         return { key = x; hash = Principal.hash(x) };
     };
