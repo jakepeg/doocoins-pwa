@@ -16,7 +16,7 @@ import { ReactComponent as ApproveIcon } from "../assets/images/tick.svg";
 import { ReactComponent as GoalIcon } from "../assets/images/goal.svg";
 import { ReactComponent as EditIcon } from "../assets/images/pencil.svg";
 import { ReactComponent as DeleteIcon } from "../assets/images/delete.svg";
-import { Text, useToast } from "@chakra-ui/react";
+import { Skeleton, Stack, Text, useToast } from "@chakra-ui/react";
 import DeleteDialog from "../components/Dialogs/DeleteDialog";
 import EditDialog from "../components/Dialogs/EditDialog";
 import AddActionDialog from "../components/Tasks/AddActionDialog";
@@ -25,12 +25,13 @@ import { default as ClaimDialog } from "../components/Dialogs/ApproveDialog";
 
 const Rewards = () => {
   const { actor, logout } = useAuth();
-  const toast = useToast()
+  const toast = useToast();
   const [rewards, setRewards] = React.useState({});
   const [rewardClaimed, setRewardClaimed] = React.useState(null);
   const [newReward, setNewReward] = React.useState(null);
   const [currentGoal, setCurrentGoal] = React.useState(null);
   const [isLoading, setIsLoading] = React.useState(true);
+  const [loader, setLoader] = React.useState({ init: true, singles: false });
   const [child, setChild] = React.useState(null);
   const [selectedReward, setSelectedReward] = React.useState(null);
   const [showPopup, setShowPopup] = React.useState({
@@ -40,9 +41,9 @@ const Rewards = () => {
     goal: false,
     add_reward: false,
   });
-  
+
   React.useEffect(() => {
-    setIsLoading(true);
+    setLoader((prevState) => ({ ...prevState, init: true }));
     get("selectedChild").then(async (data) => {
       const [balance, name] = await Promise.all([
         get(`balance-${data}`),
@@ -59,12 +60,12 @@ const Rewards = () => {
   function getRewards() {
     if (child) {
       console.log("getRewards called for child id: " + child);
-      setIsLoading(true);
+      setLoader((prevState) => ({ ...prevState, init: true }));
       actor?.getGoals(child.id).then((returnedRewards) => {
         if ("ok" in returnedRewards) {
           const rewards = Object.values(returnedRewards);
           setRewards(rewards);
-          setIsLoading(false);
+          setLoader((prevState) => ({ ...prevState, init: false }));
         } else {
           console.error(returnedRewards.err);
         }
@@ -106,15 +107,14 @@ const Rewards = () => {
     handleToggleGoalPopup();
     // API call currentGoal
     actor?.currentGoal(child.id, reward_id).then((returnedCurrentGoal) => {
-      console.log(`returnedCurrentGoal`, returnedCurrentGoal)
       if ("ok" in returnedCurrentGoal) {
         setCurrentGoal(reward_id);
         toast({
           title: `Goal is set to ${child.name}.`,
-          status: 'success',
+          status: "success",
           duration: 4000,
           isClosable: true,
-        })
+        });
       } else {
         console.error(returnedCurrentGoal.err);
       }
@@ -133,10 +133,10 @@ const Rewards = () => {
           if ("ok" in returnedClaimReward) {
             toast({
               title: `Reward is claimed for ${child.name}.`,
-              status: 'success',
+              status: "success",
               duration: 4000,
               isClosable: true,
-            })
+            });
             setRewardClaimed(parseInt(reward_id));
           } else {
             console.error(returnedClaimReward.err);
@@ -154,7 +154,7 @@ const Rewards = () => {
   const trailingActions = ({ reward }) => (
     <TrailingActions>
       <SwipeAction
-        onClick={() => handleTogglePopup(true, reward, 'claim')}
+        onClick={() => handleTogglePopup(true, reward, "claim")}
         className="approve"
       >
         <div className="action-btn ">
@@ -167,7 +167,7 @@ const Rewards = () => {
         </div>
       </SwipeAction>
       <SwipeAction
-        onClick={() => handleTogglePopup(true, reward, 'goal')}
+        onClick={() => handleTogglePopup(true, reward, "goal")}
         className="claim-option"
       >
         <div className="action-btn ">
@@ -243,10 +243,10 @@ const Rewards = () => {
         name: rewardName,
         value: parseInt(value),
       };
-      console.log(`reward`, reward);
+      setLoader((prevState) => ({ ...prevState, singles: true }))
       handleToggleAddRewardPopup();
       actor.addGoal(reward, child.id).then((response) => {
-        console.log(`response added`, response);
+        setLoader((prevState) => ({ ...prevState, singles: false }))
         getRewards();
       });
     }
@@ -258,10 +258,6 @@ const Rewards = () => {
     showPopup.claim ||
     showPopup.goal ||
     showPopup.add_reward;
-
-    if (isLoading) {
-      return <LoadingSpinner />;
-    }
 
   return (
     <>
@@ -304,8 +300,8 @@ const Rewards = () => {
       )}
       <Balance
         isModalOpen={isModalOpen ? modelStyles.blur_background : undefined}
-        childName={child.name}
-        childBalance={child.balance}
+        childName={child?.name}
+        childBalance={child?.balance}
       />
 
       <div
@@ -323,33 +319,50 @@ const Rewards = () => {
             />
           </h2>
         </div>
-        {rewards?.length && (
+        {loader.init ? (
+          <Stack margin={"0 20px 20px 20px"}>
+            <Skeleton height="20px" />
+            <Skeleton height="20px" mt={"12px"} />
+            <Skeleton height="20px" mt={"12px"} />
+          </Stack>
+        ) : (
           <>
-            <SwipeableList
-              threshold={0.25}
-              type={ListType.IOS}
-              fullSwipe={false}
-            >
-              {rewards[0].map((reward) => (
-                <SwipeableListItem
-                  leadingActions={null}
-                  trailingActions={trailingActions({ reward })}
-                  key={reward.id}
+            {rewards?.length && (
+              <>
+                <SwipeableList
+                  threshold={0.25}
+                  type={ListType.IOS}
+                  fullSwipe={false}
                 >
-                  <div className="list-item" key={parseInt(reward.id)}>
-                    <div>{reward.name}</div>
-                    <div>
-                      <img
-                        src={dc}
-                        className="dc-img-small"
-                        alt="DooCoins symbol"
-                      />
-                      {parseInt(reward.value)}
-                    </div>
-                  </div>
-                </SwipeableListItem>
-              ))}
-            </SwipeableList>
+                  {rewards[0].map((reward) => (
+                    <SwipeableListItem
+                      leadingActions={null}
+                      trailingActions={trailingActions({ reward })}
+                      key={reward.id}
+                    >
+                      <div className="list-item" key={parseInt(reward.id)}>
+                        <div>{reward.name}</div>
+                        <div>
+                          <img
+                            src={dc}
+                            className="dc-img-small"
+                            alt="DooCoins symbol"
+                          />
+                          {parseInt(reward.value)}
+                        </div>
+                      </div>
+                    </SwipeableListItem>
+                  ))}
+                  {loader.singles ? (
+                    <Stack margin={"0 20px 20px 20px"}>
+                      <Skeleton height="20px" mt={"12px"} />
+                    </Stack>
+                  ) : (
+                    <div></div>
+                  )}
+                </SwipeableList>
+              </>
+            )}
           </>
         )}
       </div>
