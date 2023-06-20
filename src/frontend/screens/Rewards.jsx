@@ -67,7 +67,11 @@ const Rewards = () => {
         if ("ok" in returnedRewards) {
           const rewards = Object.values(returnedRewards);
           setRewards(rewards);
-          setLoader((prevState) => ({ ...prevState, init: false, singles: false }));
+          setLoader((prevState) => ({
+            ...prevState,
+            init: false,
+            singles: false,
+          }));
         } else {
           console.error(returnedRewards.err);
         }
@@ -125,28 +129,22 @@ const Rewards = () => {
 
   function handleClaimReward(reward_id) {
     handleToggleClaimPopup();
-    let r = window.confirm("Are you sure?");
-    if (r == true) {
-      let dateNum = Math.floor(Date.now() / 1000);
-      let date = dateNum.toString();
-      actor
-        ?.claimGoal(child.id, reward_id, date)
-        .then((returnedClaimReward) => {
-          if ("ok" in returnedClaimReward) {
-            toast({
-              title: `Reward is claimed for ${child.name}.`,
-              status: "success",
-              duration: 4000,
-              isClosable: true,
-            });
-            setRewardClaimed(parseInt(reward_id));
-          } else {
-            console.error(returnedClaimReward.err);
-          }
+
+    let dateNum = Math.floor(Date.now() / 1000);
+    let date = dateNum.toString();
+    actor?.claimGoal(child.id, reward_id, date).then((returnedClaimReward) => {
+      if ("ok" in returnedClaimReward) {
+        toast({
+          title: `Reward is claimed for ${child.name}.`,
+          status: "success",
+          duration: 4000,
+          isClosable: true,
         });
-    } else {
-      console.log("You pressed cancel!");
-    }
+        setRewardClaimed(parseInt(reward_id));
+      } else {
+        console.error(returnedClaimReward.err);
+      }
+    });
   }
 
   React.useEffect(() => {

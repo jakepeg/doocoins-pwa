@@ -339,13 +339,13 @@ input[type="text"]::placeholder {
 }
 
 input::-webkit-input-placeholder {/* Chrome/Opera/Safari/Edge */
-	color: grey;
+	color: #ccc;
 }
 
 input::-ms-input-placeholder { /* Microsoft Edge */
-   color: grey;
+   color: #ccc;
 }
 
 input:-ms-input-placeholder {/* IE 10+ */
-	color: grey;
+	color: #ccc;
 }
