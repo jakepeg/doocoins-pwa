@@ -76,6 +76,22 @@ function ChildList() {
       .finally(() => setIsLoading(false));
   }
 
+  function updateChild(childID, childName) {
+    console.log("updateChild called");
+    const child_object = { id: childID, name: childName, archived: false };
+    actor?.updateChild(childID, child_object).then((response) => {
+      console.log(`child updated`, response);
+    });
+  }
+
+  function deleteChild(childID, childName) {
+    console.log("deleteChild called");
+    const child_object = { id: childID, name: childName, archived: true };
+    actor?.updateChild(childID, child_object).then((response) => {
+      console.log(`child archived`, response);
+    });
+  }
+
   async function getBalance(childID) {
     return new Promise((resolve, reject) => {
       let bal;
