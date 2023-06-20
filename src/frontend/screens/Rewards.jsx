@@ -128,6 +128,12 @@ const Rewards = () => {
         ?.claimGoal(child.id, reward_id, date)
         .then((returnedClaimReward) => {
           if ("ok" in returnedClaimReward) {
+            toast({
+              title: `Reward is claimed for ${child.name}.`,
+              status: 'success',
+              duration: 4000,
+              isClosable: true,
+            })
             setRewardClaimed(parseInt(reward_id));
           } else {
             console.error(returnedClaimReward.err);
@@ -145,7 +151,7 @@ const Rewards = () => {
   const trailingActions = ({ reward }) => (
     <TrailingActions>
       <SwipeAction
-        onClick={() => handleTaskComplete(parseInt(reward.id))}
+        onClick={() => handleClaimReward(parseInt(reward.id))}
         className="approve"
       >
         <div className="action-btn ">
