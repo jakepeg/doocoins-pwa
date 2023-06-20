@@ -7,7 +7,6 @@ import LoadingSpinner from "../components/LoadingSpinner";
 import dc from "../assets/images/dc.svg";
 import { useAuth } from "../use-auth-client";
 
-
 const Wallet = () => {
   const {actor} = useAuth()
   const [transactions, setTransactions] = React.useState({});
@@ -68,7 +67,9 @@ const Wallet = () => {
               role="button"
               key={parseInt(transaction.id)}
             >
-              {/* <div><Moment format="DD/MM/YY" unix>{transaction.completedDate}</Moment> {transaction.name}</div> */}
+              <div>
+                {/* <Moment format="DD/MM/YY" unix>{transaction.completedDate}</Moment>  */}
+                {transaction.completedDate} {transaction.name}</div>
               <div>
                 <img src={dc} className="dc-img-small" alt="DooCoins symbol" />
                 {parseInt(transaction.value)}

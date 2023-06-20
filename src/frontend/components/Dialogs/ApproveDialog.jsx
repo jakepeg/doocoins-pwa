@@ -7,7 +7,7 @@ const ApproveDialog = ({ handleApprove, handleClosePopup, selectedItem }) => {
     <ConfirmationPopup handleClosePopup={handleClosePopup}>
       <h4 className={modelStyles.popup_title}>{selectedItem.name}</h4>
       <button
-        className={modelStyles.popup_delete_action_btn}
+        className={modelStyles.popup_edit_action_btn}
         onClick={handleApprove}
       >
         Approve
