@@ -259,6 +259,10 @@ const Rewards = () => {
     showPopup.goal ||
     showPopup.add_reward;
 
+    if (isLoading) {
+      return <LoadingSpinner />;
+    }
+
   return (
     <>
       {showPopup.delete && (
