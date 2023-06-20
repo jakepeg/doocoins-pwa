@@ -2,7 +2,7 @@ import React from "react";
 import { ReactComponent as DCIcon } from "../../assets/images/dc.svg";
 import { Box, Text } from "@chakra-ui/react";
 
-const ChildTask = ({ task, handleTaskComplete }) => {
+const ChildTask = ({ task }) => {
   return (
     <>
       <Box
@@ -12,7 +12,6 @@ const ChildTask = ({ task, handleTaskComplete }) => {
         className="list-item"
         role="link"
         key={parseInt(task.id)}
-        onKeyDown={() => handleTaskComplete(parseInt(task.id))}
       >
         <Text textAlign={"left"} fontSize={"22px"}>
           {task.name}

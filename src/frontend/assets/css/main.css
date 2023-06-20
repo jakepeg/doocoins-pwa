@@ -216,18 +216,22 @@ main {
 
 .approve {
   background-color: #0B334D;
+  cursor: pointer;
 }
 
 .claim-option {
   background-color: #0075C0;
+  cursor: pointer;
 }
 
 .edit {
   background-color: #139EAA;
+  cursor: pointer;
 }
 
 .delete {
   background-color: #ff3636;
+  cursor: pointer;
 }
 
 .logout {

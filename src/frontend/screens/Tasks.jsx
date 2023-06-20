@@ -7,7 +7,7 @@ import ChildTask from "../components/Tasks/ChildTask";
 import EditDialog from "../components/Dialogs/EditDialog";
 import modelStyles from "../components/popup/confirmation_popup.module.css";
 import DeleteDialog from "../components/Dialogs/DeleteDialog";
-import AddTaskDialog from "../components/Tasks/AddTaskDialog";
+import AddActionDialog from "../components/Tasks/AddActionDialog";
 import {
   SwipeableList,
   Type as ListType,
@@ -117,18 +117,17 @@ const Tasks = () => {
   function handleTaskComplete(task_id) {
     // let r = window.confirm("Is the task complete?");
     // if (r == true) {
-      let dateNum = Math.floor(Date.now() / 1000);
-      let date = dateNum.toString();
-      // API call approveTask
-      actor
-        ?.approveTask(child.id, task_id, date)
-        .then((returnedApproveTask) => {
-          if ("ok" in returnedApproveTask) {
-            setTaskComplete(parseInt(task_id));
-          } else {
-            console.error(returnedApproveTask.err);
-          }
-        });
+    let dateNum = Math.floor(Date.now() / 1000);
+    let date = dateNum.toString();
+    // API call approveTask
+    handleCloseTogglePopup();
+    actor?.approveTask(child.id, task_id, date).then((returnedApproveTask) => {
+      if ("ok" in returnedApproveTask) {
+        setTaskComplete(parseInt(task_id));
+      } else {
+        console.error(returnedApproveTask.err);
+      }
+    });
     // } else {
     //   console.log("You pressed cancel!");
     // }
@@ -215,9 +214,12 @@ const Tasks = () => {
         />
       )}
       {showPopup.add_task && (
-        <AddTaskDialog
+        <AddActionDialog
           handleSubmitTask={handleSubmitTask}
           handleClosePopup={handleToggleAddTaskPopup}
+          title="Add Task"
+          namePlaceHolder="Task Name"
+          valuePlaceHolder="Task Value"
         />
       )}
       <div
@@ -248,11 +250,7 @@ const Tasks = () => {
                   trailingActions={trailingActions({ task })}
                   key={task.id}
                 >
-                  <ChildTask
-                    key={task.id}
-                    task={task}
-                    handleTaskComplete={handleTaskComplete}
-                  />
+                  <ChildTask key={task.id} task={task} />
                 </SwipeableListItem>
               ))}
             </SwipeableList>

@@ -16,12 +16,14 @@ import { ReactComponent as ApproveIcon } from "../assets/images/tick.svg";
 import { ReactComponent as GoalIcon } from "../assets/images/goal.svg";
 import { ReactComponent as EditIcon } from "../assets/images/pencil.svg";
 import { ReactComponent as DeleteIcon } from "../assets/images/delete.svg";
-import { Text } from "@chakra-ui/react";
+import { Text, useToast } from "@chakra-ui/react";
 import DeleteDialog from "../components/Dialogs/DeleteDialog";
 import EditDialog from "../components/Dialogs/EditDialog";
+import AddActionDialog from "../components/Tasks/AddActionDialog";
 
 const Rewards = () => {
   const { actor, logout } = useAuth();
+  const toast = useToast()
   const [rewards, setRewards] = React.useState({});
   const [rewardClaimed, setRewardClaimed] = React.useState(null);
   const [newReward, setNewReward] = React.useState(null);
@@ -35,8 +37,9 @@ const Rewards = () => {
     claim: false,
     goal: false,
     approve: false,
+    add_reward: false,
   });
-
+  
   React.useEffect(() => {
     setIsLoading(true);
     get("selectedChild").then(async (data) => {
@@ -80,7 +83,7 @@ const Rewards = () => {
       e.target.querySelector('input[name="reward_value"]').value
     );
     const reward_object = { name: reward_name, value: reward_value };
-    actor?.addGoal(reward_object, selectedChild).then((returnedAddReward) => {
+    actor?.addGoal(reward_object, child.id).then((returnedAddReward) => {
       if ("ok" in returnedAddReward) {
         setNewReward(reward_name);
         inputs.forEach((input) => {
@@ -100,10 +103,16 @@ const Rewards = () => {
 
   function handleSetGoal(reward_id) {
     // API call currentGoal
-    actor?.currentGoal(selectedChild, reward_id).then((returnedCurrentGoal) => {
+    actor?.currentGoal(child.id, reward_id).then((returnedCurrentGoal) => {
+      console.log(`returnedCurrentGoal`, returnedCurrentGoal)
       if ("ok" in returnedCurrentGoal) {
         setCurrentGoal(reward_id);
-        ref.current.toggle();
+        toast({
+          title: `Goal is set to ${child.name}.`,
+          status: 'success',
+          duration: 4000,
+          isClosable: true,
+        })
       } else {
         console.error(returnedCurrentGoal.err);
       }
@@ -116,7 +125,7 @@ const Rewards = () => {
       let dateNum = Math.floor(Date.now() / 1000);
       let date = dateNum.toString();
       actor
-        ?.claimGoal(selectedChild, reward_id, date)
+        ?.claimGoal(child.id, reward_id, date)
         .then((returnedClaimReward) => {
           if ("ok" in returnedClaimReward) {
             setRewardClaimed(parseInt(reward_id));
@@ -198,6 +207,35 @@ const Rewards = () => {
     setShowPopup((prevState) => ({ ...prevState, ["edit"]: false }));
   };
 
+  const handleToggleAddRewardPopup = () => {
+    setShowPopup((prevState) => ({
+      ...prevState,
+      ["add_reward"]: !prevState.add_reward,
+    }));
+  };
+
+  const handleSubmitReward = (rewardName, value) => {
+    if (rewardName) {
+      const reward = {
+        name: rewardName,
+        value: parseInt(value),
+      };
+      console.log(`reward`, reward);
+      handleToggleAddRewardPopup();
+      actor.addGoal(reward, child.id).then((response) => {
+        console.log(`response added`, response);
+        getRewards();
+      });
+    }
+  };
+
+  const isModalOpen =
+    showPopup.delete ||
+    showPopup.edit ||
+    showPopup.claim ||
+    showPopup.goal ||
+    showPopup.add_reward;
+
   if (isLoading) {
     return <LoadingSpinner />;
   }
@@ -216,34 +254,35 @@ const Rewards = () => {
           selectedChild={selectedReward}
         />
       )}
+      {showPopup.add_reward && (
+        <AddActionDialog
+          handleSubmitTask={handleSubmitReward}
+          handleClosePopup={handleToggleAddRewardPopup}
+          title="Add Reward"
+          namePlaceHolder="Reward Name"
+          valuePlaceHolder="Reward Value"
+        />
+      )}
       <Balance
-        isModalOpen={
-          showPopup.delete ||
-          showPopup.edit ||
-          showPopup.claim ||
-          showPopup.goal
-            ? modelStyles.blur_background
-            : undefined
-        }
+        isModalOpen={isModalOpen ? modelStyles.blur_background : undefined}
         childName={child.name}
         childBalance={child.balance}
       />
 
       <div
         className={`${
-          showPopup.delete ||
-          showPopup.edit ||
-          showPopup.claim ||
-          showPopup.goal
-            ? modelStyles.blur_background
-            : undefined
+          isModalOpen ? modelStyles.blur_background : undefined
         } light-panel`}
       >
         <div className={`panel-header-wrapper`}>
           <h2 className="title-button dark">
-            <span>Rewards</span> <span className="plus-sign" />
+            <span>Rewards</span>{" "}
+            <span
+              role="button"
+              onClick={handleToggleAddRewardPopup}
+              className="plus-sign"
+            />
           </h2>
-          {isLoading ? <LoadingSpinner /> : null}
         </div>
         {rewards?.length && (
           <>
@@ -258,13 +297,7 @@ const Rewards = () => {
                   trailingActions={trailingActions({ reward })}
                   key={reward.id}
                 >
-                  <div
-                    className="list-item"
-                    role="button"
-                    key={parseInt(reward.id)}
-                    onClick={() => handleClaimReward(parseInt(reward.id))}
-                    onKeyDown={() => handleClaimReward(parseInt(reward.id))}
-                  >
+                  <div className="list-item" key={parseInt(reward.id)}>
                     <div>{reward.name}</div>
                     <div>
                       <img
