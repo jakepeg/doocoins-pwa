@@ -354,13 +354,18 @@ const Rewards = () => {
                       </div>
                     </SwipeableListItem>
                   ))}
-                  {loader.singles ? (
-                    <Stack margin={"0 20px 20px 20px"}>
-                      <Skeleton height="20px" mt={"12px"} />
-                    </Stack>
-                  ) : (
-                    <div></div>
-                  )}
+                  <SwipeableListItem
+                    leadingActions={null}
+                    trailingActions={null}
+                  >
+                    {loader.singles ? (
+                      <Stack margin={"0 20px 20px 20px"}>
+                        <Skeleton height="20px" mt={"12px"} />
+                      </Stack>
+                    ) : (
+                      <div></div>
+                    )}
+                  </SwipeableListItem>
                 </SwipeableList>
               </>
             )}
