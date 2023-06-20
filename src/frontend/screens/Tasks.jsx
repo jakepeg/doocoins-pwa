@@ -115,7 +115,7 @@ const Tasks = () => {
   };
 
   function updateTask(childID, taskID, taskName, taskValue) {
-    console.log("updateChild called");
+    console.log("updateTask called");
     const task_object = { name: taskName, value: taskValue, id: taskID, archived: false };
     actor?.updateTask(childID, taskID, task_object).then((response) => {
       console.log(`task updated`, response);
@@ -123,7 +123,7 @@ const Tasks = () => {
   }
 
   function deleteTask(childID, taskID, taskName, taskValue) {
-    console.log("updateChild called");
+    console.log("deleteTask called");
     const task_object = { name: taskName, value: taskValue, id: taskID, archived: true };
     actor?.updateTask(childID, taskID, task_object).then((response) => {
       console.log(`task archived`, response);

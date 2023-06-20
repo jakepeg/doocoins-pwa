@@ -80,6 +80,22 @@ const Rewards = () => {
     }
   }
 
+  function updateReward(childID, rewardID, rewardName, rewardValue) {
+    console.log("updateReward called");
+    const reward_object = { name: rewardName, value: rewardValue, id: rewardID, archived: false };
+    actor?.updateGoal(childID, rewardID, reward_object).then((response) => {
+      console.log(`reward updated`, response);
+    });
+  }
+
+  function deleteReward(childID, rewardID, rewardName, rewardValue) {
+    console.log("deleteReward called");
+    const reward_object = { name: rewardName, value: rewardValue, id: rewardID, archived: true };
+    actor?.updateGoal(childID, rewardID, reward_object).then((response) => {
+      console.log(`reward archived`, response);
+    });
+  }
+
   // add swiper - delete, edit, claim reward, set goal
   function handleAddReward(e) {
     e.preventDefault();
