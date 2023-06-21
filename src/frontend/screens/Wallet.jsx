@@ -14,6 +14,17 @@ const Wallet = () => {
   const [isLoading, setIsLoading] = React.useState(true);
   const [child, setChild] = React.useState(null);
 
+  // const humanReadableDate = time => {
+  //   return new Date(time).toLocaleString('en-US', {
+  //     month: 'short',
+  //     day: 'numeric',
+  //   });
+  // };
+
+  const humanReadableDate = time => {
+    return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric'}).format(time)
+  };
+
   React.useEffect(() => {
     setIsLoading(true)
     get("selectedChild").then(async (data) => {
@@ -69,7 +80,8 @@ const Wallet = () => {
             >
               <div>
                 {/* <Moment format="DD/MM/YY" unix>{transaction.completedDate}</Moment>  */}
-                {transaction.completedDate} {transaction.name}</div>
+                <span className="date">{humanReadableDate(transaction.completedDate)}</span>
+                {transaction.name}</div>
               <div>
                 <img src={dc} className="dc-img-small" alt="DooCoins symbol" />
                 {parseInt(transaction.value)}

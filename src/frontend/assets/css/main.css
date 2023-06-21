@@ -168,7 +168,13 @@ main {
   font-size: 68px;
   font-weight: 300;
   color: #ffffff;
+  font-family: "Courier New", Courier, monospace;
+  margin: 14px 0 0 0;
 }
+
+
+
+
 
 .name {
   text-align: center;
@@ -333,9 +339,9 @@ input[type="text"]::placeholder {
   justify-content: space-evenly;
   background-color: #ffffff;
   padding: 20px;
-  margin-bottom: 20px;
-  margin-top: -80px;
-  border-radius: 8px;;
+  margin: -30px auto 20px auto;
+  border-radius: 8px;
+  max-width: 380px;
 }
 
 input::-webkit-input-placeholder {/* Chrome/Opera/Safari/Edge */
@@ -348,4 +354,14 @@ input::-ms-input-placeholder { /* Microsoft Edge */
 
 input:-ms-input-placeholder {/* IE 10+ */
 	color: #ccc;
+}
+
+.date {
+  width: 100%;
+  display: block;
+  font-size: 18px;
+  text-align: left;
+  color: #999;
+  margin-bottom: -5px;
+  margin-top: 5px;
 }
