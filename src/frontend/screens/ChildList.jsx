@@ -98,19 +98,21 @@ function ChildList() {
   }
 
   async function getBalance(childID) {
+    console.log("getBalance called");
     return new Promise((resolve, reject) => {
       let bal;
       get("balance-" + childID)
         .then((val) => {
-          if (val === undefined) {
+          // if (val === undefined) {
             actor?.getBalance(childID).then((returnedBalance) => {
               set("balance-" + childID, parseInt(returnedBalance));
               resolve(returnedBalance);
+              console.log(returnedBalance);
             });
-          } else {
-            bal = val;
-            resolve(bal);
-          }
+          // } else {
+          //   bal = val;
+          //   resolve(bal);
+          // }
         })
         .catch((error) => {
           reject(error);
