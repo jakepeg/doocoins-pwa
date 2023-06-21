@@ -37,11 +37,12 @@ function ChildList() {
     del("selectedChild");
     del("selectedChildName");
     setLoader((prevState) => ({ ...prevState, init: true }));
-    get("childList")
-      .then(async (val) => {
-        if (val === undefined || callService) {
-          setLoader((prevState) => ({ ...prevState, init: true }))
-          actor?.getChildren().then(async (returnedChilren) => {
+    get("childList").then(async (val) => {
+      if (val === undefined || callService) {
+        setLoader((prevState) => ({ ...prevState, init: true }));
+        actor
+          ?.getChildren()
+          .then(async (returnedChilren) => {
             if ("ok" in returnedChilren) {
               const children = Object.values(returnedChilren);
               const updatedChildrenData = await Promise.all(
@@ -58,27 +59,30 @@ function ChildList() {
             } else {
               console.error(returnedChilren.err);
             }
-          }).finally(() => setLoader((prevState) => ({ ...prevState, init: false })));
-        } else {
-          const updatedChildrenData = await Promise.all(
-            Object.values(val).map(async (child) => {
-              const balance = await getBalance(child.id);
-              return {
-                ...child,
-                balance: parseInt(balance),
-              };
-            })
+          })
+          .finally(() =>
+            setLoader((prevState) => ({ ...prevState, init: false }))
           );
-          setChildren(updatedChildrenData);
-          setLoader((prevState) => ({ ...prevState, init: false }))
-        }
-      }) 
+      } else {
+        const updatedChildrenData = await Promise.all(
+          Object.values(val).map(async (child) => {
+            const balance = await getBalance(child.id);
+            return {
+              ...child,
+              balance: parseInt(balance),
+            };
+          })
+        );
+        setChildren(updatedChildrenData);
+        setLoader((prevState) => ({ ...prevState, init: false }));
+      }
+    });
   }
 
   function updateChild(childID, childName) {
     handleCloseEditPopup();
     const child_object = { id: childID, name: childName, archived: false };
-    setLoader((prevState) => ({ ...prevState, init: true }))
+    setLoader((prevState) => ({ ...prevState, init: true }));
     actor?.updateChild(childID, child_object).then((response) => {
       getChildren({ callService: true });
     });
@@ -87,7 +91,7 @@ function ChildList() {
   function deleteChild(childID, childName) {
     handleCloseDeletePopup();
     const child_object = { id: childID, name: childName, archived: true };
-    setLoader((prevState) => ({ ...prevState, init: true }))
+    setLoader((prevState) => ({ ...prevState, init: true }));
     actor?.updateChild(childID, child_object).then((response) => {
       getChildren({ callService: true });
     });
@@ -217,14 +221,14 @@ function ChildList() {
       {showPopup.delete && (
         <DeleteDialog
           handleCloseDeletePopup={handleCloseDeletePopup}
-          selectedChild={selectedChild}
+          selectedItem={selectedChild}
           handleDelete={deleteChild}
         />
       )}
       {showPopup.edit && (
         <EditDialog
           handleCloseEditPopup={handleCloseEditPopup}
-          selectedChild={selectedChild}
+          selectedItem={selectedChild}
           handleSubmitForm={updateChild}
           hasValueField={false}
           namePlaceholder="Child Name"

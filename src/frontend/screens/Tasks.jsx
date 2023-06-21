@@ -123,34 +123,37 @@ const Tasks = () => {
   };
 
   function updateTask(childID, taskID, taskName, taskValue) {
-    console.log("updateTask called");
     const task_object = {
       name: taskName,
       value: taskValue,
       id: taskID,
       archived: false,
     };
+    handleCloseEditPopup();
+    setLoader((prevState) => ({ ...prevState, init: true }));
     actor?.updateTask(childID, taskID, task_object).then((response) => {
-      console.log(`task updated`, response);
+      getTasks({ disableFullLoader: false });
     });
   }
 
   function deleteTask(childID, taskID, taskName, taskValue) {
-    console.log("deleteTask called");
     const task_object = {
       name: taskName,
       value: taskValue,
       id: taskID,
       archived: true,
     };
-    actor?.updateTask(childID, taskID, task_object).then((response) => {
-      console.log(`task archived`, response);
-    });
+    handleCloseDeletePopup();
+    setLoader((prevState) => ({ ...prevState, init: true }));
+    actor
+      ?.updateTask(childID, taskID, task_object)
+      .then((response) => {
+        getTasks({ disableFullLoader: false });
+      })
+      .finally(() => setSelectedTask(null));
   }
 
   function handleTaskComplete(task_id) {
-    // let r = window.confirm("Is the task complete?");
-    // if (r == true) {
     let dateNum = Math.floor(Date.now() / 1000);
     let date = dateNum.toString();
     // API call approveTask
@@ -162,9 +165,6 @@ const Tasks = () => {
         console.error(returnedApproveTask.err);
       }
     });
-    // } else {
-    //   console.log("You pressed cancel!");
-    // }
   }
 
   const trailingActions = ({ task }) => (
@@ -226,8 +226,16 @@ const Tasks = () => {
       />
       {showPopup.delete && (
         <DeleteDialog
-          selectedChild={selectedTask}
+          selectedItem={selectedTask}
           handleCloseDeletePopup={handleCloseDeletePopup}
+          handleDelete={(childId) =>
+            deleteTask(
+              parseInt(childId).toString(),
+              parseInt(selectedTask.id),
+              selectedTask.name,
+              parseInt(selectedTask.value)
+            )
+          }
         />
       )}
       {showPopup.approve && (
@@ -240,7 +248,15 @@ const Tasks = () => {
       {showPopup.edit && (
         <EditDialog
           handleCloseEditPopup={handleCloseEditPopup}
-          selectedChild={selectedTask}
+          selectedItem={selectedTask}
+          handleSubmitForm={(childId, taskName, taskValue) =>
+            updateTask(
+              parseInt(childId).toString(),
+              parseInt(selectedTask.id),
+              taskName,
+              parseInt(taskValue)
+            )
+          }
         />
       )}
       {showPopup.add_task && (

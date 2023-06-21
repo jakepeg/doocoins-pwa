@@ -4,7 +4,7 @@ import modelStyles from "../../components/popup/confirmation_popup.module.css";
 
 const EditDialog = ({
   handleCloseEditPopup,
-  selectedChild,
+  selectedItem,
   handleSubmitForm,
   hasValueField = true,
   namePlaceholder = "Task Name",
@@ -12,17 +12,17 @@ const EditDialog = ({
 }) => {
   const nameRef = React.useRef(null);
   const valueRef = React.useRef(null);
-  console.log(`selectedChild`, selectedChild);
+
   return (
     <ConfirmationPopup handleClosePopup={handleCloseEditPopup}>
-      <h4 className={modelStyles.popup_title}>Edit {selectedChild.name}</h4>
+      <h4 className={modelStyles.popup_title}>Edit {selectedItem.name}</h4>
       <input
         type="text"
         name="task"
         style={{ marginTop: "18px" }}
         className={`text-field ${modelStyles.popup_input_edit_field}`}
         ref={nameRef}
-        defaultValue={selectedChild.name ? selectedChild.name : undefined}
+        defaultValue={selectedItem.name ? selectedItem.name : undefined}
         placeholder={namePlaceholder}
       />
       {hasValueField && (
@@ -33,7 +33,7 @@ const EditDialog = ({
           className={`text-field ${modelStyles.popup_input_edit_field}`}
           ref={valueRef}
           defaultValue={
-            selectedChild.value ? parseInt(selectedChild.value) : undefined
+            selectedItem.value ? parseInt(selectedItem.value) : undefined
           }
           placeholder={valuePlaceholder}
         />
@@ -41,7 +41,7 @@ const EditDialog = ({
 
       <button
         className={modelStyles.popup_edit_action_btn}
-        onClick={() => handleSubmitForm(selectedChild.id, nameRef.current.value)}
+        onClick={() => handleSubmitForm(selectedItem.id, nameRef.current?.value, valueRef.current?.value)}
       >
         EDIT
       </button>
