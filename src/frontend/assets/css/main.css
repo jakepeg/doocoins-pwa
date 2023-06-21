@@ -60,7 +60,7 @@ main {
   text-align: left;
 }
 
-.child-list {
+.list-wrapper {
   width: 100%;
   list-style-type: none;
   margin: 0;

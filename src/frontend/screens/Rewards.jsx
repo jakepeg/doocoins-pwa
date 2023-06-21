@@ -30,7 +30,6 @@ const Rewards = () => {
   const [rewardClaimed, setRewardClaimed] = React.useState(null);
   const [newReward, setNewReward] = React.useState(null);
   const [currentGoal, setCurrentGoal] = React.useState(null);
-  const [isLoading, setIsLoading] = React.useState(true);
   const [loader, setLoader] = React.useState({ init: true, singles: false });
   const [child, setChild] = React.useState(null);
   const [selectedReward, setSelectedReward] = React.useState(null);
@@ -82,7 +81,12 @@ const Rewards = () => {
 
   function updateReward(childID, rewardID, rewardName, rewardValue) {
     console.log("updateReward called");
-    const reward_object = { name: rewardName, value: rewardValue, id: rewardID, archived: false };
+    const reward_object = {
+      name: rewardName,
+      value: rewardValue,
+      id: rewardID,
+      archived: false,
+    };
     actor?.updateGoal(childID, rewardID, reward_object).then((response) => {
       console.log(`reward updated`, response);
     });
@@ -90,7 +94,12 @@ const Rewards = () => {
 
   function deleteReward(childID, rewardID, rewardName, rewardValue) {
     console.log("deleteReward called");
-    const reward_object = { name: rewardName, value: rewardValue, id: rewardID, archived: true };
+    const reward_object = {
+      name: rewardName,
+      value: rewardValue,
+      id: rewardID,
+      archived: true,
+    };
     actor?.updateGoal(childID, rewardID, reward_object).then((response) => {
       console.log(`reward archived`, response);
     });
@@ -308,7 +317,7 @@ const Rewards = () => {
       )}
       {showPopup.add_reward && (
         <AddActionDialog
-          handleSubmitTask={handleSubmitReward}
+          handleSubmitForm={handleSubmitReward}
           handleClosePopup={handleToggleAddRewardPopup}
           title="Add Reward"
           namePlaceHolder="Reward Name"
@@ -345,47 +354,44 @@ const Rewards = () => {
         ) : (
           <>
             {rewards?.length && (
-              <>
-                <SwipeableList
-                  threshold={0.25}
-                  type={ListType.IOS}
-                  fullSwipe={false}
-                >
-                  {rewards[0].map((reward) => (
-                    <SwipeableListItem
-                      leadingActions={null}
-                      trailingActions={trailingActions({ reward })}
-                      key={reward.id}
-                    >
-                      <div className="list-item" key={parseInt(reward.id)}>
-                        <div>{reward.name}</div>
-                        <div>
-                          <img
-                            src={dc}
-                            className="dc-img-small"
-                            alt="DooCoins symbol"
-                          />
-                          {parseInt(reward.value)}
-                        </div>
-                      </div>
-                    </SwipeableListItem>
-                  ))}
-                  <SwipeableListItem
-                    leadingActions={null}
-                    trailingActions={null}
+              <div className="example">
+                <ul className="list-wrapper">
+                  <SwipeableList
+                    threshold={0.25}
+                    type={ListType.IOS}
+                    fullSwipe={false}
                   >
-                    {loader.singles ? (
-                      <Stack margin={"0 20px 20px 20px"}>
-                        <Skeleton height="20px" mt={"12px"} />
-                      </Stack>
-                    ) : (
-                      <div></div>
-                    )}
-                  </SwipeableListItem>
-                </SwipeableList>
-              </>
+                    {rewards[0].map((reward) => (
+                      <SwipeableListItem
+                        leadingActions={null}
+                        trailingActions={trailingActions({ reward })}
+                        key={reward.id}
+                      >
+                        <div className="list-item" key={parseInt(reward.id)}>
+                          <div>{reward.name}</div>
+                          <div>
+                            <img
+                              src={dc}
+                              className="dc-img-small"
+                              alt="DooCoins symbol"
+                            />
+                            {parseInt(reward.value)}
+                          </div>
+                        </div>
+                      </SwipeableListItem>
+                    ))}
+                  </SwipeableList>
+                </ul>
+              </div>
             )}
           </>
+        )}
+        {loader.singles ? (
+          <Stack margin={"0 20px 20px 20px"}>
+            <Skeleton height="20px" mt={"12px"} />
+          </Stack>
+        ) : (
+          <div></div>
         )}
       </div>
     </>

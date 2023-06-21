@@ -4,7 +4,7 @@ import modelStyles from "../../components/popup/confirmation_popup.module.css";
 
 const AddActionDialog = ({
   handleClosePopup,
-  handleSubmitTask,
+  handleSubmitForm,
   title,
   valuePlaceHolder,
   namePlaceHolder
@@ -35,7 +35,7 @@ const AddActionDialog = ({
       <button
         className={modelStyles.popup_edit_action_btn}
         type="submit"
-        onClick={() => handleSubmitTask(nameRef.current.value, valueRef.current.value)}
+        onClick={() => handleSubmitForm(nameRef.current.value, valueRef.current.value)}
       >
         Submit
       </button>

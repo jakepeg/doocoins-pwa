@@ -3,11 +3,9 @@ import { useAuth } from "../use-auth-client";
 import { set, get, del } from "idb-keyval";
 import ChildItem from "../components/ChildItem";
 import modelStyles from "../components/popup/confirmation_popup.module.css";
-import ConfirmationPopup from "../components/popup/ConfirmationPopup";
 import AddChildDialog from "../components/ChildList/AddChildDialog";
 import DeleteDialog from "../components/Dialogs/DeleteDialog";
 import EditDialog from "../components/Dialogs/EditDialog";
-import LoadingSpinner from "../components/LoadingSpinner";
 import {
   SwipeableList,
   Type as ListType,
@@ -17,10 +15,10 @@ import {
 } from "react-swipeable-list";
 import { ReactComponent as EditIcon } from "../assets/images/pencil.svg";
 import { ReactComponent as DeleteIcon } from "../assets/images/delete.svg";
-import { Text } from "@chakra-ui/react";
+import { Skeleton, Stack, Text } from "@chakra-ui/react";
 
 function ChildList() {
-  const { actor, logout } = useAuth();
+  const { actor } = useAuth();
   const [children, setChildren] = React.useState(null);
   const [openItemId, setOpenItemId] = React.useState(null);
   const [showPopup, setShowPopup] = React.useState({
@@ -29,19 +27,20 @@ function ChildList() {
     add_child: false,
   });
   const [selectedChild, setSelectedChild] = React.useState(null);
-  const [isLoading, setIsLoading] = React.useState(false);
+  const [loader, setLoader] = React.useState({ init: true, singles: false });
 
   React.useEffect(() => {
-    getChildren();
+    getChildren({ callService: false });
   }, [actor]);
 
-  function getChildren() {
+  function getChildren({ callService = false }) {
     del("selectedChild");
     del("selectedChildName");
-    setIsLoading(true);
+    setLoader((prevState) => ({ ...prevState, init: true }));
     get("childList")
       .then(async (val) => {
-        if (val === undefined) {
+        if (val === undefined || callService) {
+          setLoader((prevState) => ({ ...prevState, init: true }))
           actor?.getChildren().then(async (returnedChilren) => {
             if ("ok" in returnedChilren) {
               const children = Object.values(returnedChilren);
@@ -59,7 +58,7 @@ function ChildList() {
             } else {
               console.error(returnedChilren.err);
             }
-          });
+          }).finally(() => setLoader((prevState) => ({ ...prevState, init: false })));
         } else {
           const updatedChildrenData = await Promise.all(
             Object.values(val).map(async (child) => {
@@ -71,24 +70,26 @@ function ChildList() {
             })
           );
           setChildren(updatedChildrenData);
+          setLoader((prevState) => ({ ...prevState, init: false }))
         }
-      })
-      .finally(() => setIsLoading(false));
+      }) 
   }
 
   function updateChild(childID, childName) {
-    console.log("updateChild called");
+    handleCloseEditPopup();
     const child_object = { id: childID, name: childName, archived: false };
+    setLoader((prevState) => ({ ...prevState, init: true }))
     actor?.updateChild(childID, child_object).then((response) => {
-      console.log(`child updated`, response);
+      getChildren({ callService: true });
     });
   }
 
   function deleteChild(childID, childName) {
-    console.log("deleteChild called");
+    handleCloseDeletePopup();
     const child_object = { id: childID, name: childName, archived: true };
+    setLoader((prevState) => ({ ...prevState, init: true }))
     actor?.updateChild(childID, child_object).then((response) => {
-      console.log(`child archived`, response);
+      getChildren({ callService: true });
     });
   }
 
@@ -133,6 +134,8 @@ function ChildList() {
       setChildren(updatedChildrenData);
     } catch (error) {
       console.error("Error adding item to childList:", error);
+    } finally {
+      setLoader((prevState) => ({ ...prevState, singles: false }));
     }
   }
 
@@ -161,23 +164,16 @@ function ChildList() {
       handleToggleAddChildPopup();
       const child_object = { name: childName };
       let me = await actor.whoami();
-      setIsLoading(true);
-      actor
-        ?.addChild(child_object)
-        .then((returnedAddChild) => {
-          if ("ok" in returnedAddChild) {
-            updateChildList(returnedAddChild);
-          } else {
-            console.error(returnedAddChild.err);
-          }
-        })
-        .finally(() => setIsLoading(false));
+      setLoader((prevState) => ({ ...prevState, singles: true }));
+      actor?.addChild(child_object).then((returnedAddChild) => {
+        if ("ok" in returnedAddChild) {
+          updateChildList(returnedAddChild);
+        } else {
+          console.error(returnedAddChild.err);
+        }
+      });
     }
   };
-
-  if (isLoading) {
-    return <LoadingSpinner />;
-  }
 
   const trailingActions = ({ child }) => (
     <TrailingActions>
@@ -222,12 +218,16 @@ function ChildList() {
         <DeleteDialog
           handleCloseDeletePopup={handleCloseDeletePopup}
           selectedChild={selectedChild}
+          handleDelete={deleteChild}
         />
       )}
       {showPopup.edit && (
         <EditDialog
           handleCloseEditPopup={handleCloseEditPopup}
           selectedChild={selectedChild}
+          handleSubmitForm={updateChild}
+          hasValueField={false}
+          namePlaceholder="Child Name"
         />
       )}
       <div
@@ -247,33 +247,52 @@ function ChildList() {
             />
           </h2>
         </div>
-        {children?.length ? (
-          <div className="example">
-            <ul className="child-list">
-              <SwipeableList threshold={0.25} type={ListType.IOS} fullSwipe={false}>
-                {children.length > 0 &&
-                  children.map((child, index) => {
-                    return (
-                      <SwipeableListItem
-                        leadingActions={null}
-                        trailingActions={trailingActions({ child })}
-                        key={child.id}
-                      >
-                        <ChildItem
-                          child={child}
-                          handleUpdateOpenItemId={setOpenItemId}
-                          openItemId={openItemId}
-                          index={index}
-                          handleTogglePopup={handleTogglePopup}
-                        />
-                      </SwipeableListItem>
-                    );
-                  })}
-              </SwipeableList>
-            </ul>
-          </div>
+        {loader.init ? (
+          <Stack margin={"0 20px 20px 20px"}>
+            <Skeleton height="20px" />
+            <Skeleton height="20px" mt={"12px"} />
+            <Skeleton height="20px" mt={"12px"} />
+          </Stack>
         ) : (
-          <p>Loading...</p>
+          <>
+            {children?.length && (
+              <div className="example">
+                <ul className="list-wrapper">
+                  <SwipeableList
+                    threshold={0.25}
+                    type={ListType.IOS}
+                    fullSwipe={false}
+                  >
+                    {children.length > 0 &&
+                      children.map((child, index) => {
+                        return (
+                          <SwipeableListItem
+                            leadingActions={null}
+                            trailingActions={trailingActions({ child })}
+                            key={child.id}
+                          >
+                            <ChildItem
+                              child={child}
+                              handleUpdateOpenItemId={setOpenItemId}
+                              openItemId={openItemId}
+                              index={index}
+                              handleTogglePopup={handleTogglePopup}
+                            />
+                          </SwipeableListItem>
+                        );
+                      })}
+                  </SwipeableList>
+                </ul>
+              </div>
+            )}
+          </>
+        )}
+        {loader.singles ? (
+          <Stack margin={"0 20px 20px 20px"}>
+            <Skeleton height="20px" mt={"12px"} />
+          </Stack>
+        ) : (
+          <div></div>
         )}
       </div>
     </>

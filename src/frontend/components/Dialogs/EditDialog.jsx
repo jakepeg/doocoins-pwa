@@ -2,10 +2,17 @@ import React from "react";
 import ConfirmationPopup from "../popup/ConfirmationPopup";
 import modelStyles from "../../components/popup/confirmation_popup.module.css";
 
-const EditDialog = ({ handleCloseEditPopup, selectedChild }) => {
-  const taskRef = React.useRef(null);
+const EditDialog = ({
+  handleCloseEditPopup,
+  selectedChild,
+  handleSubmitForm,
+  hasValueField = true,
+  namePlaceholder = "Task Name",
+  valuePlaceholder = "Task Value"
+}) => {
+  const nameRef = React.useRef(null);
   const valueRef = React.useRef(null);
-  console.log(`selectedChild`, selectedChild)
+  console.log(`selectedChild`, selectedChild);
   return (
     <ConfirmationPopup handleClosePopup={handleCloseEditPopup}>
       <h4 className={modelStyles.popup_title}>Edit {selectedChild.name}</h4>
@@ -14,22 +21,27 @@ const EditDialog = ({ handleCloseEditPopup, selectedChild }) => {
         name="task"
         style={{ marginTop: "18px" }}
         className={`text-field ${modelStyles.popup_input_edit_field}`}
-        ref={taskRef}
+        ref={nameRef}
         defaultValue={selectedChild.name ? selectedChild.name : undefined}
-        placeholder="Task Name"
+        placeholder={namePlaceholder}
       />
-      <input
-        type="number"
-        name="value"
-        style={{ marginTop: "18px" }}
-        className={`text-field ${modelStyles.popup_input_edit_field}`}
-        ref={valueRef}
-        defaultValue={selectedChild.value ? parseInt(selectedChild.value) : undefined}
-        placeholder="Task Value"
-      />
+      {hasValueField && (
+        <input
+          type="number"
+          name="value"
+          style={{ marginTop: "18px" }}
+          className={`text-field ${modelStyles.popup_input_edit_field}`}
+          ref={valueRef}
+          defaultValue={
+            selectedChild.value ? parseInt(selectedChild.value) : undefined
+          }
+          placeholder={valuePlaceholder}
+        />
+      )}
+
       <button
         className={modelStyles.popup_edit_action_btn}
-        onClick={handleCloseEditPopup}
+        onClick={() => handleSubmitForm(selectedChild.id, nameRef.current.value)}
       >
         EDIT
       </button>

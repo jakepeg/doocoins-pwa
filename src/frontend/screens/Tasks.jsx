@@ -18,14 +18,14 @@ import {
 import { ReactComponent as ApproveIcon } from "../assets/images/tick.svg";
 import { ReactComponent as EditIcon } from "../assets/images/pencil.svg";
 import { ReactComponent as DeleteIcon } from "../assets/images/delete.svg";
-import { Text } from "@chakra-ui/react";
+import { Skeleton, Stack, Text } from "@chakra-ui/react";
 import ApproveDialog from "../components/Dialogs/ApproveDialog";
 
 const Tasks = () => {
   const { actor } = useAuth();
   const [tasks, setTasks] = React.useState({});
   const [taskComplete, setTaskComplete] = React.useState(null);
-  const [isLoading, setIsLoading] = React.useState(true);
+  const [loader, setLoader] = React.useState({ init: true, singles: false });
   const [child, setChild] = React.useState(null);
   const [selectedTask, setSelectedTask] = React.useState(null);
   const [showPopup, setShowPopup] = React.useState({
@@ -36,7 +36,7 @@ const Tasks = () => {
   });
 
   React.useEffect(() => {
-    setIsLoading(true);
+    setLoader((prevState) => ({ ...prevState, init: true }));
     get("selectedChild").then(async (data) => {
       const [balance, name] = await Promise.all([
         get(`balance-${data}`),
@@ -50,21 +50,29 @@ const Tasks = () => {
     });
   }, []);
 
-  function getTasks() {
+  function getTasks({ disableFullLoader = false }) {
     if (child) {
-      setIsLoading(true);
+      if (!disableFullLoader) {
+        setLoader((prevState) => ({ ...prevState, init: true }));
+      }
+
       actor
         ?.getTasks(child.id)
         .then((returnedTasks) => {
           if ("ok" in returnedTasks) {
             const tasks = Object.values(returnedTasks);
             setTasks(tasks);
-            setIsLoading(false);
           } else {
             console.error(returnedTasks.err);
           }
         })
-        .finally(() => setIsLoading(false));
+        .finally(() =>
+          setLoader((prevState) => ({
+            ...prevState,
+            init: false,
+            singles: false,
+          }))
+        );
       return false;
     }
   }
@@ -107,16 +115,21 @@ const Tasks = () => {
         value: parseInt(value),
       };
       handleToggleAddTaskPopup();
+      setLoader((prevState) => ({ ...prevState, singles: true }));
       actor.addTask(task, child.id).then((response) => {
-        console.log(`response added`, response);
-        getTasks();
+        getTasks({ disableFullLoader: true });
       });
     }
   };
 
   function updateTask(childID, taskID, taskName, taskValue) {
     console.log("updateTask called");
-    const task_object = { name: taskName, value: taskValue, id: taskID, archived: false };
+    const task_object = {
+      name: taskName,
+      value: taskValue,
+      id: taskID,
+      archived: false,
+    };
     actor?.updateTask(childID, taskID, task_object).then((response) => {
       console.log(`task updated`, response);
     });
@@ -124,7 +137,12 @@ const Tasks = () => {
 
   function deleteTask(childID, taskID, taskName, taskValue) {
     console.log("deleteTask called");
-    const task_object = { name: taskName, value: taskValue, id: taskID, archived: true };
+    const task_object = {
+      name: taskName,
+      value: taskValue,
+      id: taskID,
+      archived: true,
+    };
     actor?.updateTask(childID, taskID, task_object).then((response) => {
       console.log(`task archived`, response);
     });
@@ -199,16 +217,12 @@ const Tasks = () => {
     showPopup.add_task ||
     showPopup.approve;
 
-  if (isLoading) {
-    return <LoadingSpinner />;
-  }
-
   return (
     <>
       <Balance
         isModalOpen={isModalOpen ? modelStyles.blur_background : undefined}
-        childName={child.name}
-        childBalance={child.balance}
+        childName={child?.name}
+        childBalance={child?.balance}
       />
       {showPopup.delete && (
         <DeleteDialog
@@ -231,7 +245,7 @@ const Tasks = () => {
       )}
       {showPopup.add_task && (
         <AddActionDialog
-          handleSubmitTask={handleSubmitTask}
+          handleSubmitForm={handleSubmitTask}
           handleClosePopup={handleToggleAddTaskPopup}
           title="Add Task"
           namePlaceHolder="Task Name"
@@ -253,24 +267,41 @@ const Tasks = () => {
             />
           </h2>
         </div>
-        {tasks?.length && (
+        {loader.init ? (
+          <Stack margin={"0 20px 20px 20px"}>
+            <Skeleton height="20px" />
+            <Skeleton height="20px" mt={"12px"} />
+            <Skeleton height="20px" mt={"12px"} />
+          </Stack>
+        ) : (
           <>
-            <SwipeableList
-              threshold={0.25}
-              type={ListType.IOS}
-              fullSwipe={false}
-            >
-              {tasks[0].map((task) => (
-                <SwipeableListItem
-                  leadingActions={null}
-                  trailingActions={trailingActions({ task })}
-                  key={task.id}
-                >
-                  <ChildTask key={task.id} task={task} />
-                </SwipeableListItem>
-              ))}
-            </SwipeableList>
+            {tasks?.length && (
+              <div className="example">
+                <ul className="child-list">
+                  <SwipeableList
+                    threshold={0.25}
+                    type={ListType.IOS}
+                    fullSwipe={false}
+                  >
+                    {tasks[0].map((task) => (
+                      <SwipeableListItem
+                        leadingActions={null}
+                        trailingActions={trailingActions({ task })}
+                        key={task.id}
+                      >
+                        <ChildTask key={task.id} task={task} />
+                      </SwipeableListItem>
+                    ))}
+                  </SwipeableList>
+                </ul>
+              </div>
+            )}
           </>
+        )}
+        {loader.singles && (
+          <Stack margin={"0 20px 20px 20px"}>
+            <Skeleton height="20px" mt={"12px"} />
+          </Stack>
         )}
       </div>
     </>
