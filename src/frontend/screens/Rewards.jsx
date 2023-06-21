@@ -317,7 +317,7 @@ const Rewards = () => {
         )}
       </>
     );
-  }, []);
+  }, [rewards]);
 
   const isModalOpen =
     showPopup.delete ||
