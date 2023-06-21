@@ -121,7 +121,7 @@ const Tasks = () => {
     }
   };
 
-  function updateTask(childID, taskID, taskName, taskValue) {
+  function updateTask(taskID, taskName, taskValue) {
     const task_object = {
       name: taskName,
       value: taskValue,
@@ -130,12 +130,12 @@ const Tasks = () => {
     };
     handleCloseEditPopup();
     setLoader((prevState) => ({ ...prevState, init: true }));
-    actor?.updateTask(childID, taskID, task_object).then((response) => {
+    actor?.updateTask(child.id, taskID, task_object).then((response) => {
       getTasks({ disableFullLoader: false });
     });
   }
 
-  function deleteTask(childID, taskID, taskName, taskValue) {
+  function deleteTask(taskID, taskName, taskValue) {
     const task_object = {
       name: taskName,
       value: taskValue,
@@ -145,7 +145,7 @@ const Tasks = () => {
     handleCloseDeletePopup();
     setLoader((prevState) => ({ ...prevState, init: true }));
     actor
-      ?.updateTask(childID, taskID, task_object)
+      ?.updateTask(child.id, taskID, task_object)
       .then((response) => {
         getTasks({ disableFullLoader: false });
       })
@@ -258,9 +258,8 @@ const Tasks = () => {
         <DeleteDialog
           selectedItem={selectedTask}
           handleCloseDeletePopup={handleCloseDeletePopup}
-          handleDelete={(childId) =>
+          handleDelete={() =>
             deleteTask(
-              parseInt(childId).toString(),
               parseInt(selectedTask.id),
               selectedTask.name,
               parseInt(selectedTask.value)
@@ -279,9 +278,8 @@ const Tasks = () => {
         <EditDialog
           handleCloseEditPopup={handleCloseEditPopup}
           selectedItem={selectedTask}
-          handleSubmitForm={(childId, taskName, taskValue) =>
+          handleSubmitForm={(taskId, taskName, taskValue) =>
             updateTask(
-              parseInt(childId).toString(),
               parseInt(selectedTask.id),
               taskName,
               parseInt(taskValue)

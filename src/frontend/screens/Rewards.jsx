@@ -43,6 +43,7 @@ const Rewards = () => {
   React.useEffect(() => {
     setLoader((prevState) => ({ ...prevState, init: true }));
     get("selectedChild").then(async (data) => {
+      console.log(`data`, data)
       const [balance, name] = await Promise.all([
         get(`balance-${data}`),
         get(`selectedChildName`),
@@ -54,6 +55,8 @@ const Rewards = () => {
       });
     });
   }, []);
+
+  console.log('child', child)
 
   function getRewards({ disableFullLoader }) {
     if (child) {
@@ -77,7 +80,7 @@ const Rewards = () => {
     }
   }
 
-  function updateReward(childID, rewardID, rewardName, rewardValue) {
+  function updateReward(rewardID, rewardName, rewardValue) {
     const reward_object = {
       name: rewardName,
       value: rewardValue,
@@ -87,14 +90,14 @@ const Rewards = () => {
     handleCloseEditPopup();
     setLoader((prevState) => ({ ...prevState, init: true }));
     actor
-      ?.updateGoal(childID, rewardID, reward_object)
+      ?.updateGoal(child.id, rewardID, reward_object)
       .then((response) => {
         getRewards({ disableFullLoader: false });
       })
       .finally(() => setSelectedReward(null));
   }
 
-  function deleteReward(childID, rewardID, rewardName, rewardValue) {
+  function deleteReward(rewardID, rewardName, rewardValue) {
     const reward_object = {
       name: rewardName,
       value: rewardValue,
@@ -104,7 +107,7 @@ const Rewards = () => {
     handleCloseDeletePopup();
     setLoader((prevState) => ({ ...prevState, init: true }));
     actor
-      ?.updateGoal(childID, rewardID, reward_object)
+      ?.updateGoal(child.id, rewardID, reward_object)
       .then((response) => {
         console.log(`reward archived`, response);
         getRewards({ disableFullLoader: false });
@@ -317,7 +320,6 @@ const Rewards = () => {
           handleCloseDeletePopup={handleCloseDeletePopup}
           handleDelete={(childId) =>
             deleteReward(
-              parseInt(childId).toString(),
               parseInt(selectedReward.id),
               selectedReward.name,
               parseInt(selectedReward.value)
@@ -329,9 +331,8 @@ const Rewards = () => {
         <EditDialog
           handleCloseEditPopup={handleCloseEditPopup}
           selectedItem={selectedReward}
-          handleSubmitForm={(childId, rewardName, rewardValue) =>
+          handleSubmitForm={(rewardId, rewardName, rewardValue) =>
             updateReward(
-              parseInt(childId).toString(),
               parseInt(selectedReward.id),
               rewardName,
               parseInt(rewardValue)
