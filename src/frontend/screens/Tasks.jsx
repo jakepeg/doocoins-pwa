@@ -167,49 +167,80 @@ const Tasks = () => {
     });
   }
 
-  const trailingActions = ({ task }) => (
-    <TrailingActions>
-      <SwipeAction
-        onClick={() => handleTogglePopup(true, task, "approve")}
-        className="approve"
-      >
-        <div className="action-btn ">
-          <div className="ItemColumnCentered">
-            <ApproveIcon width="22px" height="22px" />
-            <Text fontSize={"xs"} color={"#fff"}>
-              Approve
-            </Text>
+  const trailingActions = React.useCallback(
+    ({ task }) => (
+      <TrailingActions>
+        <SwipeAction
+          onClick={() => handleTogglePopup(true, task, "approve")}
+          className="approve"
+        >
+          <div className="action-btn ">
+            <div className="ItemColumnCentered">
+              <ApproveIcon width="22px" height="22px" />
+              <Text fontSize={"xs"} color={"#fff"}>
+                Approve
+              </Text>
+            </div>
           </div>
-        </div>
-      </SwipeAction>
-      <SwipeAction
-        className="edit"
-        onClick={() => handleTogglePopup(true, task, "edit")}
-      >
-        <div className="action-btn ">
-          <div className="ItemColumnCentered">
-            <EditIcon width="22px" height="22px" />
-            <Text fontSize={"xs"} color={"#fff"}>
-              Edit
-            </Text>
+        </SwipeAction>
+        <SwipeAction
+          className="edit"
+          onClick={() => handleTogglePopup(true, task, "edit")}
+        >
+          <div className="action-btn ">
+            <div className="ItemColumnCentered">
+              <EditIcon width="22px" height="22px" />
+              <Text fontSize={"xs"} color={"#fff"}>
+                Edit
+              </Text>
+            </div>
           </div>
-        </div>
-      </SwipeAction>
-      <SwipeAction
-        className="delete"
-        onClick={() => handleTogglePopup(true, task, "delete")}
-      >
-        <div className="action-btn ">
-          <div className="ItemColumnCentered">
-            <DeleteIcon width="22px" height="22px" />
-            <Text fontSize={"xs"} color={"#fff"}>
-              Delete
-            </Text>
+        </SwipeAction>
+        <SwipeAction
+          className="delete"
+          onClick={() => handleTogglePopup(true, task, "delete")}
+        >
+          <div className="action-btn ">
+            <div className="ItemColumnCentered">
+              <DeleteIcon width="22px" height="22px" />
+              <Text fontSize={"xs"} color={"#fff"}>
+                Delete
+              </Text>
+            </div>
           </div>
-        </div>
-      </SwipeAction>
-    </TrailingActions>
+        </SwipeAction>
+      </TrailingActions>
+    ),
+    []
   );
+
+  const TaskList = React.useMemo(() => {
+    return (
+      <>
+        {tasks?.length && (
+          <div className="example">
+            <ul className="child-list">
+              <SwipeableList
+                threshold={0.25}
+                type={ListType.IOS}
+                fullSwipe={false}
+              >
+                {tasks[0].map((task) => (
+                  <SwipeableListItem
+                    leadingActions={null}
+                    trailingActions={trailingActions({ task })}
+                    key={task.id}
+                  >
+                    <ChildTask key={task.id} task={task} />
+                  </SwipeableListItem>
+                ))}
+              </SwipeableList>
+            </ul>
+          </div>
+        )}
+      </>
+    );
+  }, [tasks]);
 
   const isModalOpen =
     showPopup.delete ||
@@ -290,29 +321,7 @@ const Tasks = () => {
             <Skeleton height="20px" mt={"12px"} />
           </Stack>
         ) : (
-          <>
-            {tasks?.length && (
-              <div className="example">
-                <ul className="child-list">
-                  <SwipeableList
-                    threshold={0.25}
-                    type={ListType.IOS}
-                    fullSwipe={false}
-                  >
-                    {tasks[0].map((task) => (
-                      <SwipeableListItem
-                        leadingActions={null}
-                        trailingActions={trailingActions({ task })}
-                        key={task.id}
-                      >
-                        <ChildTask key={task.id} task={task} />
-                      </SwipeableListItem>
-                    ))}
-                  </SwipeableList>
-                </ul>
-              </div>
-            )}
-          </>
+          <>{TaskList}</>
         )}
         {loader.singles && (
           <Stack margin={"0 20px 20px 20px"}>

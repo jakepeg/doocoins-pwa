@@ -179,36 +179,76 @@ function ChildList() {
     }
   };
 
-  const trailingActions = ({ child }) => (
-    <TrailingActions>
-      <SwipeAction
-        className="edit"
-        onClick={() => handleTogglePopup(true, child, "edit")}
-      >
-        <div className="action-btn ">
-          <div className="ItemColumnCentered">
-            <EditIcon width="22px" height="22px" />
-            <Text fontSize={"xs"} color={"#fff"}>
-              Edit
-            </Text>
+  const trailingActions = React.useCallback(
+    ({ child }) => (
+      <TrailingActions>
+        <SwipeAction
+          className="edit"
+          onClick={() => handleTogglePopup(true, child, "edit")}
+        >
+          <div className="action-btn ">
+            <div className="ItemColumnCentered">
+              <EditIcon width="22px" height="22px" />
+              <Text fontSize={"xs"} color={"#fff"}>
+                Edit
+              </Text>
+            </div>
           </div>
-        </div>
-      </SwipeAction>
-      <SwipeAction
-        className="delete"
-        onClick={() => handleTogglePopup(true, child, "delete")}
-      >
-        <div className="action-btn">
-          <div className="ItemColumnCentered">
-            <DeleteIcon width="22px" height="22px" />
-            <Text fontSize={"xs"} color={"#fff"}>
-              Delete
-            </Text>
+        </SwipeAction>
+        <SwipeAction
+          className="delete"
+          onClick={() => handleTogglePopup(true, child, "delete")}
+        >
+          <div className="action-btn">
+            <div className="ItemColumnCentered">
+              <DeleteIcon width="22px" height="22px" />
+              <Text fontSize={"xs"} color={"#fff"}>
+                Delete
+              </Text>
+            </div>
           </div>
-        </div>
-      </SwipeAction>
-    </TrailingActions>
+        </SwipeAction>
+      </TrailingActions>
+    ),
+    []
   );
+
+  const ChildrenList = React.useMemo(() => {
+    return (
+      <>
+        {children?.length && (
+          <div className="example">
+            <ul className="list-wrapper">
+              <SwipeableList
+                threshold={0.25}
+                type={ListType.IOS}
+                fullSwipe={false}
+              >
+                {children.length > 0 &&
+                  children.map((child, index) => {
+                    return (
+                      <SwipeableListItem
+                        leadingActions={null}
+                        trailingActions={trailingActions({ child })}
+                        key={child.id}
+                      >
+                        <ChildItem
+                          child={child}
+                          handleUpdateOpenItemId={setOpenItemId}
+                          openItemId={openItemId}
+                          index={index}
+                          handleTogglePopup={handleTogglePopup}
+                        />
+                      </SwipeableListItem>
+                    );
+                  })}
+              </SwipeableList>
+            </ul>
+          </div>
+        )}
+      </>
+    );
+  }, [children]);
 
   return (
     <>
@@ -258,38 +298,7 @@ function ChildList() {
             <Skeleton height="20px" mt={"12px"} />
           </Stack>
         ) : (
-          <>
-            {children?.length && (
-              <div className="example">
-                <ul className="list-wrapper">
-                  <SwipeableList
-                    threshold={0.25}
-                    type={ListType.IOS}
-                    fullSwipe={false}
-                  >
-                    {children.length > 0 &&
-                      children.map((child, index) => {
-                        return (
-                          <SwipeableListItem
-                            leadingActions={null}
-                            trailingActions={trailingActions({ child })}
-                            key={child.id}
-                          >
-                            <ChildItem
-                              child={child}
-                              handleUpdateOpenItemId={setOpenItemId}
-                              openItemId={openItemId}
-                              index={index}
-                              handleTogglePopup={handleTogglePopup}
-                            />
-                          </SwipeableListItem>
-                        );
-                      })}
-                  </SwipeableList>
-                </ul>
-              </div>
-            )}
-          </>
+          <>{ChildrenList}</>
         )}
         {loader.singles ? (
           <Stack margin={"0 20px 20px 20px"}>

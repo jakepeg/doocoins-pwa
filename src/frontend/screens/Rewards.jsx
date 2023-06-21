@@ -176,61 +176,64 @@ const Rewards = () => {
     if (child) getRewards(child);
   }, [actor, child]);
 
-  const trailingActions = ({ reward }) => (
-    <TrailingActions>
-      <SwipeAction
-        onClick={() => handleTogglePopup(true, reward, "claim")}
-        className="approve"
-      >
-        <div className="action-btn ">
-          <div className="ItemColumnCentered">
-            <ApproveIcon width="22px" height="22px" />
-            <Text fontSize={"xs"} color={"#fff"}>
-              Claim
-            </Text>
+  const trailingActions = React.useCallback(
+    ({ reward }) => (
+      <TrailingActions>
+        <SwipeAction
+          onClick={() => handleTogglePopup(true, reward, "claim")}
+          className="approve"
+        >
+          <div className="action-btn ">
+            <div className="ItemColumnCentered">
+              <ApproveIcon width="22px" height="22px" />
+              <Text fontSize={"xs"} color={"#fff"}>
+                Claim
+              </Text>
+            </div>
           </div>
-        </div>
-      </SwipeAction>
-      <SwipeAction
-        onClick={() => handleTogglePopup(true, reward, "goal")}
-        className="claim-option"
-      >
-        <div className="action-btn ">
-          <div className="ItemColumnCentered">
-            <GoalIcon width="22px" height="22px" />
-            <Text fontSize={"xs"} color={"#fff"}>
-              Goal
-            </Text>
+        </SwipeAction>
+        <SwipeAction
+          onClick={() => handleTogglePopup(true, reward, "goal")}
+          className="claim-option"
+        >
+          <div className="action-btn ">
+            <div className="ItemColumnCentered">
+              <GoalIcon width="22px" height="22px" />
+              <Text fontSize={"xs"} color={"#fff"}>
+                Goal
+              </Text>
+            </div>
           </div>
-        </div>
-      </SwipeAction>
-      <SwipeAction
-        className="edit"
-        onClick={() => handleTogglePopup(true, reward, "edit")}
-      >
-        <div className="action-btn ">
-          <div className="ItemColumnCentered">
-            <EditIcon width="22px" height="22px" />
-            <Text fontSize={"xs"} color={"#fff"}>
-              Edit
-            </Text>
+        </SwipeAction>
+        <SwipeAction
+          className="edit"
+          onClick={() => handleTogglePopup(true, reward, "edit")}
+        >
+          <div className="action-btn ">
+            <div className="ItemColumnCentered">
+              <EditIcon width="22px" height="22px" />
+              <Text fontSize={"xs"} color={"#fff"}>
+                Edit
+              </Text>
+            </div>
           </div>
-        </div>
-      </SwipeAction>
-      <SwipeAction
-        className="delete"
-        onClick={() => handleTogglePopup(true, reward, "delete")}
-      >
-        <div className="action-btn ">
-          <div className="ItemColumnCentered">
-            <DeleteIcon width="22px" height="22px" />
-            <Text fontSize={"xs"} color={"#fff"}>
-              Delete
-            </Text>
+        </SwipeAction>
+        <SwipeAction
+          className="delete"
+          onClick={() => handleTogglePopup(true, reward, "delete")}
+        >
+          <div className="action-btn ">
+            <div className="ItemColumnCentered">
+              <DeleteIcon width="22px" height="22px" />
+              <Text fontSize={"xs"} color={"#fff"}>
+                Delete
+              </Text>
+            </div>
           </div>
-        </div>
-      </SwipeAction>
-    </TrailingActions>
+        </SwipeAction>
+      </TrailingActions>
+    ),
+    []
   );
 
   const handleCloseDeletePopup = () => {
@@ -278,6 +281,44 @@ const Rewards = () => {
     }
   };
 
+  const RewardList = React.useMemo(() => {
+    return (
+      <>
+        {rewards?.length && (
+          <div className="example">
+            <ul className="list-wrapper">
+              <SwipeableList
+                threshold={0.25}
+                type={ListType.IOS}
+                fullSwipe={false}
+              >
+                {rewards[0].map((reward) => (
+                  <SwipeableListItem
+                    leadingActions={null}
+                    trailingActions={trailingActions({ reward })}
+                    key={reward.id}
+                  >
+                    <div className="list-item" key={parseInt(reward.id)}>
+                      <div>{reward.name}</div>
+                      <div>
+                        <img
+                          src={dc}
+                          className="dc-img-small"
+                          alt="DooCoins symbol"
+                        />
+                        {parseInt(reward.value)}
+                      </div>
+                    </div>
+                  </SwipeableListItem>
+                ))}
+              </SwipeableList>
+            </ul>
+          </div>
+        )}
+      </>
+    );
+  }, []);
+
   const isModalOpen =
     showPopup.delete ||
     showPopup.edit ||
@@ -289,14 +330,14 @@ const Rewards = () => {
     <>
       {showPopup.delete && (
         <DeleteDialog
-          selectedChild={selectedReward}
+          selectedItem={selectedReward}
           handleCloseDeletePopup={handleCloseDeletePopup}
         />
       )}
       {showPopup.edit && (
         <EditDialog
           handleCloseEditPopup={handleCloseEditPopup}
-          selectedChild={selectedReward}
+          selectedItem={selectedReward}
         />
       )}
       {showPopup.claim && (
@@ -352,39 +393,7 @@ const Rewards = () => {
             <Skeleton height="20px" mt={"12px"} />
           </Stack>
         ) : (
-          <>
-            {rewards?.length && (
-              <div className="example">
-                <ul className="list-wrapper">
-                  <SwipeableList
-                    threshold={0.25}
-                    type={ListType.IOS}
-                    fullSwipe={false}
-                  >
-                    {rewards[0].map((reward) => (
-                      <SwipeableListItem
-                        leadingActions={null}
-                        trailingActions={trailingActions({ reward })}
-                        key={reward.id}
-                      >
-                        <div className="list-item" key={parseInt(reward.id)}>
-                          <div>{reward.name}</div>
-                          <div>
-                            <img
-                              src={dc}
-                              className="dc-img-small"
-                              alt="DooCoins symbol"
-                            />
-                            {parseInt(reward.value)}
-                          </div>
-                        </div>
-                      </SwipeableListItem>
-                    ))}
-                  </SwipeableList>
-                </ul>
-              </div>
-            )}
-          </>
+          <>{RewardList}</>
         )}
         {loader.singles ? (
           <Stack margin={"0 20px 20px 20px"}>
