@@ -1,7 +1,6 @@
 import * as React from "react";
 import { get } from "idb-keyval";
 import Balance from "../components/Balance";
-import LoadingSpinner from "../components/LoadingSpinner";
 import dc from "../assets/images/dc.svg";
 import { useAuth } from "../use-auth-client";
 import modelStyles from "../components/popup/confirmation_popup.module.css";
@@ -24,7 +23,7 @@ import { default as GoalDialog } from "../components/Dialogs/ApproveDialog";
 import { default as ClaimDialog } from "../components/Dialogs/ApproveDialog";
 
 const Rewards = () => {
-  const { actor, logout } = useAuth();
+  const { actor } = useAuth();
   const toast = useToast();
   const [rewards, setRewards] = React.useState({});
   const [rewardClaimed, setRewardClaimed] = React.useState(null);
@@ -58,7 +57,6 @@ const Rewards = () => {
 
   function getRewards({ disableFullLoader }) {
     if (child) {
-      console.log("getRewards called for child id: " + child);
       if (!disableFullLoader) {
         setLoader((prevState) => ({ ...prevState, init: true }));
       }
@@ -80,53 +78,38 @@ const Rewards = () => {
   }
 
   function updateReward(childID, rewardID, rewardName, rewardValue) {
-    console.log("updateReward called");
     const reward_object = {
       name: rewardName,
       value: rewardValue,
       id: rewardID,
       archived: false,
     };
-    actor?.updateGoal(childID, rewardID, reward_object).then((response) => {
-      console.log(`reward updated`, response);
-    });
+    handleCloseEditPopup();
+    setLoader((prevState) => ({ ...prevState, init: true }));
+    actor
+      ?.updateGoal(childID, rewardID, reward_object)
+      .then((response) => {
+        getRewards({ disableFullLoader: false });
+      })
+      .finally(() => setSelectedReward(null));
   }
 
   function deleteReward(childID, rewardID, rewardName, rewardValue) {
-    console.log("deleteReward called");
     const reward_object = {
       name: rewardName,
       value: rewardValue,
       id: rewardID,
       archived: true,
     };
-    actor?.updateGoal(childID, rewardID, reward_object).then((response) => {
-      console.log(`reward archived`, response);
-    });
-  }
-
-  // add swiper - delete, edit, claim reward, set goal
-  function handleAddReward(e) {
-    e.preventDefault();
-    const inputs = e.target.querySelectorAll("input");
-    const reward_name = e.target.querySelector(
-      'input[name="reward_name"]'
-    ).value;
-    const reward_value = parseInt(
-      e.target.querySelector('input[name="reward_value"]').value
-    );
-    const reward_object = { name: reward_name, value: reward_value };
-    actor?.addGoal(reward_object, child.id).then((returnedAddReward) => {
-      if ("ok" in returnedAddReward) {
-        setNewReward(reward_name);
-        inputs.forEach((input) => {
-          input.value = "";
-        });
-      } else {
-        console.error(returnedAddReward.err);
-      }
-    });
-    return false;
+    handleCloseDeletePopup();
+    setLoader((prevState) => ({ ...prevState, init: true }));
+    actor
+      ?.updateGoal(childID, rewardID, reward_object)
+      .then((response) => {
+        console.log(`reward archived`, response);
+        getRewards({ disableFullLoader: false });
+      })
+      .finally(() => setSelectedReward(null));
   }
 
   const handleTogglePopup = (isOpen, reward, popup) => {
@@ -332,12 +315,28 @@ const Rewards = () => {
         <DeleteDialog
           selectedItem={selectedReward}
           handleCloseDeletePopup={handleCloseDeletePopup}
+          handleDelete={(childId) =>
+            deleteReward(
+              parseInt(childId).toString(),
+              parseInt(selectedReward.id),
+              selectedReward.name,
+              parseInt(selectedReward.value)
+            )
+          }
         />
       )}
       {showPopup.edit && (
         <EditDialog
           handleCloseEditPopup={handleCloseEditPopup}
           selectedItem={selectedReward}
+          handleSubmitForm={(childId, rewardName, rewardValue) =>
+            updateReward(
+              parseInt(childId).toString(),
+              parseInt(selectedReward.id),
+              rewardName,
+              parseInt(rewardValue)
+            )
+          }
         />
       )}
       {showPopup.claim && (

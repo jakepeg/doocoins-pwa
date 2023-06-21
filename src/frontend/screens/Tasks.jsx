@@ -1,7 +1,6 @@
 import * as React from "react";
 import { get } from "idb-keyval";
 import Balance from "../components/Balance";
-import LoadingSpinner from "../components/LoadingSpinner";
 import { useAuth } from "../use-auth-client";
 import ChildTask from "../components/Tasks/ChildTask";
 import EditDialog from "../components/Dialogs/EditDialog";
