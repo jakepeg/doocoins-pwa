@@ -2,7 +2,7 @@ import React from "react";
 import ConfirmationPopup from "../popup/ConfirmationPopup";
 import modelStyles from "../../components/popup/confirmation_popup.module.css";
 
-const ApproveDialog = ({ handleApprove, handleClosePopup, selectedItem, submitBtnLabel = "Approve" }) => {
+const ApproveDialog = ({ handleApprove, handleClosePopup, selectedItem, submitBtnLabel = "Approve Task" }) => {
   return (
     <ConfirmationPopup handleClosePopup={handleClosePopup}>
       <h4 className={modelStyles.popup_title}>{selectedItem.name}</h4>

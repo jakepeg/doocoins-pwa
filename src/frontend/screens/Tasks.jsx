@@ -17,11 +17,12 @@ import {
 import { ReactComponent as ApproveIcon } from "../assets/images/tick.svg";
 import { ReactComponent as EditIcon } from "../assets/images/pencil.svg";
 import { ReactComponent as DeleteIcon } from "../assets/images/delete.svg";
-import { Skeleton, Stack, Text } from "@chakra-ui/react";
+import { Skeleton, Stack, Text, useToast } from "@chakra-ui/react";
 import ApproveDialog from "../components/Dialogs/ApproveDialog";
 
 const Tasks = () => {
   const { actor } = useAuth();
+  const toast = useToast();
   const [tasks, setTasks] = React.useState({});
   const [taskComplete, setTaskComplete] = React.useState(null);
   const [loader, setLoader] = React.useState({ init: true, singles: false });
@@ -184,6 +185,12 @@ const Tasks = () => {
         setTaskComplete(parseInt(task_id));
         actor?.getChildren().then(async (returnedChilren) => {
           if ("ok" in returnedChilren) {
+            toast({
+              title: `Keep up the good work, ${child.name}.`,
+              status: "success",
+              duration: 4000,
+              isClosable: true,
+            });
             const children = Object.values(returnedChilren);
             const updatedChildrenData = await Promise.all(
               children[0].map(async (child) => {

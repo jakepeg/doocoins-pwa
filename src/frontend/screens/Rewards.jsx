@@ -135,7 +135,7 @@ const Rewards = () => {
       if ("ok" in returnedCurrentGoal) {
         setCurrentGoal(reward_id);
         toast({
-          title: `Goal is set to ${child.name}.`,
+          title: `Good luck achieving your goal, ${child.name}.`,
           status: "success",
           duration: 4000,
           isClosable: true,
@@ -154,7 +154,7 @@ const Rewards = () => {
     actor?.claimGoal(child.id, reward_id, date).then(async (returnedClaimReward) => {
       if ("ok" in returnedClaimReward) {
         toast({
-          title: `Reward is claimed for ${child.name}.`,
+          title: `Yay - well deserved, ${child.name}.`,
           status: "success",
           duration: 4000,
           isClosable: true,

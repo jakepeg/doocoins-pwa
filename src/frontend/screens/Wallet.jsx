@@ -56,8 +56,6 @@ const Wallet = () => {
   }
 }
 
-
-
   React.useEffect(() => {
     if (child) getTransactions(child);
   }, [actor, child]);
