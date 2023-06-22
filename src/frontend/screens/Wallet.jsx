@@ -47,6 +47,7 @@ const Wallet = () => {
         const transactions = Object.values(returnedTransactions);
         setTransactions(transactions);
         setIsLoading(false);
+        console.log("transactions: ", transactions);
       } else {
         console.error(returnedTransactions.err);
       }
@@ -83,6 +84,8 @@ const Wallet = () => {
                 <span className="date">{humanReadableDate(transaction.completedDate)}</span>
                 {transaction.name}</div>
               <div>
+              {transaction.transactionType === `GOAL_DEBIT` ? <span>-</span> : null}
+
                 <img src={dc} className="dc-img-small pushdown" alt="DooCoins symbol" />
                 {parseInt(transaction.value)}
               </div>
