@@ -6,17 +6,10 @@ import "react-circular-progressbar/dist/styles.css";
 
 const Goal = () => {
   const { actor } = useAuth();
-  // const [hasGoal, setHasGoal] = React.useState(false);
-  // const [goalValue, setGoalValue] = React.useState(null);
-  // const [goalName, setGoalName] = React.useState(null);
-  // const [goalId, setGoalId] = React.useState(null);
   const [goal, setGoal] = React.useState(null);
   const [child, setChild] = React.useState(null);
-  const [isLoading, setIsLoading] = React.useState(true);
 
   const hasGoal = true;
-  const goalValue = 200;
-  const goalName = "New Beyblade";
   const goalId = 123;
   const balance = child?.balance || 0;
 
@@ -38,7 +31,6 @@ const Goal = () => {
   React.useEffect(() => {
     if (child?.id) {
       get("childGoal").then(async (data) => {
-        console.log("the data", data);
         if (data) {
         } else {
           getCurrentGoal();
@@ -52,7 +44,7 @@ const Goal = () => {
   // setGoalState {
   // setHasGoal(true);
   // setGoalName(goalName);
-  // setGoalValue(goalValue);
+  // setGoalValue(value);
   // setGoalId(goalId);
   // }
   // if the goal for the selected child isn't in local storage call getCurrentGoal()
@@ -68,8 +60,7 @@ const Goal = () => {
           const { name, value, id } = rewards[0].find(
             (reward) => rewardId === parseInt(reward.id)
           );
-          console.log(`goal`, goal);
-          setGoal({ name, goalId: id, goalValue: value, hasGoal: true });
+          setGoal({ name, goalId: id, value: parseInt(value), hasGoal: true });
         }
       } else {
         console.error(returnedRewards.err);
@@ -94,30 +85,6 @@ const Goal = () => {
     return false;
   }
 
-  // function handleClaimGoal(goal_id) {
-  //   let r = window.confirm("Are you sure?");
-  //   if (r == true) {
-  //     let dateNum = Math.floor(Date.now() / 1000);
-  //     let date = dateNum.toString();
-  //     // API call claimGoal
-  //     actor?.claimGoal(selectedChild,goal_id,date).then((returnedClaimGoal) => {
-  //       if ("ok" in returnedClaimGoal) {
-  //         setGoalClaimed(parseInt(goal_id));
-  //       } else {
-  //         console.error(returnedClaimGoal.err);
-  //       }
-  //     });
-  //   } else {
-  //     console.log("You pressed cancel!");
-  //   }
-  // }
-
-  // handleSetGoal(reward_id) is on Rewards.jsx
-
-  // React.useEffect(() => {
-  //   checkGoal();
-  // }, [actor]);
-
   return (
     <div className="goal">
       <div className="goal-info">
@@ -138,7 +105,7 @@ const Goal = () => {
         <div className="goal-progress">
           <CircularProgressbar
             strokeWidth="12"
-            value={balance}
+            value={balance?.toString()}
             maxValue={goal?.value}
             text={`${balance}`}
             styles={buildStyles({
