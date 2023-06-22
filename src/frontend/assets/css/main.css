@@ -275,7 +275,7 @@ main {
 }
 
 input[type="text"]::placeholder {
-  color: #ccc; /* Sets the placeholder text color to white */
+  color: #ccc; 
 }
 
 .button {
