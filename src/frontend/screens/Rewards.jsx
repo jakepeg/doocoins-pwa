@@ -25,7 +25,7 @@ import { default as ClaimDialog } from "../components/Dialogs/ApproveDialog";
 const Rewards = () => {
   const { actor } = useAuth();
   const toast = useToast();
-  const [rewards, setRewards] = React.useState({});
+  const [rewards, setRewards] = React.useState([]);
   const [rewardClaimed, setRewardClaimed] = React.useState(null);
   const [newReward, setNewReward] = React.useState(null);
   const [currentGoal, setCurrentGoal] = React.useState(null);
@@ -43,7 +43,6 @@ const Rewards = () => {
   React.useEffect(() => {
     setLoader((prevState) => ({ ...prevState, init: true }));
     get("selectedChild").then(async (data) => {
-      console.log(`data`, data)
       const [balance, name] = await Promise.all([
         get(`balance-${data}`),
         get(`selectedChildName`),
@@ -56,8 +55,6 @@ const Rewards = () => {
     });
   }, []);
 
-  console.log('child', child)
-
   function getRewards({ disableFullLoader }) {
     if (child) {
       if (!disableFullLoader) {
@@ -66,7 +63,15 @@ const Rewards = () => {
       actor?.getGoals(child.id).then((returnedRewards) => {
         if ("ok" in returnedRewards) {
           const rewards = Object.values(returnedRewards);
-          setRewards(rewards);
+          setRewards(
+            rewards[0].map((reward) => {
+              return {
+                ...reward,
+                value: parseInt(reward.value),
+                id: parseInt(reward.id),
+              };
+            })
+          );
           setLoader((prevState) => ({
             ...prevState,
             init: false,
@@ -109,7 +114,6 @@ const Rewards = () => {
     actor
       ?.updateGoal(child.id, rewardID, reward_object)
       .then((response) => {
-        console.log(`reward archived`, response);
         getRewards({ disableFullLoader: false });
       })
       .finally(() => setSelectedReward(null));
@@ -165,32 +169,36 @@ const Rewards = () => {
   const trailingActions = React.useCallback(
     ({ reward }) => (
       <TrailingActions>
-        <SwipeAction
-          onClick={() => handleTogglePopup(true, reward, "claim")}
-          className="approve"
-        >
-          <div className="action-btn ">
-            <div className="ItemColumnCentered">
-              <ApproveIcon width="22px" height="22px" />
-              <Text fontSize={"xs"} color={"#fff"}>
-                Claim
-              </Text>
+        {child.balance >= reward.value ? (
+          <SwipeAction
+            onClick={() => handleTogglePopup(true, reward, "claim")}
+            className="approve"
+          >
+            <div className="action-btn ">
+              <div className="ItemColumnCentered">
+                <ApproveIcon width="22px" height="22px" />
+                <Text fontSize={"xs"} color={"#fff"}>
+                  Claim
+                </Text>
+              </div>
             </div>
-          </div>
-        </SwipeAction>
-        <SwipeAction
-          onClick={() => handleTogglePopup(true, reward, "goal")}
-          className="claim-option"
-        >
-          <div className="action-btn ">
-            <div className="ItemColumnCentered">
-              <GoalIcon width="22px" height="22px" />
-              <Text fontSize={"xs"} color={"#fff"}>
-                Goal
-              </Text>
+          </SwipeAction>
+        ) : (
+          <SwipeAction
+            onClick={() => handleTogglePopup(true, reward, "goal")}
+            className="claim-option"
+          >
+            <div className="action-btn ">
+              <div className="ItemColumnCentered">
+                <GoalIcon width="22px" height="22px" />
+                <Text fontSize={"xs"} color={"#fff"}>
+                  Goal
+                </Text>
+              </div>
             </div>
-          </div>
-        </SwipeAction>
+          </SwipeAction>
+        )}
+
         <SwipeAction
           className="edit"
           onClick={() => handleTogglePopup(true, reward, "edit")}
@@ -219,7 +227,7 @@ const Rewards = () => {
         </SwipeAction>
       </TrailingActions>
     ),
-    []
+    [child]
   );
 
   const handleCloseDeletePopup = () => {
@@ -278,7 +286,7 @@ const Rewards = () => {
                 type={ListType.IOS}
                 fullSwipe={false}
               >
-                {rewards[0].map((reward) => (
+                {rewards.map((reward) => (
                   <SwipeableListItem
                     leadingActions={null}
                     trailingActions={trailingActions({ reward })}
