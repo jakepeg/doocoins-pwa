@@ -34,7 +34,8 @@ main {
 
 .light-panel {
   background-color: #F0F7FC;
-  min-height: 100%;
+  min-height: 95%;
+  /* min-height: calc(100vh - 50px); */
 }
 
 .panel-header-wrapper {
