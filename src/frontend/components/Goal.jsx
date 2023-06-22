@@ -18,7 +18,7 @@ const Goal = () => {
   const goalValue = 200;
   const goalName = "New Beyblade";
   const goalId = 123;
-  const balance = child?.balance || 0
+  const balance = child?.balance || 0;
 
   React.useEffect(() => {
     // setIsLoading(true);
@@ -60,20 +60,34 @@ const Goal = () => {
 
   // claim goal button should open confirmation confirmation dialog CLAIM / CANCEL
 
+  const getReward = (rewardId) => {
+    actor?.getGoals(child.id).then((returnedRewards) => {
+      if ("ok" in returnedRewards) {
+        const rewards = Object.values(returnedRewards);
+        if (rewards) {
+          const { name, value, id } = rewards[0].find(
+            (reward) => rewardId === parseInt(reward.id)
+          );
+          console.log(`goal`, goal);
+          setGoal({ name, goalId: id, goalValue: value, hasGoal: true });
+        }
+      } else {
+        console.error(returnedRewards.err);
+      }
+    });
+  };
+
   function getCurrentGoal() {
     actor?.getCurrentGoal(child.id).then((returnedGoal) => {
       returnedGoal = parseInt(returnedGoal);
-      console.log(`returnedGoal`, returnedGoal)
+      console.log(`returnedGoal`, returnedGoal);
       if (returnedGoal > 0) {
-        let info = goals[0].filter((x) => x.id === returnedGoal);
-        setGoalName(info[0].name);
-        setGoalValue(parseInt(info[0].value));
-        setGoalId(info[0].id);
-        setHasGoal(true);
+        getReward(returnedGoal);
       } else {
         setGoal({
           name: "no goal set",
           value: 0,
+          hasGoal: false
         });
       }
     });
