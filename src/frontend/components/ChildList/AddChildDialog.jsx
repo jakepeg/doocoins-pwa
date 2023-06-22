@@ -21,7 +21,7 @@ const AddChildDialog = ({ handleClosePopup, handleSubmit }) => {
         type="submit"
         onClick={() => handleSubmit(childRef.current.value)}
       >
-        Submit
+        Add child
       </button>
       <p
         role="button"

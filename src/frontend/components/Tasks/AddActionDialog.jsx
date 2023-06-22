@@ -37,7 +37,7 @@ const AddActionDialog = ({
         type="submit"
         onClick={() => handleSubmitForm(nameRef.current.value, valueRef.current.value)}
       >
-        Submit
+        Add
       </button>
       <p
         role="button"

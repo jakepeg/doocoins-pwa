@@ -10,7 +10,7 @@ const DeleteDialog = ({ handleCloseDeletePopup, selectedItem, handleDelete }) =>
         className={modelStyles.popup_delete_action_btn}
         onClick={() => handleDelete(selectedItem.id, selectedItem.name)}
       >
-        DELETE
+        Delete
       </button>
       <p
         className={modelStyles.popup_cancel_action_btn}

@@ -330,7 +330,7 @@ const Tasks = () => {
         <AddActionDialog
           handleSubmitForm={handleSubmitTask}
           handleClosePopup={handleToggleAddTaskPopup}
-          title="Add Task"
+          title="Add a Task"
           namePlaceHolder="Task Name"
           valuePlaceHolder="Task Value"
         />

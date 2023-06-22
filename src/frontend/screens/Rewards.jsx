@@ -375,7 +375,7 @@ const Rewards = () => {
         <AddActionDialog
           handleSubmitForm={handleSubmitReward}
           handleClosePopup={handleToggleAddRewardPopup}
-          title="Add Reward"
+          title="Add a Reward"
           namePlaceHolder="Reward Name"
           valuePlaceHolder="Reward Value"
         />

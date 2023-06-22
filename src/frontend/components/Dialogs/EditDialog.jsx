@@ -43,7 +43,7 @@ const EditDialog = ({
         className={modelStyles.popup_edit_action_btn}
         onClick={() => handleSubmitForm(selectedItem.id, nameRef.current?.value, valueRef.current?.value)}
       >
-        EDIT
+        Save
       </button>
       <p
         className={modelStyles.popup_cancel_action_btn}
