@@ -14,6 +14,18 @@ const Wallet = () => {
   const [isLoading, setIsLoading] = React.useState(true);
   const [child, setChild] = React.useState(null);
 
+  // const humanReadableDate = time => {
+  //   return new Date(time).toLocaleString('en-US', {
+  //     month: 'short',
+  //     day: 'numeric',
+  //   });
+  // };
+
+  const humanReadableDate = timestamp => {
+    const date = new Date(timestamp * 1000); // Convert timestamp to milliseconds
+    return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' }).format(date);
+  };
+
   React.useEffect(() => {
     setIsLoading(true)
     get("selectedChild").then(async (data) => {
@@ -56,7 +68,7 @@ const Wallet = () => {
   return (
     <>
       <Balance childName={child.name} childBalance={child.balance} />
-      <div className="light-panel">
+      <div className="light-panel transactions">
         <Goal />
         <h2 className="title-button dark"><span>Transactions</span></h2>
         {isLoading ? <LoadingSpinner /> : null}
@@ -68,10 +80,10 @@ const Wallet = () => {
               key={parseInt(transaction.id)}
             >
               <div>
-                {/* <Moment format="DD/MM/YY" unix>{transaction.completedDate}</Moment>  */}
-                {transaction.completedDate} {transaction.name}</div>
+                <span className="date">{humanReadableDate(transaction.completedDate)}</span>
+                {transaction.name}</div>
               <div>
-                <img src={dc} className="dc-img-small" alt="DooCoins symbol" />
+                <img src={dc} className="dc-img-small pushdown" alt="DooCoins symbol" />
                 {parseInt(transaction.value)}
               </div>
             </div>

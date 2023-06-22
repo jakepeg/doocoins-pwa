@@ -134,20 +134,7 @@ h2 {
   width: 32px;
 }
 
-.balance {
-  font-family: "Courier New", Courier, monospace;
-  font-size: 52px;
-  font-weight: 300;
-  padding: 0;
-  margin: 14px 0 20px 0;
-  text-align: center;
 
-  /* color: #f0f0f0;
-  background-color: #666666;
-  text-shadow: 1px 4px 4px #555;
-  -webkit-background-clip: text;
-  -moz-background-clip: text; */
-}
 
 .wallet-footer {
   display: flex;
@@ -234,19 +221,6 @@ h2 {
 
 .col-p {
   margin-top: 15px;
-}
-
-.flippy-container * {
-  box-sizing: inherit !important;
-}
-
-.flippy-front,
-.flippy-back {
-  padding: 0em !important;
-  box-shadow: 0 0 0 0 rgb(0 0 0 / 20%) !important;
-}
-
-.form {
 }
 
 label {
