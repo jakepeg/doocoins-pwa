@@ -1,5 +1,5 @@
 import * as React from "react";
-import { get } from "idb-keyval";
+import { get, set } from "idb-keyval";
 import Balance from "../components/Balance";
 import { useAuth } from "../use-auth-client";
 import ChildTask from "../components/Tasks/ChildTask";
@@ -36,7 +36,11 @@ const Tasks = () => {
 
   React.useEffect(() => {
     setLoader((prevState) => ({ ...prevState, init: true }));
-    get("selectedChild").then(async (data) => {
+    getChildren();
+  }, []);
+
+  const getChildren = async () => {
+    await get("selectedChild").then(async (data) => {
       const [balance, name] = await Promise.all([
         get(`balance-${data}`),
         get(`selectedChildName`),
@@ -46,8 +50,8 @@ const Tasks = () => {
         balance: parseInt(balance),
         name,
       });
-    });
-  }, []);
+    })
+  }
 
   function getTasks({ disableFullLoader = false }) {
     if (child) {
@@ -152,15 +156,54 @@ const Tasks = () => {
       .finally(() => setSelectedTask(null));
   }
 
+  async function getBalance(childID) {
+    console.log("getBalance called");
+    return new Promise((resolve, reject) => {
+      get("balance-" + childID)
+        .then((val) => {
+          actor?.getBalance(childID).then((returnedBalance) => {
+            set("balance-" + childID, parseInt(returnedBalance));
+            console.log(returnedBalance);
+            resolve(returnedBalance);
+          });
+        })
+        .catch((error) => {
+          reject(error);
+        });
+    });
+  }
+
   function handleTaskComplete(task_id) {
     let dateNum = Math.floor(Date.now() / 1000);
     let date = dateNum.toString();
     // API call approveTask
     handleCloseTogglePopup();
+    setLoader((prevState) => ({ ...prevState, init: true }));
     actor?.approveTask(child.id, task_id, date).then((returnedApproveTask) => {
       if ("ok" in returnedApproveTask) {
         setTaskComplete(parseInt(task_id));
+        actor?.getChildren().then(async (returnedChilren) => {
+          if ("ok" in returnedChilren) {
+            const children = Object.values(returnedChilren);
+            const updatedChildrenData = await Promise.all(
+              children[0].map(async (child) => {
+                const balance = await getBalance(child.id);
+                return {
+                  ...child,
+                  balance: parseInt(balance),
+                };
+              })
+            );
+            set("childList", updatedChildrenData);
+            await getChildren()
+            setLoader((prevState) => ({ ...prevState, init: false }));
+          } else {
+            setLoader((prevState) => ({ ...prevState, init: false }));
+            console.error(returnedChilren.err);
+          }
+        });
       } else {
+        setLoader((prevState) => ({ ...prevState, init: false }));
         console.error(returnedApproveTask.err);
       }
     });
@@ -279,11 +322,7 @@ const Tasks = () => {
           handleCloseEditPopup={handleCloseEditPopup}
           selectedItem={selectedTask}
           handleSubmitForm={(taskId, taskName, taskValue) =>
-            updateTask(
-              parseInt(selectedTask.id),
-              taskName,
-              parseInt(taskValue)
-            )
+            updateTask(parseInt(selectedTask.id), taskName, parseInt(taskValue))
           }
         />
       )}

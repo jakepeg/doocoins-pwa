@@ -42,7 +42,11 @@ const Rewards = () => {
 
   React.useEffect(() => {
     setLoader((prevState) => ({ ...prevState, init: true }));
-    get("selectedChild").then(async (data) => {
+    getChildren();
+  }, []);
+
+  const getChildren = async () => {
+    await get("selectedChild").then(async (data) => {
       const [balance, name] = await Promise.all([
         get(`balance-${data}`),
         get(`selectedChildName`),
@@ -53,7 +57,7 @@ const Rewards = () => {
         name,
       });
     });
-  }, []);
+  }
 
   function getRewards({ disableFullLoader }) {
     if (child) {
@@ -144,10 +148,10 @@ const Rewards = () => {
 
   function handleClaimReward(reward_id) {
     handleToggleClaimPopup();
-
     let dateNum = Math.floor(Date.now() / 1000);
     let date = dateNum.toString();
-    actor?.claimGoal(child.id, reward_id, date).then((returnedClaimReward) => {
+    setLoader((prevState) => ({ ...prevState, init: true }));
+    actor?.claimGoal(child.id, reward_id, date).then(async (returnedClaimReward) => {
       if ("ok" in returnedClaimReward) {
         toast({
           title: `Reward is claimed for ${child.name}.`,
@@ -156,8 +160,11 @@ const Rewards = () => {
           isClosable: true,
         });
         setRewardClaimed(parseInt(reward_id));
+        await getChildren();
+        setLoader((prevState) => ({ ...prevState, init: false }));
       } else {
         console.error(returnedClaimReward.err);
+        setLoader((prevState) => ({ ...prevState, init: false }));
       }
     });
   }
