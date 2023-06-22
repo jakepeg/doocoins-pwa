@@ -21,8 +21,9 @@ const Wallet = () => {
   //   });
   // };
 
-  const humanReadableDate = time => {
-    return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric'}).format(time)
+  const humanReadableDate = timestamp => {
+    const date = new Date(timestamp * 1000); // Convert timestamp to milliseconds
+    return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' }).format(date);
   };
 
   React.useEffect(() => {
@@ -67,7 +68,7 @@ const Wallet = () => {
   return (
     <>
       <Balance childName={child.name} childBalance={child.balance} />
-      <div className="light-panel">
+      <div className="light-panel transactions">
         <Goal />
         <h2 className="title-button dark"><span>Transactions</span></h2>
         {isLoading ? <LoadingSpinner /> : null}
@@ -79,11 +80,10 @@ const Wallet = () => {
               key={parseInt(transaction.id)}
             >
               <div>
-                {/* <Moment format="DD/MM/YY" unix>{transaction.completedDate}</Moment>  */}
                 <span className="date">{humanReadableDate(transaction.completedDate)}</span>
                 {transaction.name}</div>
               <div>
-                <img src={dc} className="dc-img-small" alt="DooCoins symbol" />
+                <img src={dc} className="dc-img-small pushdown" alt="DooCoins symbol" />
                 {parseInt(transaction.value)}
               </div>
             </div>
