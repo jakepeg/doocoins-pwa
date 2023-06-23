@@ -2,21 +2,15 @@ import React from "react";
 import ConfirmationPopup from "../popup/ConfirmationPopup";
 import modelStyles from "../../components/popup/confirmation_popup.module.css";
 
-const ApproveDialog = ({
-  handleApprove,
-  handleClosePopup,
-  selectedItem,
-  submitBtnLabel = "Approve Task",
-  title = selectedItem.name,
-}) => {
+const RemoveGoalDialog = ({ handleRemove, handleClosePopup, selectedItem }) => {
   return (
     <ConfirmationPopup handleClosePopup={handleClosePopup}>
-      <h4 className={modelStyles.popup_title}>{title}</h4>
+      <h4 className={modelStyles.popup_title}>Remove {selectedItem.name}</h4>
       <button
-        className={modelStyles.popup_edit_action_btn}
-        onClick={handleApprove}
+        className={modelStyles.popup_delete_action_btn}
+        onClick={() => handleRemove(selectedItem.id, selectedItem.name)}
       >
-        {submitBtnLabel}
+        Remove 
       </button>
       <p
         className={modelStyles.popup_cancel_action_btn}
@@ -28,4 +22,4 @@ const ApproveDialog = ({
   );
 };
 
-export default ApproveDialog;
+export default RemoveGoalDialog;

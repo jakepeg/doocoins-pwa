@@ -22,14 +22,13 @@ import AddActionDialog from "../components/Tasks/AddActionDialog";
 import { default as GoalDialog } from "../components/Dialogs/ApproveDialog";
 import { default as ClaimDialog } from "../components/Dialogs/ApproveDialog";
 import { useNavigate } from "react-router-dom";
+import RemoveGoalDialog from "../components/Dialogs/RemoveGoalDialog";
 
 const Rewards = () => {
   const { actor } = useAuth();
   const toast = useToast();
   const navigate = useNavigate();
   const [rewards, setRewards] = React.useState([]);
-  const [rewardClaimed, setRewardClaimed] = React.useState(null);
-  const [newReward, setNewReward] = React.useState(null);
   const [currentGoal, setCurrentGoal] = React.useState(null);
   const [loader, setLoader] = React.useState({ init: true, singles: false });
   const [child, setChild] = React.useState(null);
@@ -40,6 +39,7 @@ const Rewards = () => {
     claim: false,
     goal: false,
     add_reward: false,
+    remove_goal: false,
   });
 
   React.useEffect(() => {
@@ -85,15 +85,27 @@ const Rewards = () => {
       if (!disableFullLoader) {
         setLoader((prevState) => ({ ...prevState, init: true }));
       }
-      actor?.getGoals(child.id).then((returnedRewards) => {
+      actor?.getGoals(child.id).then(async (returnedRewards) => {
         if ("ok" in returnedRewards) {
           const rewards = Object.values(returnedRewards);
+          let currentGoalId;
+          await actor?.getCurrentGoal(child.id).then((returnedGoal) => {
+            console.log(`returnedGoal`, returnedGoal);
+            currentGoalId = parseInt(returnedGoal);
+            console.log(`returnedGoal`, returnedGoal);
+
+            return currentGoalId;
+          });
+
+          console.log(`currentGoalId`, currentGoalId);
+
           setRewards(
             rewards[0].map((reward) => {
               return {
                 ...reward,
                 value: parseInt(reward.value),
                 id: parseInt(reward.id),
+                active: currentGoalId === parseInt(reward.id) ? true : false,
               };
             })
           );
@@ -149,18 +161,35 @@ const Rewards = () => {
     setShowPopup((prevState) => ({ ...prevState, [popup]: isOpen }));
   };
 
-  function handleSetGoal(reward_id) {
-    handleToggleGoalPopup();
+  function handleSetGoal({ reward_id, isForSet, disableFullLoader }) {
+    if (isForSet) {
+      handleToggleGoalPopup();
+    } else {
+      handleCloseRemoveGoalPopup();
+    }
+    if (!disableFullLoader) {
+      setLoader((prevState) => ({ ...prevState, init: true }));
+    }
     // API call currentGoal
     actor?.currentGoal(child.id, reward_id).then((returnedCurrentGoal) => {
       if ("ok" in returnedCurrentGoal) {
         setCurrentGoal(reward_id);
-        toast({
-          title: `Good luck achieving your goal, ${child.name}.`,
-          status: "success",
-          duration: 4000,
-          isClosable: true,
-        });
+        if (isForSet) {
+          toast({
+            title: `Good luck achieving your goal, ${child.name}.`,
+            status: "success",
+            duration: 4000,
+            isClosable: true,
+          });
+        } else {
+          toast({
+            title: `Goal is unset for, ${child.name}.`,
+            status: "success",
+            duration: 4000,
+            isClosable: true,
+          });
+        }
+        getRewards({ disableFullLoader: false });
       } else {
         console.error(returnedCurrentGoal.err);
       }
@@ -226,19 +255,37 @@ const Rewards = () => {
             </div>
           </SwipeAction>
         ) : (
-          <SwipeAction
-            onClick={() => handleTogglePopup(true, reward, "goal")}
-            className="claim-option"
-          >
-            <div className="action-btn ">
-              <div className="ItemColumnCentered">
-                <GoalIcon width="22px" height="22px" />
-                <Text fontSize={"xs"} color={"#fff"}>
-                  Goal
-                </Text>
-              </div>
-            </div>
-          </SwipeAction>
+          <>
+            {reward.active ? (
+              <SwipeAction
+                onClick={() => handleTogglePopup(true, reward, "remove_goal")}
+                className="delete"
+              >
+                <div className="action-btn ">
+                  <div className="ItemColumnCentered">
+                    <GoalIcon width="22px" height="22px" />
+                    <Text fontSize={"xs"} color={"#fff"}>
+                      Remove
+                    </Text>
+                  </div>
+                </div>
+              </SwipeAction>
+            ) : (
+              <SwipeAction
+                onClick={() => handleTogglePopup(true, reward, "goal")}
+                className="claim-option"
+              >
+                <div className="action-btn ">
+                  <div className="ItemColumnCentered">
+                    <GoalIcon width="22px" height="22px" />
+                    <Text fontSize={"xs"} color={"#fff"}>
+                      Goal
+                    </Text>
+                  </div>
+                </div>
+              </SwipeAction>
+            )}
+          </>
         )}
 
         <SwipeAction
@@ -291,6 +338,13 @@ const Rewards = () => {
     setShowPopup((prevState) => ({
       ...prevState,
       ["claim"]: !prevState.claim,
+    }));
+  };
+
+  const handleCloseRemoveGoalPopup = () => {
+    setShowPopup((prevState) => ({
+      ...prevState,
+      ["remove_goal"]: !prevState.remove_goal,
     }));
   };
 
@@ -360,7 +414,8 @@ const Rewards = () => {
     showPopup.edit ||
     showPopup.claim ||
     showPopup.goal ||
-    showPopup.add_reward;
+    showPopup.add_reward ||
+    showPopup.remove_goal;
 
   return (
     <>
@@ -374,6 +429,19 @@ const Rewards = () => {
               selectedReward.name,
               parseInt(selectedReward.value)
             )
+          }
+        />
+      )}
+      {showPopup.remove_goal && (
+        <RemoveGoalDialog
+          selectedItem={selectedReward}
+          handleClosePopup={handleCloseRemoveGoalPopup}
+          handleRemove={() =>
+            handleSetGoal({
+              reward_id: 0,
+              isForSet: false,
+              disableFullLoader: false,
+            })
           }
         />
       )}
@@ -402,7 +470,13 @@ const Rewards = () => {
         <GoalDialog
           handleClosePopup={handleToggleGoalPopup}
           selectedItem={selectedReward}
-          handleApprove={() => handleSetGoal(parseInt(selectedReward.id))}
+          handleApprove={() =>
+            handleSetGoal({
+              reward_id: parseInt(selectedReward.id),
+              isForSet: true,
+              disableFullLoader: false,
+            })
+          }
           submitBtnLabel="Set Goal"
         />
       )}
