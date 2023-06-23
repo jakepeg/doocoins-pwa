@@ -9,8 +9,8 @@ import { useAuth } from "../use-auth-client";
 import { useNavigate } from "react-router-dom";
 
 const Wallet = () => {
-  const {actor} = useAuth()
-  const navigate = useNavigate()
+  const { actor } = useAuth();
+  const navigate = useNavigate();
   const [transactions, setTransactions] = React.useState({});
   const [currentGoal, setCurrentGoal] = React.useState(null);
   const [isLoading, setIsLoading] = React.useState(true);
@@ -23,15 +23,21 @@ const Wallet = () => {
   //   });
   // };
 
-  const humanReadableDate = timestamp => {
+  const humanReadableDate = (timestamp) => {
     const date = new Date(timestamp * 1000); // Convert timestamp to milliseconds
-    return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' }).format(date);
+    return new Intl.DateTimeFormat("en-US", {
+      month: "short",
+      day: "numeric",
+    }).format(date);
   };
 
   React.useEffect(() => {
-    setIsLoading(true)
+    setIsLoading(true);
     get("selectedChild").then(async (data) => {
-      const [balance, name] = await Promise.all([get(`balance-${data}`), get(`selectedChildName`)])
+      const [balance, name] = await Promise.all([
+        get(`balance-${data}`),
+        get(`selectedChildName`),
+      ]);
       if (data) {
         setChild({
           id: data,
@@ -41,31 +47,43 @@ const Wallet = () => {
       } else {
         navigate("/");
       }
-    })
-  }, [])
+    });
+  }, []);
 
   function getTransactions() {
     if (child) {
-    setIsLoading(true);
-    actor?.getTransactions(child.id).then((returnedTransactions) => {
-      if ("ok" in returnedTransactions) {
-        const transactions = Object.values(returnedTransactions);
-        setTransactions(transactions);
-        setIsLoading(false);
-      } else {
-        console.error(returnedTransactions.err);
-      }
-    });
-    return false;
+      setIsLoading(true);
+      actor?.getTransactions(child.id).then((returnedTransactions) => {
+        if ("ok" in returnedTransactions) {
+          const transactions = Object.values(returnedTransactions);
+          if (transactions.length) {
+            setTransactions(transactions[0]);
+          }
+          setIsLoading(false);
+        } else {
+          console.error(returnedTransactions.err);
+        }
+      });
+      return false;
+    }
   }
-}
 
   React.useEffect(() => {
     if (child) getTransactions(child);
   }, [actor, child]);
 
-  if(isLoading) {
-    return  <LoadingSpinner />
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
+
+  function sortTransactionsByDate() {
+    transactions.sort((a, b) => {
+      const dateA = new Date(parseInt(a.completedDate) * 1000);
+      const dateB = new Date(parseInt(b.completedDate) * 1000);
+      return dateB - dateA;
+    });
+
+    return transactions;
   }
 
   return (
@@ -73,22 +91,33 @@ const Wallet = () => {
       <Balance childName={child.name} childBalance={child.balance} />
       <div className="light-panel transactions">
         <Goal />
-        <h2 className="title-button dark"><span>Transactions</span></h2>
+        <h2 className="title-button dark">
+          <span>Transactions</span>
+        </h2>
         {isLoading ? <LoadingSpinner /> : null}
         {transactions.length > 0 &&
-              transactions[0].reverse().map(transaction => (
+          sortTransactionsByDate().map((transaction) => (
             <div
               className="list-item"
               role="button"
               key={parseInt(transaction.id)}
             >
               <div>
-                <span className="date">{humanReadableDate(transaction.completedDate)}</span>
-                {transaction.name}</div>
+                <span className="date">
+                  {humanReadableDate(transaction.completedDate)}
+                </span>
+                {transaction.name}
+              </div>
               <div>
-              {transaction.transactionType === `GOAL_DEBIT` ? <span>-</span> : null}
+                {transaction.transactionType === `GOAL_DEBIT` ? (
+                  <span>-</span>
+                ) : null}
 
-                <img src={dc} className="dc-img-small pushdown" alt="DooCoins symbol" />
+                <img
+                  src={dc}
+                  className="dc-img-small pushdown"
+                  alt="DooCoins symbol"
+                />
                 {parseInt(transaction.value)}
               </div>
             </div>
