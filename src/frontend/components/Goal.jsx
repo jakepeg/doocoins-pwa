@@ -1,18 +1,18 @@
 import * as React from "react";
 import { useAuth } from "../use-auth-client";
-import { set, get } from "idb-keyval";
+import { get } from "idb-keyval";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
+import { Box, SkeletonText } from "@chakra-ui/react";
 
 const Goal = () => {
   const { actor } = useAuth();
   const [goal, setGoal] = React.useState(null);
+  const [isLoading, setIsLoading] = React.useState(true);
   const [child, setChild] = React.useState(null);
-
   const balance = child?.balance || 0;
 
   React.useEffect(() => {
-    // setIsLoading(true);
     get("selectedChild").then(async (data) => {
       const [balance, name] = await Promise.all([
         get(`balance-${data}`),
@@ -38,39 +38,67 @@ const Goal = () => {
   }, [child?.id]);
 
   const getReward = (rewardId) => {
-    actor?.getGoals(child.id).then((returnedRewards) => {
-      if ("ok" in returnedRewards) {
-        const rewards = Object.values(returnedRewards);
-        if (rewards) {
-          const { name, value, id } = rewards[0].find(
-            (reward) => rewardId === parseInt(reward.id)
-          );
-          setGoal({ name, goalId: id, value: parseInt(value), hasGoal: true });
+    actor
+      ?.getGoals(child.id)
+      .then((returnedRewards) => {
+        if ("ok" in returnedRewards) {
+          const rewards = Object.values(returnedRewards);
+          if (rewards) {
+            const { name, value, id } = rewards[0].find(
+              (reward) => rewardId === parseInt(reward.id)
+            );
+            setGoal({
+              name,
+              goalId: id,
+              value: parseInt(value),
+              hasGoal: true,
+            });
+          }
+        } else {
+          console.error(returnedRewards.err);
         }
-      } else {
-        console.error(returnedRewards.err);
-      }
-    });
+      })
+      .finally(() => setIsLoading(false));
   };
 
   function getCurrentGoal() {
+    console.log("IN CHILD", child)
     actor?.getCurrentGoal(child.id).then((returnedGoal) => {
+      console.log(`returnedGoal`, returnedGoal)
       returnedGoal = parseInt(returnedGoal);
+      console.log(`returnedGoal`, returnedGoal)
       if (returnedGoal > 0) {
+        console.log("ncjfd")
         getReward(returnedGoal);
       } else {
         setGoal({
           name: "no goal set",
           value: 0,
-          hasGoal: false
+          hasGoal: false,
         });
+        setIsLoading(false)
       }
-    });
+    }).catch((e) => console.log('error', e));
     return false;
   }
 
-  if(!goal?.hasGoal) {
-    return ""
+  if (isLoading) {
+    return (
+      <>
+        <Box
+          style={{ maxWidth: "380px", display: "flex", flexDirection: "column", margin: "-50px auto 20px auto", borderRadius: "8px" }}
+          padding={'20px'}
+          boxShadow="none"
+          bg="white"
+        >
+          <SkeletonText mt="4" noOfLines={3} spacing="4" skeletonHeight="2" />
+        </Box>
+      </>
+    );
+  }
+
+  if (!goal?.hasGoal) {
+    return "";
   }
 
   return (
