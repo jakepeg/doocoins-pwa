@@ -9,8 +9,6 @@ const Goal = () => {
   const [goal, setGoal] = React.useState(null);
   const [child, setChild] = React.useState(null);
 
-  const hasGoal = true;
-  const goalId = 123;
   const balance = child?.balance || 0;
 
   React.useEffect(() => {
@@ -39,19 +37,6 @@ const Goal = () => {
     }
   }, [child?.id]);
 
-  // check if goal for SELECTED CHILD is in local storage checkGoal()
-  // if it is call
-  // setGoalState {
-  // setHasGoal(true);
-  // setGoalName(goalName);
-  // setGoalValue(value);
-  // setGoalId(goalId);
-  // }
-  // if the goal for the selected child isn't in local storage call getCurrentGoal()
-  // and set local storage
-
-  // claim goal button should open confirmation confirmation dialog CLAIM / CANCEL
-
   const getReward = (rewardId) => {
     actor?.getGoals(child.id).then((returnedRewards) => {
       if ("ok" in returnedRewards) {
@@ -71,7 +56,6 @@ const Goal = () => {
   function getCurrentGoal() {
     actor?.getCurrentGoal(child.id).then((returnedGoal) => {
       returnedGoal = parseInt(returnedGoal);
-      console.log(`returnedGoal`, returnedGoal);
       if (returnedGoal > 0) {
         getReward(returnedGoal);
       } else {
@@ -85,6 +69,10 @@ const Goal = () => {
     return false;
   }
 
+  if(!goal?.hasGoal) {
+    return ""
+  }
+
   return (
     <div className="goal">
       <div className="goal-info">
@@ -95,13 +83,13 @@ const Goal = () => {
         {balance >= goal?.value && goal.value > 0 && (
           <button
             className="claim"
-            onClick={() => handleClaimGoal(parseInt(goalId))}
+            onClick={() => handleClaimGoal(parseInt(goal?.id))}
           >
             Claim
           </button>
         )}
       </div>
-      {hasGoal && (
+      {goal.hasGoal && (
         <div className="goal-progress">
           <CircularProgressbar
             strokeWidth="12"

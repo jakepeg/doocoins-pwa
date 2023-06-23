@@ -46,14 +46,12 @@ const Wallet = () => {
 
   function getTransactions() {
     if (child) {
-    console.log("getTransactions called for child id: "+child.id);
     setIsLoading(true);
     actor?.getTransactions(child.id).then((returnedTransactions) => {
       if ("ok" in returnedTransactions) {
         const transactions = Object.values(returnedTransactions);
         setTransactions(transactions);
         setIsLoading(false);
-        console.log("transactions: ", transactions);
       } else {
         console.error(returnedTransactions.err);
       }
