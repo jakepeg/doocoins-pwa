@@ -19,10 +19,12 @@ import { ReactComponent as EditIcon } from "../assets/images/pencil.svg";
 import { ReactComponent as DeleteIcon } from "../assets/images/delete.svg";
 import { Skeleton, Stack, Text, useToast } from "@chakra-ui/react";
 import ApproveDialog from "../components/Dialogs/ApproveDialog";
+import { useNavigate } from "react-router-dom";
 
 const Tasks = () => {
   const { actor } = useAuth();
   const toast = useToast();
+  const navigate = useNavigate();
   const [tasks, setTasks] = React.useState({});
   const [taskComplete, setTaskComplete] = React.useState(null);
   const [loader, setLoader] = React.useState({ init: true, singles: false });
@@ -46,13 +48,17 @@ const Tasks = () => {
         get(`balance-${data}`),
         get(`selectedChildName`),
       ]);
-      setChild({
-        id: data,
-        balance: parseInt(balance),
-        name,
-      });
-    })
-  }
+      if (data) {
+        setChild({
+          id: data,
+          balance: parseInt(balance),
+          name,
+        });
+      } else {
+        navigate("/");
+      }
+    });
+  };
 
   function getTasks({ disableFullLoader = false }) {
     if (child) {
@@ -202,7 +208,7 @@ const Tasks = () => {
               })
             );
             set("childList", updatedChildrenData);
-            await getChildren()
+            await getChildren();
             setLoader((prevState) => ({ ...prevState, init: false }));
           } else {
             setLoader((prevState) => ({ ...prevState, init: false }));
@@ -266,7 +272,7 @@ const Tasks = () => {
   const TaskList = React.useMemo(() => {
     return (
       <>
-        {tasks?.length && (
+        {tasks?.length ? (
           <div className="example">
             <ul className="child-list">
               <SwipeableList
@@ -286,7 +292,7 @@ const Tasks = () => {
               </SwipeableList>
             </ul>
           </div>
-        )}
+        ) : null}
       </>
     );
   }, [tasks]);

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { get } from "idb-keyval";
+import { get, set } from "idb-keyval";
 import Balance from "../components/Balance";
 import dc from "../assets/images/dc.svg";
 import { useAuth } from "../use-auth-client";
@@ -21,10 +21,12 @@ import EditDialog from "../components/Dialogs/EditDialog";
 import AddActionDialog from "../components/Tasks/AddActionDialog";
 import { default as GoalDialog } from "../components/Dialogs/ApproveDialog";
 import { default as ClaimDialog } from "../components/Dialogs/ApproveDialog";
+import { useNavigate } from "react-router-dom";
 
 const Rewards = () => {
   const { actor } = useAuth();
   const toast = useToast();
+  const navigate = useNavigate();
   const [rewards, setRewards] = React.useState([]);
   const [rewardClaimed, setRewardClaimed] = React.useState(null);
   const [newReward, setNewReward] = React.useState(null);
@@ -51,16 +53,35 @@ const Rewards = () => {
         get(`balance-${data}`),
         get(`selectedChildName`),
       ]);
-      setChild({
-        id: data,
-        balance: parseInt(balance),
-        name,
-      });
+      if (data) {
+        setChild({
+          id: data,
+          balance: parseInt(balance),
+          name,
+        });
+      } else {
+        navigate("/");
+      }
+    });
+  };
+
+  async function getBalance(childID) {
+    return new Promise((resolve, reject) => {
+      get("balance-" + childID)
+        .then((val) => {
+          actor?.getBalance(childID).then((returnedBalance) => {
+            set("balance-" + childID, parseInt(returnedBalance));
+            resolve(returnedBalance);
+          });
+        })
+        .catch((error) => {
+          reject(error);
+        });
     });
   }
 
   function getRewards({ disableFullLoader }) {
-    if (child) {
+    if (child.id) {
       if (!disableFullLoader) {
         setLoader((prevState) => ({ ...prevState, init: true }));
       }
@@ -151,22 +172,36 @@ const Rewards = () => {
     let dateNum = Math.floor(Date.now() / 1000);
     let date = dateNum.toString();
     setLoader((prevState) => ({ ...prevState, init: true }));
-    actor?.claimGoal(child.id, reward_id, date).then(async (returnedClaimReward) => {
-      if ("ok" in returnedClaimReward) {
-        toast({
-          title: `Yay - well deserved, ${child.name}.`,
-          status: "success",
-          duration: 4000,
-          isClosable: true,
-        });
-        setRewardClaimed(parseInt(reward_id));
-        await getChildren();
-        setLoader((prevState) => ({ ...prevState, init: false }));
-      } else {
-        console.error(returnedClaimReward.err);
-        setLoader((prevState) => ({ ...prevState, init: false }));
-      }
-    });
+    actor
+      ?.claimGoal(child.id, reward_id, date)
+      .then(async (returnedClaimReward) => {
+        if ("ok" in returnedClaimReward) {
+          toast({
+            title: `Yay - well deserved, ${child.name}.`,
+            status: "success",
+            duration: 4000,
+            isClosable: true,
+          });
+          actor?.getChildren().then(async (returnedChilren) => {
+            const children = Object.values(returnedChilren);
+            const updatedChildrenData = await Promise.all(
+              children[0].map(async (child) => {
+                const balance = await getBalance(child.id);
+                return {
+                  ...child,
+                  balance: parseInt(balance),
+                };
+              })
+            );
+            set("childList", updatedChildrenData);
+            await getChildren();
+            setLoader((prevState) => ({ ...prevState, init: false }));
+          });
+        } else {
+          console.error(returnedClaimReward.err);
+          setLoader((prevState) => ({ ...prevState, init: false }));
+        }
+      });
   }
 
   React.useEffect(() => {
@@ -285,7 +320,7 @@ const Rewards = () => {
   const RewardList = React.useMemo(() => {
     return (
       <>
-        {rewards?.length && (
+        {rewards?.length ? (
           <div className="example">
             <ul className="list-wrapper">
               <SwipeableList
@@ -315,7 +350,7 @@ const Rewards = () => {
               </SwipeableList>
             </ul>
           </div>
-        )}
+        ) : null}
       </>
     );
   }, [rewards]);

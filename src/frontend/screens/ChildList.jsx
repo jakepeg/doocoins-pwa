@@ -218,7 +218,7 @@ function ChildList() {
   const ChildrenList = React.useMemo(() => {
     return (
       <>
-        {children?.length && (
+        {children?.length ? (
           <div className="example">
             <ul className="list-wrapper">
               <SwipeableList
@@ -247,7 +247,7 @@ function ChildList() {
               </SwipeableList>
             </ul>
           </div>
-        )}
+        ) : null}
       </>
     );
   }, [children]);
@@ -302,12 +302,10 @@ function ChildList() {
         ) : (
           <>{ChildrenList}</>
         )}
-        {loader.singles ? (
+        {loader.singles && (
           <Stack margin={"0 20px 20px 20px"}>
             <Skeleton height="20px" mt={"12px"} />
           </Stack>
-        ) : (
-          <div></div>
         )}
       </div>
     </>

@@ -6,9 +6,11 @@ import Goal from "../components/Goal";
 import LoadingSpinner from "../components/LoadingSpinner";
 import dc from "../assets/images/dc.svg";
 import { useAuth } from "../use-auth-client";
+import { useNavigate } from "react-router-dom";
 
 const Wallet = () => {
   const {actor} = useAuth()
+  const navigate = useNavigate()
   const [transactions, setTransactions] = React.useState({});
   const [currentGoal, setCurrentGoal] = React.useState(null);
   const [isLoading, setIsLoading] = React.useState(true);
@@ -30,11 +32,15 @@ const Wallet = () => {
     setIsLoading(true)
     get("selectedChild").then(async (data) => {
       const [balance, name] = await Promise.all([get(`balance-${data}`), get(`selectedChildName`)])
-      setChild({
-        id: data,
-        balance: parseInt(balance),
-        name
-      });
+      if (data) {
+        setChild({
+          id: data,
+          balance: parseInt(balance),
+          name,
+        });
+      } else {
+        navigate("/");
+      }
     })
   }, [])
 
