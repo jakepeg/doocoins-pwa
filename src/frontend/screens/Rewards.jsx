@@ -90,14 +90,10 @@ const Rewards = () => {
           const rewards = Object.values(returnedRewards);
           let currentGoalId;
           await actor?.getCurrentGoal(child.id).then((returnedGoal) => {
-            console.log(`returnedGoal`, returnedGoal);
             currentGoalId = parseInt(returnedGoal);
-            console.log(`returnedGoal`, returnedGoal);
 
             return currentGoalId;
           });
-
-          console.log(`currentGoalId`, currentGoalId);
 
           setRewards(
             rewards[0].map((reward) => {
@@ -259,7 +255,7 @@ const Rewards = () => {
             {reward.active ? (
               <SwipeAction
                 onClick={() => handleTogglePopup(true, reward, "remove_goal")}
-                className="delete"
+                className="claim-option"
               >
                 <div className="action-btn ">
                   <div className="ItemColumnCentered">
