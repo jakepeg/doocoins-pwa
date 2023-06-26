@@ -18,6 +18,7 @@ const defaultOptions = {
     idleOptions: {
       // Set to true if you do not want idle functionality
       disableIdle: true,
+      disableDefaultIdleCallback: true,
     },
   },
   /**
