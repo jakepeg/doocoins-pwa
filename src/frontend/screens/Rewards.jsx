@@ -179,7 +179,7 @@ const Rewards = () => {
           });
         } else {
           toast({
-            title: `Goal is unset for, ${child.name}.`,
+            title: `Goal removed for ${child.name}.`,
             status: "success",
             duration: 4000,
             isClosable: true,
