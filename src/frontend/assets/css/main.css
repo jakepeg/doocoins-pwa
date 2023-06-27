@@ -79,7 +79,7 @@ main {
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  font-size: 22px;
+  font-size: 1.2em;
   font-weight: 400;
   text-align: center;
   -webkit-font-smoothing: antialiased;
@@ -104,7 +104,7 @@ main {
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 400;
   text-align: center;
   -webkit-font-smoothing: antialiased;
@@ -156,8 +156,6 @@ main {
   transform: rotate(180deg);
 }
 
-
-
 .dc-img-big {
   display: inline-block;
   width: 41px;
@@ -165,7 +163,7 @@ main {
 
 .dc-img-small {
   display: inline-block;
-  width: 20px;
+  width: 17px;
 }
 
 .balance {
@@ -176,10 +174,6 @@ main {
   font-family: "Courier New", Courier, monospace;
   margin: 14px 0 0 0;
 }
-
-
-
-
 
 .name {
   text-align: center;
@@ -325,7 +319,7 @@ input[type="text"]::placeholder {
 }
 
 .goal-name {
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
 
 .goal-value {
@@ -372,4 +366,43 @@ input:-ms-input-placeholder {/* IE 10+ */
 
 .pushdown {
   margin-top: 32px;
+}
+
+.claim {
+  box-shadow: 0px 3px 0px 0px hsl(205, 67%, 96%);
+  background-color: hsl(204, 75%, 17%);
+  border-radius: 8px;
+  border: 1px solid hsl(205, 67%, 96%);
+  display: inline-block;
+  cursor: pointer;
+  color: #ffffff;
+  font-family: Arial;
+  font-size: 20px;
+  font-weight: bold;
+  padding: 10px 20px;
+  text-decoration: none;
+}
+.claim:hover {
+  background-color: hsl(184, 81%, 37%);
+}
+.claim:active {
+  position: relative;
+  top: 1px;
+}
+
+
+.claim-disabled {
+  cursor: not-allowed; /* Change pointer to arrow */
+  opacity: 0.2; /* Set opacity to 0.5 */
+  box-shadow: 0px 3px 0px 0px hsl(205, 67%, 96%);
+  background-color: hsl(204, 75%, 17%);
+  border-radius: 8px;
+  border: 1px solid hsl(205, 67%, 96%);
+  display: inline-block;
+  color: #ffffff;
+  font-family: Arial;
+  font-size: 20px;
+  font-weight: bold;
+  padding: 10px 20px;
+  text-decoration: none;
 }

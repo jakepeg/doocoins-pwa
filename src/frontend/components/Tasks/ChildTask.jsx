@@ -13,14 +13,14 @@ const ChildTask = ({ task }) => {
         role="link"
         key={parseInt(task.id)}
       >
-        <Text textAlign={"left"} fontSize={"22px"}>
+        <Text textAlign={"left"} fontSize={"20px"}>
           {task.name}
         </Text>
       </Box>
 
       <div className="child-balance">
-        <DCIcon className="balance-dc-icon" width="1.2em" height="1.2em" />
-        <Box fontSize={"22px"}>{parseInt(task.value)}</Box>
+        <DCIcon className="balance-dc-icon" width="18px" height="18px" />
+        <Box fontSize={"20px"}>{parseInt(task.value)}</Box>
       </div>
     </>
   );

@@ -108,14 +108,16 @@ const Goal = () => {
           Current goal <br />
           {goal?.name}
         </p>
-        {balance >= goal?.value && goal.value > 0 && (
-          <button
-            className="claim"
-            onClick={() => handleClaimGoal(parseInt(goal?.id))}
+        <button
+          disabled={!(balance >= goal?.value && goal.value > 0)}
+          className={!(balance >= goal?.value && goal.value > 0) ? 'claim-disabled' : 'claim'}
+          onClick={() => handleClaimGoal(parseInt(goal?.id))}
           >
-            Claim
-          </button>
-        )}
+          Claim
+        </button>
+
+
+
       </div>
       {goal.hasGoal && (
         <div className="goal-progress">

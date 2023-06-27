@@ -268,28 +268,6 @@ label {
   justify-content: space-evenly;
 }
 
-.claim {
-  box-shadow: 0px 3px 0px 0px hsl(205, 67%, 96%);
-  background-color: hsl(204, 75%, 17%);
-  border-radius: 8px;
-  border: 1px solid hsl(205, 67%, 96%);
-  display: inline-block;
-  cursor: pointer;
-  color: #ffffff;
-  font-family: Arial;
-  font-size: 20px;
-  font-weight: bold;
-  padding: 10px 20px;
-  text-decoration: none;
-}
-.claim:hover {
-  background-color: hsl(184, 81%, 37%);
-}
-.claim:active {
-  position: relative;
-  top: 1px;
-}
-
 .gray {
   color: #999;
 }
