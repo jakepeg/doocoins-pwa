@@ -103,7 +103,7 @@ const Wallet = () => {
     <>
       <Balance childName={child.name} childBalance={child.balance} />
       <div className="light-panel transactions">
-        <Goal />
+        <Goal setChild={setChild} child={child} />
         <h2 className="title-button dark">
           <span>Transactions</span>
         </h2>
