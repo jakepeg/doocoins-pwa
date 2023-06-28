@@ -9,28 +9,28 @@
       "type": "image/x-icon"
     },
     {
-      "src": "/logo192.png",
+      "src": "/192.png",
       "type": "image/png",
       "sizes": "192x192",
-      "purpose": "maskable"
+      "purpose": "any maskable"
     },
     {
-      "src": "/logo512.png",
+      "src": "/512.png",
       "type": "image/png",
       "sizes": "512x512",
-      "purpose": "maskable"
+      "purpose": "any maskable"
     },
     {
-      "src": "/logo144.png",
+      "src": "/144.png",
       "sizes": "144x144",
       "type": "image/png",
-      "purpose": "any"
+      "purpose": "any maskable"
     },
     {
-      "src": "/logo1024.png",
+      "src": "/1024.png",
       "sizes": "1024x1024",
       "type": "image/png",
-      "purpose": "any"
+      "purpose": "any maskable"
     }
   ],
   "theme_color": "#0B334D",
