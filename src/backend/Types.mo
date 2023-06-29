@@ -57,7 +57,7 @@ module {
     public type GoalMap = Trie.Trie<Text, Trie.Trie<Nat, Goal>>;
     public type TransactionMap = Trie.Trie<Text, Trie.Trie<Nat, Transaction>>;
     public type Error = {
-        //this is expected by result library and this is called variant
+        //varients expected by result library
         #NotFound;
         #AlreadyExists;
         #NotAuthorized;
