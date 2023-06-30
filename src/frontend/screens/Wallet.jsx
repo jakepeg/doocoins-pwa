@@ -1,6 +1,6 @@
 import * as React from "react";
 // import Moment from 'react-moment';
-import { get } from "idb-keyval";
+import { get, set } from "idb-keyval";
 import Balance from "../components/Balance";
 import Goal from "../components/Goal";
 import LoadingSpinner from "../components/LoadingSpinner";
@@ -12,7 +12,7 @@ import { Box, Skeleton, Stack } from "@chakra-ui/react";
 const Wallet = () => {
   const { actor } = useAuth();
   const navigate = useNavigate();
-  const [transactions, setTransactions] = React.useState({});
+  const [transactions, setTransactions] = React.useState([]);
   const [currentGoal, setCurrentGoal] = React.useState(null);
   const [isLoading, setIsLoading] = React.useState({
     transactions: true,
@@ -58,25 +58,47 @@ const Wallet = () => {
       );
   }, []);
 
-  function getTransactions() {
+  function getTransactions({ callService = false }) {
     if (child) {
       setIsLoading((prevState) => ({ ...prevState, transactions: true }));
-      actor
-        ?.getTransactions(child.id)
-        .then((returnedTransactions) => {
-          if ("ok" in returnedTransactions) {
-            const transactions = Object.values(returnedTransactions);
-            if (transactions.length) {
-              setTransactions(transactions[0]);
-            }
-            setIsLoading(false);
-          } else {
-            console.error(returnedTransactions.err);
-          }
-        })
-        .finally(() =>
-          setIsLoading((prevState) => ({ ...prevState, transactions: false }))
-        );
+      get("transactionList").then(async (val) => {
+        if (val == undefined || callService) {
+          actor
+            ?.getTransactions(child.id)
+            .then((returnedTransactions) => {
+              if ("ok" in returnedTransactions) {
+                const transactions = Object.values(returnedTransactions);
+                if (transactions.length) {
+                  set("transactionList", transactions)
+                  setTransactions(transactions[0]);
+                }
+                setIsLoading(false);
+              } else {
+                console.error(returnedTransactions.err);
+              }
+            })
+            .finally(() =>
+              setIsLoading((prevState) => ({
+                ...prevState,
+                transactions: false,
+              }))
+            );
+        } else {
+          setTransactions(
+            val[0]?.map((reward) => {
+              return {
+                ...reward,
+                id: parseInt(reward.id),
+                value: parseInt(reward.value),
+              };
+            })
+          );
+          setIsLoading((prevState) => ({
+            ...prevState,
+            transactions: false,
+          }))
+        }
+      });
       return false;
     }
   }
@@ -109,16 +131,16 @@ const Wallet = () => {
         </h2>
         {isLoading.transactions ? (
           <>
-            <Stack gap={'20px'} margin={"0 0 20px 0"}>
-              <Box display="flex" flexDirection={'column'} gap={1}>
+            <Stack gap={"20px"} margin={"0 0 20px 0"}>
+              <Box display="flex" flexDirection={"column"} gap={1}>
                 <Skeleton height="20px" width={"15%"} />
                 <Skeleton height="20px" />
               </Box>
-              <Box display="flex" flexDirection={'column'} gap={1}>
+              <Box display="flex" flexDirection={"column"} gap={1}>
                 <Skeleton height="20px" width={"15%"} />
                 <Skeleton height="20px" />
               </Box>
-              <Box display="flex" flexDirection={'column'} gap={1}>
+              <Box display="flex" flexDirection={"column"} gap={1}>
                 <Skeleton height="20px" width={"15%"} />
                 <Skeleton height="20px" />
               </Box>

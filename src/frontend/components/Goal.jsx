@@ -5,6 +5,7 @@ import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 import { Box, SkeletonText, useToast } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
+import { noGoalEntity } from "../utils/constants";
 
 const Goal = ({ child, setChild }) => {
   const { actor } = useAuth();
@@ -18,6 +19,13 @@ const Goal = ({ child, setChild }) => {
     if (child?.id && actor) {
       get("childGoal").then(async (data) => {
         if (data) {
+          setGoal({
+            name: data.name,
+            value: parseInt(data.value),
+            hasGoal: data.hasGoal,
+            ...data,
+          });
+          setIsLoading(false);
         } else {
           getCurrentGoal();
         }
@@ -35,12 +43,14 @@ const Goal = ({ child, setChild }) => {
             const { name, value, id } = rewards[0].find(
               (reward) => rewardId === parseInt(reward.id)
             );
-            setGoal({
+            const returnedGoal = {
               name,
-              id: id,
               value: parseInt(value),
               hasGoal: true,
-            });
+              id,
+            };
+            set("childGoal", returnedGoal);
+            setGoal(returnedGoal);
           }
         } else {
           console.error(returnedRewards.err);
@@ -57,11 +67,8 @@ const Goal = ({ child, setChild }) => {
         if (returnedGoal > 0) {
           getReward(returnedGoal);
         } else {
-          setGoal({
-            name: "no goal set",
-            value: 0,
-            hasGoal: false,
-          });
+          setGoal(noGoalEntity);
+          set("childGoal", noGoalEntity);
           setIsLoading(false);
         }
       })
@@ -120,7 +127,8 @@ const Goal = ({ child, setChild }) => {
         } else {
           console.error(returnedClaimReward.err);
         }
-      }).finally(() => setIsLoading(false));
+      })
+      .finally(() => setIsLoading(false));
   }
 
   async function getBalance(childID) {
@@ -137,7 +145,6 @@ const Goal = ({ child, setChild }) => {
         });
     });
   }
-  console.log('goal', goal)
 
   if (isLoading) {
     return (

@@ -8,3 +8,9 @@ class ConstantStrings {
 
 const strings = new ConstantStrings();
 export default strings;
+
+export const noGoalEntity = {
+  hasGoal: false,
+  name: "no goal set",
+  value: 0,
+};

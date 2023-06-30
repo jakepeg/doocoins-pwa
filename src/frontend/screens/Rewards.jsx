@@ -23,6 +23,7 @@ import { default as GoalDialog } from "../components/Dialogs/ApproveDialog";
 import { default as ClaimDialog } from "../components/Dialogs/ApproveDialog";
 import { useNavigate } from "react-router-dom";
 import RemoveGoalDialog from "../components/Dialogs/RemoveGoalDialog";
+import { noGoalEntity } from "../utils/constants";
 
 const Rewards = () => {
   const { actor } = useAuth();
@@ -80,28 +81,49 @@ const Rewards = () => {
     });
   }
 
-  function getRewards({ disableFullLoader }) {
+  function getRewards({ disableFullLoader, callService = false }) {
     if (child.id) {
       if (!disableFullLoader) {
         setLoader((prevState) => ({ ...prevState, init: true }));
       }
-      actor?.getGoals(child.id).then(async (returnedRewards) => {
-        if ("ok" in returnedRewards) {
-          const rewards = Object.values(returnedRewards);
-          let currentGoalId;
-          await actor?.getCurrentGoal(child.id).then((returnedGoal) => {
-            currentGoalId = parseInt(returnedGoal);
 
-            return currentGoalId;
+      get("rewardList").then(async (val) => {
+        if (val === undefined || callService) {
+          actor?.getGoals(child.id).then(async (returnedRewards) => {
+            if ("ok" in returnedRewards) {
+              const rewards = Object.values(returnedRewards);
+              let currentGoalId;
+              await actor?.getCurrentGoal(child.id).then((returnedGoal) => {
+                currentGoalId = parseInt(returnedGoal);
+
+                return currentGoalId;
+              });
+              const filteredRewards = rewards?.[0].map((reward) => {
+                return {
+                  ...reward,
+                  value: parseInt(reward.value),
+                  id: parseInt(reward.id),
+                  active: currentGoalId === parseInt(reward.id) ? true : false,
+                };
+              });
+              set("rewardList", filteredRewards || []);
+              setRewards(filteredRewards);
+              setLoader((prevState) => ({
+                ...prevState,
+                init: false,
+                singles: false,
+              }));
+            } else {
+              console.error(returnedRewards.err);
+            }
           });
-
+        } else {
           setRewards(
-            rewards[0].map((reward) => {
+            val?.map((reward) => {
               return {
                 ...reward,
-                value: parseInt(reward.value),
                 id: parseInt(reward.id),
-                active: currentGoalId === parseInt(reward.id) ? true : false,
+                value: parseInt(reward.value),
               };
             })
           );
@@ -110,10 +132,9 @@ const Rewards = () => {
             init: false,
             singles: false,
           }));
-        } else {
-          console.error(returnedRewards.err);
         }
       });
+
       return false;
     }
   }
@@ -130,7 +151,7 @@ const Rewards = () => {
     actor
       ?.updateGoal(child.id, rewardID, reward_object)
       .then((response) => {
-        getRewards({ disableFullLoader: false });
+        getRewards({ disableFullLoader: false, callService: true });
       })
       .finally(() => setSelectedReward(null));
   }
@@ -147,7 +168,7 @@ const Rewards = () => {
     actor
       ?.updateGoal(child.id, rewardID, reward_object)
       .then((response) => {
-        getRewards({ disableFullLoader: false });
+        getRewards({ disableFullLoader: false, callService: true });
       })
       .finally(() => setSelectedReward(null));
   }
@@ -160,7 +181,14 @@ const Rewards = () => {
   function handleSetGoal({ reward_id, isForSet, disableFullLoader }) {
     if (isForSet) {
       handleToggleGoalPopup();
+      set("childGoal", {
+        hasGoal: true,
+        value: parseInt(selectedReward.value),
+        name: selectedReward.name,
+        id: parseInt(selectedReward.id)
+      });
     } else {
+      set("childGoal", noGoalEntity);
       handleCloseRemoveGoalPopup();
     }
     if (!disableFullLoader) {
@@ -185,7 +213,7 @@ const Rewards = () => {
             isClosable: true,
           });
         }
-        getRewards({ disableFullLoader: false });
+        getRewards({ disableFullLoader: false, callService: true });
       } else {
         console.error(returnedCurrentGoal.err);
       }
@@ -361,7 +389,7 @@ const Rewards = () => {
       handleToggleAddRewardPopup();
       actor.addGoal(reward, child.id).then((response) => {
         if ("ok" in response) {
-          getRewards({ disableFullLoader: true });
+          getRewards({ disableFullLoader: true, callService: true });
         }
       });
     }

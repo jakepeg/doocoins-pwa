@@ -60,29 +60,50 @@ const Tasks = () => {
     });
   };
 
-  function getTasks({ disableFullLoader = false }) {
+  function getTasks({ disableFullLoader = false, callService = false }) {
     if (child) {
       if (!disableFullLoader) {
         setLoader((prevState) => ({ ...prevState, init: true }));
       }
 
-      actor
-        ?.getTasks(child.id)
-        .then((returnedTasks) => {
-          if ("ok" in returnedTasks) {
-            const tasks = Object.values(returnedTasks);
-            setTasks(tasks);
-          } else {
-            console.error(returnedTasks.err);
-          }
-        })
-        .finally(() =>
+      get("taskList").then(async (val) => {
+        if (val === undefined || callService) {
+          actor
+            ?.getTasks(child.id)
+            .then((returnedTasks) => {
+              if ("ok" in returnedTasks) {
+                const tasks = Object.values(returnedTasks);
+                set("taskList", tasks);
+                setTasks(tasks[0]);
+              } else {
+                console.error(returnedTasks.err);
+              }
+            })
+            .finally(() =>
+              setLoader((prevState) => ({
+                ...prevState,
+                init: false,
+                singles: false,
+              }))
+            );
+        } else {
+          setTasks(
+            val[0]?.map((task) => {
+              return {
+                ...task,
+                id: parseInt(task.id),
+                value: parseInt(task.value),
+              };
+            })
+          );
           setLoader((prevState) => ({
             ...prevState,
             init: false,
             singles: false,
-          }))
-        );
+          }));
+        }
+      });
+
       return false;
     }
   }
@@ -127,7 +148,7 @@ const Tasks = () => {
       handleToggleAddTaskPopup();
       setLoader((prevState) => ({ ...prevState, singles: true }));
       actor.addTask(task, child.id).then((response) => {
-        getTasks({ disableFullLoader: true });
+        getTasks({ disableFullLoader: true, callService: true });
       });
     }
   };
@@ -142,7 +163,7 @@ const Tasks = () => {
     handleCloseEditPopup();
     setLoader((prevState) => ({ ...prevState, init: true }));
     actor?.updateTask(child.id, taskID, task_object).then((response) => {
-      getTasks({ disableFullLoader: false });
+      getTasks({ disableFullLoader: false, callService: true });
     });
   }
 
@@ -158,19 +179,17 @@ const Tasks = () => {
     actor
       ?.updateTask(child.id, taskID, task_object)
       .then((response) => {
-        getTasks({ disableFullLoader: false });
+        getTasks({ disableFullLoader: false, callService: true });
       })
       .finally(() => setSelectedTask(null));
   }
 
   async function getBalance(childID) {
-    console.log("getBalance called");
     return new Promise((resolve, reject) => {
       get("balance-" + childID)
         .then((val) => {
           actor?.getBalance(childID).then((returnedBalance) => {
             set("balance-" + childID, parseInt(returnedBalance));
-            console.log(returnedBalance);
             resolve(returnedBalance);
           });
         })
@@ -280,7 +299,7 @@ const Tasks = () => {
                 type={ListType.IOS}
                 fullSwipe={false}
               >
-                {tasks[0].map((task) => (
+                {tasks.map((task) => (
                   <SwipeableListItem
                     leadingActions={null}
                     trailingActions={trailingActions({ task })}
