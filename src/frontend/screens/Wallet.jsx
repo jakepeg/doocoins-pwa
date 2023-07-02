@@ -1,5 +1,4 @@
 import * as React from "react";
-// import Moment from 'react-moment';
 import { get, set } from "idb-keyval";
 import Balance from "../components/Balance";
 import Goal from "../components/Goal";
@@ -8,24 +7,26 @@ import dc from "../assets/images/dc.svg";
 import { useAuth } from "../use-auth-client";
 import { useNavigate } from "react-router-dom";
 import { Box, Skeleton, Stack } from "@chakra-ui/react";
+import { ChildContext } from "../contexts/ChildContext";
 
 const Wallet = () => {
   const { actor } = useAuth();
   const navigate = useNavigate();
   const [transactions, setTransactions] = React.useState([]);
-  const [currentGoal, setCurrentGoal] = React.useState(null);
+  const { child, setChild } = React.useContext(ChildContext);
   const [isLoading, setIsLoading] = React.useState({
     transactions: true,
-    child: true,
+    child: !child ? true : false,
   });
-  const [child, setChild] = React.useState(null);
 
-  // const humanReadableDate = time => {
-  //   return new Date(time).toLocaleString('en-US', {
-  //     month: 'short',
-  //     day: 'numeric',
-  //   });
-  // };
+  React.useEffect(() => {
+    if (child) {
+      setIsLoading((prevState) => ({
+        ...prevState,
+        child: false,
+      }));
+    }
+  }, [child]);
 
   const humanReadableDate = (timestamp) => {
     const date = new Date(timestamp * 1000); // Convert timestamp to milliseconds
@@ -36,7 +37,6 @@ const Wallet = () => {
   };
 
   React.useEffect(() => {
-    setIsLoading((prevState) => ({ ...prevState, child: true }));
     get("selectedChild")
       .then(async (data) => {
         const [balance, name] = await Promise.all([
@@ -60,8 +60,8 @@ const Wallet = () => {
 
   function getTransactions({ callService = false }) {
     if (child) {
-      setIsLoading((prevState) => ({ ...prevState, transactions: true }));
       get("transactionList").then(async (val) => {
+        setIsLoading((prevState) => ({ ...prevState, transactions: true }));
         if (val == undefined || callService) {
           actor
             ?.getTransactions(child.id)
@@ -69,7 +69,7 @@ const Wallet = () => {
               if ("ok" in returnedTransactions) {
                 const transactions = Object.values(returnedTransactions);
                 if (transactions.length) {
-                  set("transactionList", transactions)
+                  set("transactionList", transactions);
                   setTransactions(transactions[0]);
                 }
                 setIsLoading(false);
@@ -96,7 +96,7 @@ const Wallet = () => {
           setIsLoading((prevState) => ({
             ...prevState,
             transactions: false,
-          }))
+          }));
         }
       });
       return false;

@@ -20,6 +20,8 @@ import { ReactComponent as DeleteIcon } from "../assets/images/delete.svg";
 import { Skeleton, Stack, Text, useToast } from "@chakra-ui/react";
 import ApproveDialog from "../components/Dialogs/ApproveDialog";
 import { useNavigate } from "react-router-dom";
+import { ChildContext } from "../contexts/ChildContext";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 const Tasks = () => {
   const { actor } = useAuth();
@@ -27,8 +29,12 @@ const Tasks = () => {
   const navigate = useNavigate();
   const [tasks, setTasks] = React.useState({});
   const [taskComplete, setTaskComplete] = React.useState(null);
-  const [loader, setLoader] = React.useState({ init: true, singles: false });
-  const [child, setChild] = React.useState(null);
+  const { child, setChild } = React.useContext(ChildContext);
+  const [loader, setLoader] = React.useState({
+    init: true,
+    singles: false,
+    child: !child ? true : false,
+  });
   const [selectedTask, setSelectedTask] = React.useState(null);
   const [showPopup, setShowPopup] = React.useState({
     delete: false,
@@ -38,9 +44,17 @@ const Tasks = () => {
   });
 
   React.useEffect(() => {
-    setLoader((prevState) => ({ ...prevState, init: true }));
     getChildren();
   }, []);
+
+  React.useEffect(() => {
+    if (child) {
+      setLoader((prevState) => ({
+        ...prevState,
+        child: false,
+      }));
+    }
+  }, [child]);
 
   const getChildren = async () => {
     await get("selectedChild").then(async (data) => {
@@ -321,6 +335,10 @@ const Tasks = () => {
     showPopup.edit ||
     showPopup.add_task ||
     showPopup.approve;
+
+  if (loader.child) {
+    return <LoadingSpinner />;
+  }
 
   return (
     <>

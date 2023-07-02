@@ -6,48 +6,34 @@ export const ChildContext = createContext();
 
 export default function ChildProvider({ children }) {
   const { actor } = useAuth();
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [selectedChild, setSelectedChild] = React.useState(null);
+  const [child, setChild] = React.useState(null);
+ 
+  const getSelectedChild = async () => {
+    let response;
+    await get("selectedChild").then(async (data) => {
+      const [balance, name] = await Promise.all([
+        get(`balance-${data}`),
+        get(`selectedChildName`),
+      ]);
+      if (data) {
+        const selectedChild = {
+          id: data,
+          balance: parseInt(balance),
+          name,
+        };
+        setChild(selectedChild);
+      }
+      response = data;
+    });
 
-  const values = {
-    
-  };
-
-  React.useEffect(() => {
-    getChildren({ callService: false });
-  }, [actor]);
-
-  function getChildren({ callService = false }) {
-    del("selectedChild");
-    del("selectedChildName");
-    setLoader(true);
-    setLoader(true);
-    actor
-      ?.getChildren()
-      .then(async (returnedChilren) => {
-        if ("ok" in returnedChilren) {
-          const children = Object.values(returnedChilren);
-          const updatedChildrenData = await Promise.all(
-            children[0].map(async (child) => {
-              const balance = await getBalance(child.id);
-              return {
-                ...child,
-                balance: parseInt(balance),
-              };
-            })
-          );
-          setChildren(updatedChildrenData);
-          set("childList", updatedChildrenData);
-        } else {
-          console.error(returnedChilren.err);
-        }
-      })
-      .finally(() => setLoader(false));
-  }
+    return response;
+  }; 
 
   return (
     <>
-      <todoContext.Provider value={values}>{children}</todoContext.Provider>
+      <ChildContext.Provider value={{ child, setChild, getSelectedChild }}>
+        {children}
+      </ChildContext.Provider>
     </>
   );
 }

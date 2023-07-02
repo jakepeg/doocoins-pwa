@@ -24,6 +24,8 @@ import { default as ClaimDialog } from "../components/Dialogs/ApproveDialog";
 import { useNavigate } from "react-router-dom";
 import RemoveGoalDialog from "../components/Dialogs/RemoveGoalDialog";
 import { noGoalEntity } from "../utils/constants";
+import { ChildContext } from "../contexts/ChildContext";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 const Rewards = () => {
   const { actor } = useAuth();
@@ -31,8 +33,12 @@ const Rewards = () => {
   const navigate = useNavigate();
   const [rewards, setRewards] = React.useState([]);
   const [currentGoal, setCurrentGoal] = React.useState(null);
-  const [loader, setLoader] = React.useState({ init: true, singles: false });
-  const [child, setChild] = React.useState(null);
+  const { child, setChild } = React.useContext(ChildContext);
+  const [loader, setLoader] = React.useState({
+    init: true,
+    singles: false,
+    child: !child ? true : false,
+  });
   const [selectedReward, setSelectedReward] = React.useState(null);
   const [showPopup, setShowPopup] = React.useState({
     delete: false,
@@ -44,10 +50,17 @@ const Rewards = () => {
   });
 
   React.useEffect(() => {
-    setLoader((prevState) => ({ ...prevState, init: true }));
     getChildren();
   }, []);
 
+  React.useEffect(() => {
+    if (child) {
+      setLoader((prevState) => ({
+        ...prevState,
+        child: false,
+      }));
+    }
+  }, [child]);
   const getChildren = async () => {
     await get("selectedChild").then(async (data) => {
       const [balance, name] = await Promise.all([
@@ -185,7 +198,7 @@ const Rewards = () => {
         hasGoal: true,
         value: parseInt(selectedReward.value),
         name: selectedReward.name,
-        id: parseInt(selectedReward.id)
+        id: parseInt(selectedReward.id),
       });
     } else {
       set("childGoal", noGoalEntity);
@@ -440,6 +453,10 @@ const Rewards = () => {
     showPopup.goal ||
     showPopup.add_reward ||
     showPopup.remove_goal;
+
+  if (loader.child) {
+    return <LoadingSpinner />;
+  }
 
   return (
     <>

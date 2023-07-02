@@ -13,72 +13,75 @@ import ProtectedRoute from "./ProtectedRoute";
 import { ChakraProvider } from "@chakra-ui/react";
 import About from "./screens/About";
 import Help from "./screens/Help";
+import ChildProvider from "./contexts/ChildContext";
 
 function App() {
   return (
     <main id="pageContent">
-      <Router>
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <ProtectedRoute>
-                <ChildList />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/home"
-            element={
-              <ProtectedRoute>
-                <Home />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/rewards"
-            element={
-              <ProtectedRoute>
-                <Rewards />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/tasks"
-            element={
-              <ProtectedRoute>
-                <Tasks />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/wallet"
-            element={
-              <ProtectedRoute>
-                <Wallet />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/about"
-            element={
-              <ProtectedRoute>
-                <About />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/help"
-            element={
-              <ProtectedRoute>
-                <Help />
-              </ProtectedRoute>
-            }
-          />
-          <Route path="/login" element={<LoggedOut />} />
-          <Route path="*" element={<NoMatch />} />
-        </Routes>
-      </Router>
+      <ChildProvider>
+        <Router>
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <ProtectedRoute>
+                  <ChildList />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/home"
+              element={
+                <ProtectedRoute>
+                  <Home />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/rewards"
+              element={
+                <ProtectedRoute>
+                  <Rewards />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/tasks"
+              element={
+                <ProtectedRoute>
+                  <Tasks />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/wallet"
+              element={
+                <ProtectedRoute>
+                  <Wallet />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/about"
+              element={
+                <ProtectedRoute>
+                  <About />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/help"
+              element={
+                <ProtectedRoute>
+                  <Help />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="/login" element={<LoggedOut />} />
+            <Route path="*" element={<NoMatch />} />
+          </Routes>
+        </Router>
+      </ChildProvider>
     </main>
   );
 }
