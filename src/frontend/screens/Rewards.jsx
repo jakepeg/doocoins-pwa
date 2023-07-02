@@ -100,88 +100,151 @@ const Rewards = () => {
         setLoader((prevState) => ({ ...prevState, init: true }));
       }
 
-      get("rewardList").then(async (val) => {
-        if (val === undefined || callService) {
-          actor?.getGoals(child.id).then(async (returnedRewards) => {
-            if ("ok" in returnedRewards) {
-              const rewards = Object.values(returnedRewards);
-              let currentGoalId;
-              await actor?.getCurrentGoal(child.id).then((returnedGoal) => {
-                currentGoalId = parseInt(returnedGoal);
+      get("rewardList")
+        .then(async (val) => {
+          if (val === undefined || callService) {
+            actor?.getGoals(child.id).then(async (returnedRewards) => {
+              if ("ok" in returnedRewards) {
+                const rewards = Object.values(returnedRewards);
+                let currentGoalId;
+                await actor?.getCurrentGoal(child.id).then((returnedGoal) => {
+                  currentGoalId = parseInt(returnedGoal);
 
-                return currentGoalId;
-              });
-              const filteredRewards = rewards?.[0].map((reward) => {
+                  return currentGoalId;
+                });
+                const filteredRewards = rewards?.[0].map((reward) => {
+                  return {
+                    ...reward,
+                    value: parseInt(reward.value),
+                    id: parseInt(reward.id),
+                    active:
+                      currentGoalId === parseInt(reward.id) ? true : false,
+                  };
+                });
+                set("rewardList", filteredRewards || []);
+                setRewards(filteredRewards);
+                setLoader((prevState) => ({
+                  ...prevState,
+                  init: false,
+                  singles: false,
+                }));
+              } else {
+                console.error(returnedRewards.err);
+              }
+            });
+          } else {
+            setRewards(
+              val?.map((reward) => {
                 return {
                   ...reward,
-                  value: parseInt(reward.value),
                   id: parseInt(reward.id),
-                  active: currentGoalId === parseInt(reward.id) ? true : false,
+                  value: parseInt(reward.value),
                 };
-              });
-              set("rewardList", filteredRewards || []);
-              setRewards(filteredRewards);
-              setLoader((prevState) => ({
-                ...prevState,
-                init: false,
-                singles: false,
-              }));
-            } else {
-              console.error(returnedRewards.err);
-            }
-          });
-        } else {
-          setRewards(
-            val?.map((reward) => {
-              return {
-                ...reward,
-                id: parseInt(reward.id),
-                value: parseInt(reward.value),
-              };
-            })
-          );
-          setLoader((prevState) => ({
-            ...prevState,
-            init: false,
-            singles: false,
-          }));
-        }
-      });
+              })
+            );
+            setLoader((prevState) => ({
+              ...prevState,
+              init: false,
+              singles: false,
+            }));
+          }
+        })
+        .catch(() => {
+          removeErrorItem();
+        });
 
       return false;
     }
   }
 
+  const removeErrorItem = () => {
+    if (rewards?.length) {
+      toast({
+        title: "An error occurred.",
+        description: `Apologies, please try again later.`,
+        status: "error",
+        duration: 4000,
+        isClosable: true,
+      });
+      const finalRewards = rewards.filter((reward) => !reward?.isLocal);
+      set("rewardList", finalRewards);
+      setRewards(finalRewards);
+    } else {
+      set("rewardList", []);
+      setRewards([]);
+    }
+  };
+
   function updateReward(rewardID, rewardName, rewardValue) {
     const reward_object = {
+      ...selectedReward,
       name: rewardName,
       value: rewardValue,
       id: rewardID,
       archived: false,
     };
     handleCloseEditPopup();
-    setLoader((prevState) => ({ ...prevState, init: true }));
+    let prevReward;
+    // setLoader((prevState) => ({ ...prevState, init: true }));
+    const updatedList = rewards.map((reward) => {
+      if (reward.id === reward_object.id) {
+        prevReward = reward;
+        return reward_object;
+      } else {
+        return reward;
+      }
+    });
+    setRewards(updatedList);
+    set("rewardList", updatedList);
     actor
       ?.updateGoal(child.id, rewardID, reward_object)
       .then((response) => {
-        getRewards({ disableFullLoader: false, callService: true });
+        if ("ok" in response) {
+          getRewards({ disableFullLoader: true, callService: true });
+        } else {
+          const updatedList = rewards.map((reward) => {
+            const updatedReward =
+              reward.id === reward_object.id ? prevReward : reward;
+            return updatedReward;
+          });
+          setRewards(updatedList);
+          set("rewardList", updatedList);
+        }
       })
       .finally(() => setSelectedReward(null));
   }
 
   function deleteReward(rewardID, rewardName, rewardValue) {
     const reward_object = {
+      ...selectedReward,
       name: rewardName,
       value: rewardValue,
       id: rewardID,
       archived: true,
     };
+    const finalRewards = rewards.filter((reward) => reward.id !== rewardID);
+    setRewards(finalRewards);
+    set("rewardList", finalRewards);
     handleCloseDeletePopup();
-    setLoader((prevState) => ({ ...prevState, init: true }));
+    // setLoader((prevState) => ({ ...prevState, init: true }));
     actor
       ?.updateGoal(child.id, rewardID, reward_object)
       .then((response) => {
-        getRewards({ disableFullLoader: false, callService: true });
+        if ("ok" in response) {
+          getRewards({ disableFullLoader: true, callService: true });
+        } else {
+          setRewards((prevState) => {
+            set("rewardList", [...prevState, reward_object]);
+            return [...prevState, reward_object];
+          });
+          toast({
+            title: "An error occurred.",
+            description: `Can't perform delete, please try again later.`,
+            status: "error",
+            duration: 4000,
+            isClosable: true,
+          });
+        }
       })
       .finally(() => setSelectedReward(null));
   }
@@ -200,13 +263,31 @@ const Rewards = () => {
         name: selectedReward.name,
         id: parseInt(selectedReward.id),
       });
+      const finalRewards = rewards.map((reward) => {
+        if (reward.id === reward_id) {
+          return { ...reward, active: true };
+        } else {
+          return reward;
+        }
+      });
+      setRewards(finalRewards);
+      set("rewardList", finalRewards);
     } else {
       set("childGoal", noGoalEntity);
       handleCloseRemoveGoalPopup();
+      const finalRewards = rewards.map((reward) => {
+        if (reward.id === selectedReward.id) {
+          return { ...reward, active: false };
+        } else {
+          return reward;
+        }
+      });
+      setRewards(finalRewards);
+      set("rewardList", finalRewards);
     }
-    if (!disableFullLoader) {
-      setLoader((prevState) => ({ ...prevState, init: true }));
-    }
+    // if (!disableFullLoader) {
+    // setLoader((prevState) => ({ ...prevState, init: true }));
+    // }
     // API call currentGoal
     actor?.currentGoal(child.id, reward_id).then((returnedCurrentGoal) => {
       if ("ok" in returnedCurrentGoal) {
@@ -226,9 +307,18 @@ const Rewards = () => {
             isClosable: true,
           });
         }
-        getRewards({ disableFullLoader: false, callService: true });
+        getRewards({ disableFullLoader: true, callService: true });
       } else {
         console.error(returnedCurrentGoal.err);
+        const finalRewards = rewards.map((reward) => {
+          if (reward.id === reward_id) {
+            return { ...reward, active: isForSet ? false : isForSet };
+          } else {
+            return reward;
+          }
+        });
+        setRewards(finalRewards);
+        set("rewardList", finalRewards);
       }
     });
   }
@@ -264,7 +354,6 @@ const Rewards = () => {
             setLoader((prevState) => ({ ...prevState, init: false }));
           });
         } else {
-          console.error(returnedClaimReward.err);
           setLoader((prevState) => ({ ...prevState, init: false }));
         }
       });
@@ -397,14 +486,29 @@ const Rewards = () => {
       const reward = {
         name: rewardName,
         value: parseInt(value),
+        active: false,
+        archived: false,
+        id: rewards?.[0]?.id + 1 || 1,
+        isLocal: true,
       };
-      setLoader((prevState) => ({ ...prevState, singles: true }));
-      handleToggleAddRewardPopup();
-      actor.addGoal(reward, child.id).then((response) => {
-        if ("ok" in response) {
-          getRewards({ disableFullLoader: true, callService: true });
-        }
+      setRewards((prevState) => {
+        set("rewardList", [reward, ...prevState]);
+        return [reward, ...prevState];
       });
+      // setLoader((prevState) => ({ ...prevState, singles: true }));
+      handleToggleAddRewardPopup();
+      actor
+        .addGoal(reward, child.id)
+        .then((response) => {
+          if ("ok" in response) {
+            getRewards({ disableFullLoader: true, callService: true });
+          } else {
+            removeErrorItem();
+          }
+        })
+        .catch((error) => {
+          removeErrorItem();
+        });
     }
   };
 
