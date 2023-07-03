@@ -114,13 +114,13 @@ main {
 
 .title-button {
   padding-left: 0;
-  margin-bottom: 20px;
+  /* margin-bottom: 20px; */
   display: flex;
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  font-size: 22px;
-  font-weight: 400;
+  font-size: 20px;
+  font-weight: 500;
   text-align: center;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -357,7 +357,7 @@ input:-ms-input-placeholder {/* IE 10+ */
 .date {
   width: 100%;
   display: block;
-  font-size: 18px;
+  font-size: 16px;
   text-align: left;
   color: #999;
   margin-bottom: -5px;

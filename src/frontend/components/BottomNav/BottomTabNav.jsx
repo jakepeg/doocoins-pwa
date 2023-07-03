@@ -62,14 +62,16 @@ function CustomTabs() {
         <Button
           style={{ border: "none" }}
           display="flex"
+          flex= "0 0 25em"
           flexDirection="column"
           alignItems={"center"}
           justifyContent={"center"}
+
           __css={styles.tab}
           {...tabProps}
         >
           <Box as="span">
-            <props.icon activeColor={isSelected && "#139EAA"} width="28px" />
+            <props.icon activeColor={isSelected && "#139EAA"} width="25px" />
           </Box>
           <Box color={isSelected ? "#139EAA" : "#fff"} fontSize={14} mt={1}>
             {tabProps.children}

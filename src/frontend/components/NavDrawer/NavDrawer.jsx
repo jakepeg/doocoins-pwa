@@ -87,6 +87,7 @@ function NavDrawer() {
                 fontSize="xl"
                 color="#0B334D"
                 fontWeight={600}
+                cursor="pointer"
               >
                 Logout
               </Text>
