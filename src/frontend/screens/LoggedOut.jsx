@@ -3,7 +3,31 @@ import { useAuth } from "../use-auth-client";
 import { Navigate } from "react-router-dom";
 import { Box, Button, Link, Text } from "@chakra-ui/react";
 import ICBadge from "../assets/images/ic-badge.svg";
+import ShareIcon from "../assets/images/share-icon.svg";
 import logo from "../assets/images/logo.svg";
+
+function checkForIOS() {
+  // already installed
+  if (navigator.standalone) {
+      return false;
+  }
+
+  const ua = window.navigator.userAgent;
+  const webkit = !!ua.match(/WebKit/i);
+  const isIPad = !!ua.match(/iPad/i);
+  const isIPhone = !!ua.match(/iPhone/i)
+  const isIOS = isIPad || isIPhone;
+  const isSafari = isIOS && webkit && !ua.match(/CriOS/i);
+  const prompt = isIOS && isSafari;
+
+  if (prompt) {
+    console.log("its iOS + Safari");
+    return true;
+  } else {
+    console.log("its NOT iOS + Safari");
+    return false;
+  }
+}
 
 function LoggedOut() {
   const { login, isAuthenticated, isLoading } = useAuth();
@@ -57,6 +81,13 @@ function LoggedOut() {
         >
           Connect
         </Button>
+
+        <Box>
+      {checkForIOS ? <div className="install-prompt"><p className="light prompt-text">Install for a better experience</p><p className="light prompt-text">Tap <img src={ShareIcon} className="share-icon" alt="Install PWA" /> then "Add to Home Screen" </p>
+</div> : ''}
+    </Box>
+
+
       </Box>
       <Box>
         <img src={ICBadge} alt="Internet Computer" />
