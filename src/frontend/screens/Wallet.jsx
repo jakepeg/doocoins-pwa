@@ -105,7 +105,7 @@ const Wallet = () => {
   }
 
   React.useEffect(() => {
-    if (child) getTransactions({ callService: true });
+    if (child) getTransactions(child);
   }, [actor, child]);
 
   const sortTransactionsByDate = React.useCallback(() => {
