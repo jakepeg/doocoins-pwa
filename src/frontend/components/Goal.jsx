@@ -10,7 +10,7 @@ import { noGoalEntity } from "../utils/constants";
 const Goal = ({ child, setChild }) => {
   const { actor } = useAuth();
   const [goal, setGoal] = React.useState(null);
-  const [isLoading, setIsLoading] = React.useState(true);
+  const [isLoading, setIsLoading] = React.useState(false);
   const balance = child?.balance || 0;
   const navigate = useNavigate();
   const toast = useToast();
@@ -60,6 +60,7 @@ const Goal = ({ child, setChild }) => {
   };
 
   function getCurrentGoal() {
+    setIsLoading(true);
     actor
       ?.getCurrentGoal(child.id)
       .then((returnedGoal) => {

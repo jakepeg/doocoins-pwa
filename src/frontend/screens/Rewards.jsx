@@ -121,7 +121,7 @@ const Rewards = () => {
                       currentGoalId === parseInt(reward.id) ? true : false,
                   };
                 });
-                set("rewardList", filteredRewards || []);
+                set("rewardList", filteredRewards);
                 setRewards(filteredRewards);
                 setLoader((prevState) => ({
                   ...prevState,
@@ -170,7 +170,7 @@ const Rewards = () => {
       set("rewardList", finalRewards);
       setRewards(finalRewards);
     } else {
-      set("rewardList", []);
+      set("rewardList", undefined);
       setRewards([]);
     }
   };

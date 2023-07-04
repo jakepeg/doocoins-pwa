@@ -27,7 +27,7 @@ const Tasks = () => {
   const { actor } = useAuth();
   const toast = useToast();
   const navigate = useNavigate();
-  const [tasks, setTasks] = React.useState({});
+  const [tasks, setTasks] = React.useState([]);
   const [taskComplete, setTaskComplete] = React.useState(null);
   const { child, setChild } = React.useContext(ChildContext);
   const [loader, setLoader] = React.useState({
@@ -87,8 +87,15 @@ const Tasks = () => {
             .then((returnedTasks) => {
               if ("ok" in returnedTasks) {
                 const tasks = Object.values(returnedTasks);
-                set("taskList", tasks);
-                setTasks(tasks[0]);
+                const filteredTasks = tasks?.[0]?.map((task) => {
+                  return {
+                    ...task,
+                    id: parseInt(task.id),
+                    value: parseInt(task.value),
+                  };
+                });
+                set("taskList", filteredTasks);
+                setTasks(filteredTasks || []);
               } else {
                 console.error(returnedTasks.err);
               }
@@ -102,13 +109,13 @@ const Tasks = () => {
             );
         } else {
           setTasks(
-            val[0]?.map((task) => {
+            val?.map((task) => {
               return {
                 ...task,
                 id: parseInt(task.id),
                 value: parseInt(task.value),
               };
-            })
+            }) || []
           );
           setLoader((prevState) => ({
             ...prevState,
@@ -152,48 +159,125 @@ const Tasks = () => {
       ["add_task"]: !prevState.add_task,
     }));
   };
-
+  console.log("tasks", tasks);
   const handleSubmitTask = (taskName, value) => {
     if (taskName) {
       const task = {
         name: taskName,
         value: parseInt(value),
+        id: tasks?.[0]?.id + 1 || 1,
+        isLocal: true,
       };
       handleToggleAddTaskPopup();
-      setLoader((prevState) => ({ ...prevState, singles: true }));
-      actor.addTask(task, child.id).then((response) => {
-        getTasks({ disableFullLoader: true, callService: true });
+      setTasks((prevState) => {
+        set("taskList", [task, ...prevState]);
+        return [task, ...prevState];
       });
+      // setLoader((prevState) => ({ ...prevState, singles: true }));
+      actor
+        .addTask(task, child.id)
+        .then((response) => {
+          if ("ok" in response) {
+            getTasks({ disableFullLoader: true, callService: true });
+          } else {
+            removeErrorItem();
+          }
+        })
+        .catch((error) => {
+          console.log("error", error);
+          removeErrorItem();
+        });
+    }
+  };
+
+  const removeErrorItem = () => {
+    if (tasks?.length) {
+      toast({
+        title: "An error occurred.",
+        description: `Apologies, please try again later.`,
+        status: "error",
+        duration: 4000,
+        isClosable: true,
+      });
+      const finalTasks = tasks.filter((task) => !task?.isLocal);
+      set("taskList", finalTasks);
+      setTasks(finalTasks);
+    } else {
+      set("taskList", []);
+      setTasks([]);
     }
   };
 
   function updateTask(taskID, taskName, taskValue) {
     const task_object = {
+      ...selectedTask,
       name: taskName,
       value: taskValue,
       id: taskID,
       archived: false,
     };
     handleCloseEditPopup();
-    setLoader((prevState) => ({ ...prevState, init: true }));
-    actor?.updateTask(child.id, taskID, task_object).then((response) => {
-      getTasks({ disableFullLoader: false, callService: true });
+    let prevTask;
+    // setLoader((prevState) => ({ ...prevState, init: true }));
+    const updatedList = tasks.map((task) => {
+      if (task.id === task_object.id) {
+        prevTask = task;
+        return task_object;
+      } else {
+        return task;
+      }
     });
+    setTasks(updatedList);
+    set("taskList", updatedList);
+
+    actor
+      ?.updateTask(child.id, taskID, task_object)
+      .then((response) => {
+        if ("ok" in response) {
+          getTasks({ disableFullLoader: true, callService: true });
+        } else {
+          const updatedList = tasks.map((task) => {
+            const updatedTask = task.id === task_object.id ? prevTask : task;
+            return updatedTask;
+          });
+          setTasks(updatedList);
+          set("taskList", updatedList);
+        }
+      })
+      .finall(() => setSelectedTask(null));
   }
 
   function deleteTask(taskID, taskName, taskValue) {
     const task_object = {
+      ...selectedTask,
       name: taskName,
       value: taskValue,
       id: taskID,
       archived: true,
     };
     handleCloseDeletePopup();
-    setLoader((prevState) => ({ ...prevState, init: true }));
+    const finalTask = tasks.filter((task) => task.id !== taskID);
+    setTasks(finalTask);
+    set("taskList", finalTask);
+    // setLoader((prevState) => ({ ...prevState, init: true }));
     actor
       ?.updateTask(child.id, taskID, task_object)
       .then((response) => {
-        getTasks({ disableFullLoader: false, callService: true });
+        if ("ok" in response) {
+          getTasks({ disableFullLoader: true, callService: true });
+        } else {
+          setTasks((prevState) => {
+            set("taskList", [...prevState, task_object]);
+            return [...prevState, task_object];
+          });
+          toast({
+            title: "An error occurred.",
+            description: `Can't perform delete, please try again later.`,
+            status: "error",
+            duration: 4000,
+            isClosable: true,
+          });
+        }
       })
       .finally(() => setSelectedTask(null));
   }
@@ -218,7 +302,7 @@ const Tasks = () => {
     let date = dateNum.toString();
     // API call approveTask
     handleCloseTogglePopup();
-    setLoader((prevState) => ({ ...prevState, init: true }));
+    // setLoader((prevState) => ({ ...prevState, init: true }));
     actor?.approveTask(child.id, task_id, date).then((returnedApproveTask) => {
       if ("ok" in returnedApproveTask) {
         setTaskComplete(parseInt(task_id));

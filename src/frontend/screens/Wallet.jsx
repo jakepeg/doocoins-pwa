@@ -15,7 +15,7 @@ const Wallet = () => {
   const [transactions, setTransactions] = React.useState([]);
   const { child, setChild } = React.useContext(ChildContext);
   const [isLoading, setIsLoading] = React.useState({
-    transactions: true,
+    transactions: false,
     child: !child ? true : false,
   });
 
@@ -61,18 +61,18 @@ const Wallet = () => {
   function getTransactions({ callService = false }) {
     if (child) {
       get("transactionList").then(async (val) => {
-        setIsLoading((prevState) => ({ ...prevState, transactions: true }));
         if (val == undefined || callService) {
+          setIsLoading((prevState) => ({ ...prevState, transactions: true }));
           actor
             ?.getTransactions(child.id)
             .then((returnedTransactions) => {
               if ("ok" in returnedTransactions) {
                 const transactions = Object.values(returnedTransactions);
                 if (transactions.length) {
-                  set("transactionList", transactions);
+                  set("transactionList", transactions[0]);
                   setTransactions(transactions[0]);
                 }
-                setIsLoading(false);
+                setIsLoading((prevState) => ({ ...prevState, transactions: false }));
               } else {
                 console.error(returnedTransactions.err);
               }
@@ -85,7 +85,7 @@ const Wallet = () => {
             );
         } else {
           setTransactions(
-            val[0]?.map((reward) => {
+            val?.map((reward) => {
               return {
                 ...reward,
                 id: parseInt(reward.id),
@@ -102,7 +102,7 @@ const Wallet = () => {
       return false;
     }
   }
-
+  console.log(`isLoading`, isLoading)
   React.useEffect(() => {
     if (child) getTransactions(child);
   }, [actor, child]);
