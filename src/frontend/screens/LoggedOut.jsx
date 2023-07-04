@@ -9,22 +9,27 @@ import logo from "../assets/images/logo.svg";
 function checkForIOS() {
   // already installed
   if (navigator.standalone) {
-      return false;
+    return false;
   }
 
   const ua = window.navigator.userAgent;
   const webkit = !!ua.match(/WebKit/i);
   const isIPad = !!ua.match(/iPad/i);
-  const isIPhone = !!ua.match(/iPhone/i)
+  const isIPhone = !!ua.match(/iPhone/i);
+  const isMacOS = !!ua.match(/Macintosh/i);
   const isIOS = isIPad || isIPhone;
   const isSafari = isIOS && webkit && !ua.match(/CriOS/i);
-  const prompt = isIOS && isSafari;
-
-  if (prompt) {
-    console.log("its iOS + Safari");
-    return true;
+  const isIOSWithSafari = isIOS && isSafari;
+  const isMacOSWithSafari = isMacOS && webkit && !ua.match(/(Chrome|Firefox)/i);
+  
+  if (isIOSWithSafari) {
+    console.log("It's iOS with Safari");
+    return "iOS";
+  } else if (isMacOSWithSafari) {
+    console.log("It's macOS with Safari");
+    return "macOS";
   } else {
-    console.log("its NOT iOS + Safari");
+    console.log("It's NOT iOS or macOS with Safari");
     return false;
   }
 }
@@ -83,7 +88,7 @@ function LoggedOut() {
         </Button>
 
         <Box>
-      {checkForIOS ? <div className="install-prompt"><p className="light prompt-text">Install for a better experience</p><p className="light prompt-text">Tap <img src={ShareIcon} className="share-icon" alt="Install PWA" /> then "Add to Home Screen" </p>
+      {checkForIOS() ? <div className="install-prompt"><p className="light prompt-text">Install for a better experience</p><p className="light prompt-text">Tap <img src={ShareIcon} className="share-icon" alt="Install PWA" /> then "Add to Home Screen" </p>
 </div> : ''}
     </Box>
 
