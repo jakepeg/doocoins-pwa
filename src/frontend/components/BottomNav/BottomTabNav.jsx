@@ -98,7 +98,6 @@ function CustomTabs() {
           maxWidth: "768px",
           minWidth: "320px",
           margin: "0 auto",
-          paddingBottom: "10px",
           backgroundColor: "#0B334D"
         }}
       >

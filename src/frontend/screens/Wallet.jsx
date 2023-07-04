@@ -70,11 +70,12 @@ const Wallet = () => {
                 const transactions = Object.values(returnedTransactions);
                 if (transactions.length) {
                   set("transactionList", transactions[0]);
-                  setTransactions(transactions[0]);
+                  setTransactions(transactions?.[0]);
                 }
                 setIsLoading((prevState) => ({ ...prevState, transactions: false }));
               } else {
                 console.error(returnedTransactions.err);
+                set("transactionList", undefined);
               }
             })
             .finally(() =>
@@ -85,11 +86,11 @@ const Wallet = () => {
             );
         } else {
           setTransactions(
-            val?.map((reward) => {
+            val?.map((transaction) => {
               return {
-                ...reward,
-                id: parseInt(reward.id),
-                value: parseInt(reward.value),
+                ...transaction,
+                id: parseInt(transaction.id),
+                value: parseInt(transaction.value),
               };
             })
           );
@@ -102,9 +103,9 @@ const Wallet = () => {
       return false;
     }
   }
-  console.log(`isLoading`, isLoading)
+
   React.useEffect(() => {
-    if (child) getTransactions(child);
+    if (child) getTransactions({ callService: true });
   }, [actor, child]);
 
   const sortTransactionsByDate = React.useCallback(() => {
