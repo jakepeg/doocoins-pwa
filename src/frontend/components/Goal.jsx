@@ -7,7 +7,7 @@ import { Box, SkeletonText, useToast } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import { noGoalEntity } from "../utils/constants";
 
-const Goal = ({ child, setChild, handleUpdateTransactions, transactions }) => {
+const Goal = ({ child, setChild }) => {
   const { actor } = useAuth();
   const [goal, setGoal] = React.useState(null);
   const [isLoading, setIsLoading] = React.useState(false);
@@ -94,19 +94,11 @@ const Goal = ({ child, setChild, handleUpdateTransactions, transactions }) => {
       }
     });
   };
-  console.log(`transactions`, transactions)
+
   function handleClaimGoal(reward_id) {
     let dateNum = Math.floor(Date.now() / 1000);
     let date = dateNum.toString();
     setIsLoading(true);
-    const new_transactions = {
-      completedDate: date,
-      id: transactions?.[0]?.id ? parseInt(transactions?.[0]?.id) + 1 : 1,
-      value: goal.value,
-      name: goal.name,
-      transactionType: "GOAL_DEBIT"
-    }
-    handleUpdateTransactions([new_transactions, ...transactions])
     actor
       ?.claimGoal(child.id, reward_id, date)
       .then(async (returnedClaimReward) => {
