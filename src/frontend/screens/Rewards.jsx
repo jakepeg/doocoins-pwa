@@ -34,6 +34,7 @@ const Rewards = () => {
   const [rewards, setRewards] = React.useState([]);
   const [currentGoal, setCurrentGoal] = React.useState(null);
   const { child, setChild } = React.useContext(ChildContext);
+  const [transactions, setTransactions] = React.useState([]);
   const [loader, setLoader] = React.useState({
     init: true,
     singles: false,
@@ -323,11 +324,30 @@ const Rewards = () => {
     });
   }
 
+  function getTransactions() {
+    get("transactionList").then(async (val) => {
+      setTransactions(val || [])
+    })
+  }
+
+  React.useEffect(() => {
+    getTransactions()
+  }, [])
+
   function handleClaimReward(reward_id) {
     handleToggleClaimPopup();
     let dateNum = Math.floor(Date.now() / 1000);
     let date = dateNum.toString();
-    setLoader((prevState) => ({ ...prevState, init: true }));
+    // setLoader((prevState) => ({ ...prevState, init: true }));
+    const new_transactions = {
+      completedDate: date,
+      id: transactions?.[0]?.id ? parseInt(transactions?.[0]?.id) + 1 : 1,
+      value: selectedReward.value,
+      name: selectedReward.name,
+      transactionType: "GOAL_DEBIT"
+    }
+    set("transactionList", [new_transactions, ...transactions]);
+    setTransactions([new_transactions, ...transactions])
     actor
       ?.claimGoal(child.id, reward_id, date)
       .then(async (returnedClaimReward) => {
@@ -354,6 +374,9 @@ const Rewards = () => {
             setLoader((prevState) => ({ ...prevState, init: false }));
           });
         } else {
+          const filteredTransactions = transactions.filter((transaction) => transaction.id !== new_transactions.id)
+          setTransactions(filteredTransactions)
+          set("transactionList", filteredTransactions)
           setLoader((prevState) => ({ ...prevState, init: false }));
         }
       });

@@ -118,6 +118,11 @@ const Wallet = () => {
     return transactions;
   }, [transactions]);
 
+  const handleUpdateTransactions = (transactions) => {
+    setTransactions(transactions)
+    set("transactionList", transactions);
+  }
+
   if (isLoading.child) {
     return <LoadingSpinner />;
   }
@@ -126,7 +131,7 @@ const Wallet = () => {
     <>
       <Balance childName={child.name} childBalance={child.balance} />
       <div className="light-panel transactions">
-        <Goal setChild={setChild} child={child} />
+        <Goal setChild={setChild} child={child} handleUpdateTransactions={handleUpdateTransactions} transactions={transactions} />
         <h2 className="title-button dark">
           <span>Transactions</span>
         </h2>
