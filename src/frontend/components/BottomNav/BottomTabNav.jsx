@@ -68,10 +68,10 @@ function CustomTabs() {
           justifyContent={"center"}
 
           __css={styles.tab}
-          {...tabProps}
+          // {...tabProps}
         >
           <Box as="span">
-            <props.icon activeColor={isSelected && "#139EAA"} width="25px" />
+            <props.icon style={{ marginLeft: '2.5px' }} activeColor={isSelected && "#139EAA"} width="25px" />
           </Box>
           <Box color={isSelected ? "#139EAA" : "#fff"} fontSize={14} mt={1}>
             {tabProps.children}
