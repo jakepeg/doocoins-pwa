@@ -70,8 +70,8 @@ function CustomTabs() {
           __css={styles.tab}
           // {...tabProps}
         >
-          <Box as="span">
-            <props.icon style={{ marginLeft: '2.5px' }} activeColor={isSelected && "#139EAA"} width="25px" />
+          <Box as="span" style={{ transform: 'translateX(1px)' }}>
+            <props.icon activeColor={isSelected && "#139EAA"} width="25px" />
           </Box>
           <Box color={isSelected ? "#139EAA" : "#fff"} fontSize={14} mt={1}>
             {tabProps.children}

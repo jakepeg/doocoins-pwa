@@ -42,6 +42,7 @@ const Tasks = () => {
     add_task: false,
     approve: false,
   });
+  const [transactions, setTransactions] = React.useState([]);
 
   React.useEffect(() => {
     getChildren();
@@ -55,6 +56,16 @@ const Tasks = () => {
       }));
     }
   }, [child]);
+
+  function getTransactions() {
+    get("transactionList").then(async (val) => {
+      setTransactions(val || []);
+    });
+  }
+
+  React.useEffect(() => {
+    getTransactions();
+  }, []);
 
   const getChildren = async () => {
     await get("selectedChild").then(async (data) => {
@@ -300,6 +311,15 @@ const Tasks = () => {
   function handleTaskComplete(task_id) {
     let dateNum = Math.floor(Date.now() / 1000);
     let date = dateNum.toString();
+    const new_transactions = {
+      completedDate: date,
+      id: transactions?.[0]?.id ? parseInt(transactions?.[0]?.id) + 1 : 1,
+      value: selectedTask.value,
+      name: selectedTask.name,
+      transactionType: "TASK_CREDIT",
+    };
+    set("transactionList", [new_transactions, ...transactions]);
+    setTransactions([new_transactions, ...transactions]);
     // API call approveTask
     handleCloseTogglePopup();
     // setLoader((prevState) => ({ ...prevState, init: true }));
@@ -334,6 +354,11 @@ const Tasks = () => {
         });
       } else {
         setLoader((prevState) => ({ ...prevState, init: false }));
+        const filteredTransactions = transactions.filter(
+          (transaction) => transaction.id !== new_transactions.id
+        );
+        setTransactions(filteredTransactions);
+        set("transactionList", filteredTransactions);
         console.error(returnedApproveTask.err);
       }
     });
