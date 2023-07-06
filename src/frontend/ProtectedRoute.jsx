@@ -12,7 +12,7 @@ function ProtectedRoute({ children }) {
   }
 
   return (
-    <Box className="container" gap={5}>
+    <Box className="container" gap={0}>
       <NavDrawer />
       {children}
       <BottomTabNav />

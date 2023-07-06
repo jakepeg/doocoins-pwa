@@ -27,6 +27,7 @@ function NavDrawer() {
         display={"flex"}
         flexDirection={"row"}
         justifyContent={"space-between"}
+        zIndex={9}
       >
         <NavLink to="/">
           <img
