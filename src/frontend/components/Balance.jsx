@@ -1,6 +1,8 @@
 import * as React from "react";
 import dc from "../assets/images/dc-thin-white.svg";
-import GoalIcon from "../assets/images/card-header/goal-symbol.svg";
+import GoalIcon from "../assets/images/card-header/card-header-claim-2.svg";
+import NoGoalIcon from "../assets/images/card-header/card-header-no-goal-2.svg";
+import PlainGoalBackground from "../assets/images/card-header/card-dc.svg";
 import styles from "../assets/css/golabal.module.css";
 import { Box, useToast } from "@chakra-ui/react";
 import { get, set } from "idb-keyval";
@@ -142,11 +144,25 @@ const Balance = (props) => {
       })
       .finally(() => setIsLoading(false));
   };
-  const percentage = (Number(props.childBalance) / Number(goal?.value)) * 100;
+  const percentage = ((Number(props.childBalance) / Number(goal?.value)) * 100).toFixed(2);
+  const isAbleToClaim = balance >= goal?.value && goal?.value > 0;
 
   return (
     <>
-      <header className={`${styles.hero} ${props.isModalOpen}`}>
+      <header
+        style={{
+          backgroundImage: `url(${
+            !goal?.hasGoal
+              ? NoGoalIcon
+              : isAbleToClaim
+              ? GoalIcon
+              : goal?.hasGoal
+              ? PlainGoalBackground
+              : null
+          })`,
+        }}
+        className={`${styles.hero} ${props.isModalOpen}`}
+      >
         <Box
           display={"flex"}
           flexDirection={"row"}
@@ -164,18 +180,9 @@ const Balance = (props) => {
             )}
           </Box>
           <Box>
-            {!goal?.hasGoal && <img src={GoalIcon} alt="goal" />}
-            {balance >= goal?.value && goal.value > 0 ? (
+            {goal?.hasGoal && !isAbleToClaim ? (
               <>
-                <img
-                  src={GoalIcon}
-                  onClick={() => handleClaimGoal(parseInt(goal?.id))}
-                  alt="claim goal"
-                />
-              </>
-            ) : goal?.hasGoal ? (
-              <>
-                <div style={{ width: 150, height: 150, maxHeight: '320px' }}>
+                <div style={{ width: 150, height: 150, maxHeight: "320px" }}>
                   <CircularProgressbar
                     value={percentage}
                     text={`${percentage}%`}

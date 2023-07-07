@@ -1,7 +1,6 @@
 import * as React from "react";
 import { get, set } from "idb-keyval";
 import Balance from "../components/Balance";
-import Goal from "../components/Goal";
 import LoadingSpinner from "../components/LoadingSpinner";
 import dc from "../assets/images/dc.svg";
 import { useAuth } from "../use-auth-client";
@@ -118,11 +117,6 @@ const Wallet = () => {
     return transactions;
   }, [transactions]);
 
-  const handleUpdateTransactions = (transactions) => {
-    setTransactions(transactions)
-    set("transactionList", transactions);
-  }
-
   if (isLoading.child) {
     return <LoadingSpinner />;
   }
@@ -131,7 +125,6 @@ const Wallet = () => {
     <>
       <Balance childName={child.name} childBalance={child.balance} />
       <div className="light-panel transactions">
-        <Goal setChild={setChild} child={child} handleUpdateTransactions={handleUpdateTransactions} transactions={transactions} />
         <h2 className="title-button dark">
           <span>Transactions</span>
         </h2>

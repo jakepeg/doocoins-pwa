@@ -16,7 +16,7 @@
 .hero {
     color: #fff;
     background-image: url("../images/card-header/card-dc.svg");
-    /* background-repeat: no-repeat; */
+    background-repeat: no-repeat;
     background-size: cover;
     padding: 20px 20px 0 20px;
     /* transform: translateY(-60px); */
