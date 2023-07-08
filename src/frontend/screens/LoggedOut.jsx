@@ -41,7 +41,9 @@ function LoggedOut() {
   }
 
   React.useEffect(() => {
-    logout()
+    if(!isLoading && !isAuthenticated) {
+      logout()
+    }
   }, [])
 
   return (
