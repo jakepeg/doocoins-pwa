@@ -103,8 +103,10 @@ export const useAuthClient = (options = defaultOptions) => {
     del("selectedChildName")
     del("taskList")
     del("transactionList")
-    await authClient?.logout();
-    await updateClient(authClient);
+    if(authClient) {
+      await authClient?.logout();
+      await updateClient(authClient);
+    }
   }
 
   return {
