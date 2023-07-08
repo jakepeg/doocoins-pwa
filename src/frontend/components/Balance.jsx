@@ -13,9 +13,8 @@ import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 
 const Balance = (props) => {
-  const { child, setChild } = React.useContext(ChildContext);
+  const { child, setChild, goal, setGoal, getBalance, handleUnsetGoal } = React.useContext(ChildContext);
   const { actor } = useAuth();
-  const [goal, setGoal] = React.useState(null);
   const [isLoading, setIsLoading] = React.useState(false);
   const balance = child?.balance || 0;
   const navigate = useNavigate();
@@ -51,7 +50,8 @@ const Balance = (props) => {
     set("transactionList", transactions);
   };
 
-  function handleClaimGoal(reward_id) {
+  function handleClaimGoal() {
+    const reward_id = goal.id
     let dateNum = Math.floor(Date.now() / 1000);
     let date = dateNum.toString();
     setIsLoading(true);
@@ -67,6 +67,7 @@ const Balance = (props) => {
       ?.claimGoal(child.id, reward_id, date)
       .then(async (returnedClaimReward) => {
         if ("ok" in returnedClaimReward) {
+          handleUnsetGoal()
           toast({
             title: `Yay - well deserved, ${child.name}.`,
             status: "success",
@@ -79,6 +80,7 @@ const Balance = (props) => {
             const updatedChildrenData = await Promise.all(
               children[0].map(async (child) => {
                 const balance = await getBalance(child.id);
+
                 return {
                   ...child,
                   balance: parseInt(balance),
@@ -144,8 +146,17 @@ const Balance = (props) => {
       })
       .finally(() => setIsLoading(false));
   };
-  const percentage = ((Number(props.childBalance) / Number(goal?.value)) * 100).toFixed(2);
+  const percentage = (
+    (Number(props.childBalance) / Number(goal?.value)) *
+    100
+  ).toFixed(2);
   const isAbleToClaim = balance >= goal?.value && goal?.value > 0;
+
+  const handleGoalClick = () => {
+    if(isAbleToClaim) {
+      handleClaimGoal()
+    }
+  }
 
   return (
     <>
@@ -179,7 +190,16 @@ const Balance = (props) => {
               </Box>
             )}
           </Box>
-          <Box>
+          <Box
+            sx={{
+              background: "transparent",
+              width: "30%",
+              zIndex: 99999999,
+              height: "120px",
+              cursor: isAbleToClaim && "pointer",
+            }}
+            onClick={handleGoalClick}
+          >
             {goal?.hasGoal && !isAbleToClaim ? (
               <>
                 <div style={{ width: 150, height: 150, maxHeight: "320px" }}>
