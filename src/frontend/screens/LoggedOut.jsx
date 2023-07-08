@@ -35,10 +35,16 @@ function checkForIOS() {
 }
 
 function LoggedOut() {
-  const { login, isAuthenticated, isLoading } = useAuth();
+  const { login, isAuthenticated, isLoading, logout } = useAuth();
   if (!isLoading && isAuthenticated) {
     return <Navigate to="/" replace />;
   }
+
+  React.useEffect(() => {
+    if(!isLoading && !isAuthenticated) {
+      logout()
+    }
+  }, [])
 
   return (
     <Box

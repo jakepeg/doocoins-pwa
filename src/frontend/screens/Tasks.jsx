@@ -68,11 +68,14 @@ const Tasks = () => {
   }, []);
 
   const getChildren = async () => {
+    console.log('should be here')
     await get("selectedChild").then(async (data) => {
+      console.log(`data`, data)
       const [balance, name] = await Promise.all([
         get(`balance-${data}`),
         get(`selectedChildName`),
       ]);
+      console.log(`balance`,balance)
       if (data) {
         setChild({
           id: data,
@@ -170,7 +173,7 @@ const Tasks = () => {
       ["add_task"]: !prevState.add_task,
     }));
   };
-  console.log("tasks", tasks);
+
   const handleSubmitTask = (taskName, value) => {
     if (taskName) {
       const task = {
@@ -318,6 +321,7 @@ const Tasks = () => {
       name: selectedTask.name,
       transactionType: "TASK_CREDIT",
     };
+    setChild((prevState) => ({  ...prevState, balance: prevState.balance + selectedTask.value  }));
     set("transactionList", [new_transactions, ...transactions]);
     setTransactions([new_transactions, ...transactions]);
     // API call approveTask
@@ -358,6 +362,7 @@ const Tasks = () => {
           (transaction) => transaction.id !== new_transactions.id
         );
         setTransactions(filteredTransactions);
+        setChild((prevState) => ({  ...prevState, balance: prevState.balance - selectedTask.value  }));
         set("transactionList", filteredTransactions);
         console.error(returnedApproveTask.err);
       }

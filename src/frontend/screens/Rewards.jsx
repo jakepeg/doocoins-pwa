@@ -33,7 +33,7 @@ const Rewards = () => {
   const navigate = useNavigate();
   const [rewards, setRewards] = React.useState([]);
   const [currentGoal, setCurrentGoal] = React.useState(null);
-  const { child, setChild } = React.useContext(ChildContext);
+  const { child, setChild, setGoal } = React.useContext(ChildContext);
   const [transactions, setTransactions] = React.useState([]);
   const [loader, setLoader] = React.useState({
     init: true,
@@ -62,6 +62,7 @@ const Rewards = () => {
       }));
     }
   }, [child]);
+
   const getChildren = async () => {
     await get("selectedChild").then(async (data) => {
       const [balance, name] = await Promise.all([
@@ -258,12 +259,14 @@ const Rewards = () => {
   function handleSetGoal({ reward_id, isForSet, disableFullLoader }) {
     if (isForSet) {
       handleToggleGoalPopup();
-      set("childGoal", {
+      const returnedGoal = {
         hasGoal: true,
         value: parseInt(selectedReward.value),
         name: selectedReward.name,
         id: parseInt(selectedReward.id),
-      });
+      }
+      set("childGoal", returnedGoal);
+      setGoal(returnedGoal);
       const finalRewards = rewards.map((reward) => {
         if (reward.id === reward_id) {
           return { ...reward, active: true };
@@ -275,6 +278,7 @@ const Rewards = () => {
       set("rewardList", finalRewards);
     } else {
       set("childGoal", noGoalEntity);
+      setGoal(noGoalEntity);
       handleCloseRemoveGoalPopup();
       const finalRewards = rewards.map((reward) => {
         if (reward.id === selectedReward.id) {
@@ -290,7 +294,7 @@ const Rewards = () => {
     // setLoader((prevState) => ({ ...prevState, init: true }));
     // }
     // API call currentGoal
-    actor?.currentGoal(child.id, reward_id).then((returnedCurrentGoal) => {
+    actor?.currentGoal(child.id, reward_id).then(async (returnedCurrentGoal) => {
       if ("ok" in returnedCurrentGoal) {
         setCurrentGoal(reward_id);
         if (isForSet) {
@@ -309,6 +313,7 @@ const Rewards = () => {
           });
         }
         getRewards({ disableFullLoader: true, callService: true });
+        await getChildren();
       } else {
         console.error(returnedCurrentGoal.err);
         const finalRewards = rewards.map((reward) => {

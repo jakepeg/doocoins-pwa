@@ -6,10 +6,11 @@ import "react-circular-progressbar/dist/styles.css";
 import { Box, SkeletonText, useToast } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import { noGoalEntity } from "../utils/constants";
+import { ChildContext } from "../contexts/ChildContext";
 
 const Goal = ({ child, setChild, handleUpdateTransactions, transactions }) => {
   const { actor } = useAuth();
-  const [goal, setGoal] = React.useState(null);
+  const { goal, setGoal } = React.useContext(ChildContext);
   const [isLoading, setIsLoading] = React.useState(false);
   const balance = child?.balance || 0;
   const navigate = useNavigate();
@@ -104,9 +105,9 @@ const Goal = ({ child, setChild, handleUpdateTransactions, transactions }) => {
       id: transactions?.[0]?.id ? parseInt(transactions?.[0]?.id) + 1 : 1,
       value: goal.value,
       name: goal.name,
-      transactionType: "GOAL_DEBIT"
-    }
-    handleUpdateTransactions([new_transactions, ...transactions])
+      transactionType: "GOAL_DEBIT",
+    };
+    handleUpdateTransactions([new_transactions, ...transactions]);
     actor
       ?.claimGoal(child.id, reward_id, date)
       .then(async (returnedClaimReward) => {
@@ -135,7 +136,11 @@ const Goal = ({ child, setChild, handleUpdateTransactions, transactions }) => {
           });
         } else {
           console.error(returnedClaimReward.err);
-          handleUpdateTransactions(transactions.filter((transaction) => transaction.id !== new_transactions.id))
+          handleUpdateTransactions(
+            transactions.filter(
+              (transaction) => transaction.id !== new_transactions.id
+            )
+          );
         }
       })
       .finally(() => setIsLoading(false));
