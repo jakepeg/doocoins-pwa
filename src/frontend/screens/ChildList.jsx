@@ -15,10 +15,17 @@ import {
 } from "react-swipeable-list";
 import { ReactComponent as EditIcon } from "../assets/images/pencil.svg";
 import { ReactComponent as DeleteIcon } from "../assets/images/delete.svg";
-import { Skeleton, Stack, Text } from "@chakra-ui/react";
+import { Skeleton, Stack, Text, useDisclosure } from "@chakra-ui/react";
+import AddItemToListCallout from "../components/Callouts/AddItemToListCallout";
+import { ChildContext } from "../contexts/ChildContext";
 
 function ChildList() {
   const { actor } = useAuth();
+  const {
+    isNewToSystem: { childList },
+    handleUpdateCalloutState,
+  } = React.useContext(ChildContext);
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const [children, setChildren] = React.useState(null);
   const [openItemId, setOpenItemId] = React.useState(null);
   const [showPopup, setShowPopup] = React.useState({
@@ -28,6 +35,12 @@ function ChildList() {
   });
   const [selectedChild, setSelectedChild] = React.useState(null);
   const [loader, setLoader] = React.useState({ init: true, singles: false });
+
+  React.useEffect(() => {
+    if (childList) {
+      onOpen();
+    }
+  }, [childList]);
 
   React.useEffect(() => {
     getChildren({ callService: false });
@@ -104,11 +117,11 @@ function ChildList() {
       get("balance-" + childID)
         .then((val) => {
           // if (val === undefined) {
-            actor?.getBalance(childID).then((returnedBalance) => {
-              set("balance-" + childID, parseInt(returnedBalance));
-              resolve(returnedBalance);
-              console.log(returnedBalance);
-            });
+          actor?.getBalance(childID).then((returnedBalance) => {
+            set("balance-" + childID, parseInt(returnedBalance));
+            resolve(returnedBalance);
+            console.log(returnedBalance);
+          });
           // } else {
           //   bal = val;
           //   resolve(bal);
@@ -163,6 +176,8 @@ function ChildList() {
       ...prevState,
       ["add_child"]: !prevState.add_child,
     }));
+    onClose();
+    handleUpdateCalloutState("childList", false);
   };
 
   const handleSubmit = async (childName) => {
@@ -283,7 +298,7 @@ function ChildList() {
             : undefined
         }`}
       >
-        <div className={`child-list-wrapper`}>
+        <div className={`child-list-wrapper`} style={{ position: "relative" }}>
           <h2 className="title-button light">
             <span>My Children</span>
             <span
@@ -292,6 +307,7 @@ function ChildList() {
               onClick={handleToggleAddChildPopup}
             />
           </h2>
+          <AddItemToListCallout isOpen={isOpen} onClose={onClose} />
         </div>
         {loader.init ? (
           <Stack margin={"0 20px 20px 20px"}>

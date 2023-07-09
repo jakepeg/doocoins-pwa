@@ -185,6 +185,17 @@ const Rewards = () => {
       id: rewardID,
       archived: false,
     };
+
+    if (reward_object.active) {
+      const returnedGoal = {
+        hasGoal: true,
+        value: parseInt(rewardValue),
+        name: rewardName,
+        id: parseInt(rewardID),
+      };
+      set("childGoal", returnedGoal);
+      setGoal(returnedGoal);
+    }
     handleCloseEditPopup();
     let prevReward;
     // setLoader((prevState) => ({ ...prevState, init: true }));
@@ -264,7 +275,7 @@ const Rewards = () => {
         value: parseInt(selectedReward.value),
         name: selectedReward.name,
         id: parseInt(selectedReward.id),
-      }
+      };
       set("childGoal", returnedGoal);
       setGoal(returnedGoal);
       const finalRewards = rewards.map((reward) => {
@@ -294,50 +305,52 @@ const Rewards = () => {
     // setLoader((prevState) => ({ ...prevState, init: true }));
     // }
     // API call currentGoal
-    actor?.currentGoal(child.id, reward_id).then(async (returnedCurrentGoal) => {
-      if ("ok" in returnedCurrentGoal) {
-        setCurrentGoal(reward_id);
-        if (isForSet) {
-          toast({
-            title: `Good luck achieving your goal, ${child.name}.`,
-            status: "success",
-            duration: 4000,
-            isClosable: true,
-          });
-        } else {
-          toast({
-            title: `Goal removed for ${child.name}.`,
-            status: "success",
-            duration: 4000,
-            isClosable: true,
-          });
-        }
-        getRewards({ disableFullLoader: true, callService: true });
-        await getChildren();
-      } else {
-        console.error(returnedCurrentGoal.err);
-        const finalRewards = rewards.map((reward) => {
-          if (reward.id === reward_id) {
-            return { ...reward, active: isForSet ? false : isForSet };
+    actor
+      ?.currentGoal(child.id, reward_id)
+      .then(async (returnedCurrentGoal) => {
+        if ("ok" in returnedCurrentGoal) {
+          setCurrentGoal(reward_id);
+          if (isForSet) {
+            toast({
+              title: `Good luck achieving your goal, ${child.name}.`,
+              status: "success",
+              duration: 4000,
+              isClosable: true,
+            });
           } else {
-            return reward;
+            toast({
+              title: `Goal removed for ${child.name}.`,
+              status: "success",
+              duration: 4000,
+              isClosable: true,
+            });
           }
-        });
-        setRewards(finalRewards);
-        set("rewardList", finalRewards);
-      }
-    });
+          getRewards({ disableFullLoader: true, callService: true });
+          await getChildren();
+        } else {
+          console.error(returnedCurrentGoal.err);
+          const finalRewards = rewards.map((reward) => {
+            if (reward.id === reward_id) {
+              return { ...reward, active: isForSet ? false : isForSet };
+            } else {
+              return reward;
+            }
+          });
+          setRewards(finalRewards);
+          set("rewardList", finalRewards);
+        }
+      });
   }
 
   function getTransactions() {
     get("transactionList").then(async (val) => {
-      setTransactions(val || [])
-    })
+      setTransactions(val || []);
+    });
   }
 
   React.useEffect(() => {
-    getTransactions()
-  }, [])
+    getTransactions();
+  }, []);
 
   function handleClaimReward(reward_id) {
     handleToggleClaimPopup();
@@ -349,10 +362,10 @@ const Rewards = () => {
       id: transactions?.[0]?.id ? parseInt(transactions?.[0]?.id) + 1 : 1,
       value: selectedReward.value,
       name: selectedReward.name,
-      transactionType: "GOAL_DEBIT"
-    }
+      transactionType: "GOAL_DEBIT",
+    };
     set("transactionList", [new_transactions, ...transactions]);
-    setTransactions([new_transactions, ...transactions])
+    setTransactions([new_transactions, ...transactions]);
     actor
       ?.claimGoal(child.id, reward_id, date)
       .then(async (returnedClaimReward) => {
@@ -379,9 +392,11 @@ const Rewards = () => {
             setLoader((prevState) => ({ ...prevState, init: false }));
           });
         } else {
-          const filteredTransactions = transactions.filter((transaction) => transaction.id !== new_transactions.id)
-          setTransactions(filteredTransactions)
-          set("transactionList", filteredTransactions)
+          const filteredTransactions = transactions.filter(
+            (transaction) => transaction.id !== new_transactions.id
+          );
+          setTransactions(filteredTransactions);
+          set("transactionList", filteredTransactions);
           setLoader((prevState) => ({ ...prevState, init: false }));
         }
       });

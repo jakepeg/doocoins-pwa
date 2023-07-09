@@ -149,7 +149,7 @@ const Balance = (props) => {
   const percentage = (
     (Number(props.childBalance) / Number(goal?.value)) *
     100
-  ).toFixed(2);
+  ).toFixed(0);
   const isAbleToClaim = balance >= goal?.value && goal?.value > 0;
 
   const handleGoalClick = () => {
@@ -193,9 +193,7 @@ const Balance = (props) => {
           <Box
             sx={{
               background: "transparent",
-              width: "30%",
-              zIndex: 99999999,
-              height: "120px",
+              zIndex: 999,
               cursor: isAbleToClaim && "pointer",
             }}
             onClick={handleGoalClick}

@@ -161,6 +161,14 @@ main {
   width: 41px;
 }
 
+
+@media only screen and (max-width: 720px){
+  .dc-img-big {
+    width: 35px !important;
+  }
+}
+
+
 .dc-img-small {
   display: inline-block;
   width: 17px;

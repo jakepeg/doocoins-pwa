@@ -1,7 +1,8 @@
 import React, { createContext } from "react";
 import { useAuth } from "../use-auth-client";
-import { del, get, set } from "idb-keyval";
+import { get, set } from "idb-keyval";
 import { noGoalEntity } from "../utils/constants";
+import useCheckIsUserNewToChildList from "../hooks/useCheckIsUserNewToChildList";
 
 export const ChildContext = createContext();
 
@@ -9,6 +10,20 @@ export default function ChildProvider({ children }) {
   const { actor } = useAuth();
   const [child, setChild] = React.useState(null);
   const [goal, setGoal] = React.useState(null);
+  const [isNewToSystem, setIsNewToSystem] = React.useState({
+    childList: false,
+    tasks: false,
+    rewards: false,
+    wallet: false,
+    swipeList: false,
+  });
+
+  const handleUpdateCalloutState = (entity, value) => {
+    setIsNewToSystem((prevState) => ({ ...prevState, [entity]: value }));
+    set(`${entity}Callout`, value)
+  };
+
+  useCheckIsUserNewToChildList({ handleUpdateCalloutState });
 
   const getSelectedChild = async () => {
     let response;
@@ -77,7 +92,9 @@ export default function ChildProvider({ children }) {
       goal,
       setGoal,
       getBalance,
-      handleUnsetGoal
+      handleUnsetGoal,
+      isNewToSystem,
+      handleUpdateCalloutState
     };
   }, [
     child,
@@ -87,7 +104,9 @@ export default function ChildProvider({ children }) {
     goal,
     setGoal,
     getBalance,
-    handleUnsetGoal
+    handleUnsetGoal,
+    isNewToSystem,
+    handleUpdateCalloutState
   ]);
 
   return (
