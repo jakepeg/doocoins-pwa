@@ -13,7 +13,8 @@ import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 
 const Balance = (props) => {
-  const { child, setChild, goal, setGoal, getBalance, handleUnsetGoal } = React.useContext(ChildContext);
+  const { child, setChild, goal, setGoal, getBalance, handleUnsetGoal } =
+    React.useContext(ChildContext);
   const { actor } = useAuth();
   const [isLoading, setIsLoading] = React.useState(false);
   const balance = child?.balance || 0;
@@ -51,7 +52,7 @@ const Balance = (props) => {
   };
 
   function handleClaimGoal() {
-    const reward_id = goal.id
+    const reward_id = goal.id;
     let dateNum = Math.floor(Date.now() / 1000);
     let date = dateNum.toString();
     setIsLoading(true);
@@ -67,7 +68,7 @@ const Balance = (props) => {
       ?.claimGoal(child.id, reward_id, date)
       .then(async (returnedClaimReward) => {
         if ("ok" in returnedClaimReward) {
-          handleUnsetGoal()
+          handleUnsetGoal();
           toast({
             title: `Yay - well deserved, ${child.name}.`,
             status: "success",
@@ -153,10 +154,10 @@ const Balance = (props) => {
   const isAbleToClaim = balance >= goal?.value && goal?.value > 0;
 
   const handleGoalClick = () => {
-    if(isAbleToClaim) {
-      handleClaimGoal()
+    if (isAbleToClaim) {
+      handleClaimGoal();
     }
-  }
+  };
 
   return (
     <>
@@ -193,14 +194,17 @@ const Balance = (props) => {
           <Box
             sx={{
               background: "transparent",
-              zIndex: 999,
+              zIndex: 99999,
+              minWidth: isAbleToClaim && "25%",
+              minHeight:  isAbleToClaim && "100px",
+              transform: isAbleToClaim && `translateX(-20px)`,
               cursor: isAbleToClaim && "pointer",
             }}
             onClick={handleGoalClick}
           >
             {goal?.hasGoal && !isAbleToClaim ? (
               <>
-                <div style={{ width: 150, height: 150, maxHeight: "320px" }}>
+                <Box display={'flex'} flexDirection={'column'} alignItems={'center'} sx={{ width: { base: 120, md: 180 }, height: { base: 120, md: 180 }, maxHeight: "320px" }}>
                   <CircularProgressbar
                     value={percentage}
                     text={`${percentage}%`}
@@ -215,7 +219,8 @@ const Balance = (props) => {
                       trailColor: "transparent",
                     })}
                   />
-                </div>
+                  <p style={{ color: '#fff', marginTop: '4px' }}>{goal.name}</p>
+                </Box>
               </>
             ) : null}
           </Box>
