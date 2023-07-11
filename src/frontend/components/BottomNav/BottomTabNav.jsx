@@ -5,6 +5,7 @@ import {
   Flex,
   TabList,
   Tabs,
+  useDisclosure,
   useMultiStyleConfig,
   useTab,
 } from "@chakra-ui/react";
@@ -13,6 +14,8 @@ import WalletIcon from "./WalletIcon";
 import TasksIcon from "./TasksIcon";
 import RewardsIcon from "./RewardsIcon";
 import strings from "../../utils/constants";
+import BottomNavCallout from "../Callouts/BottomNavCallout";
+import { ChildContext } from "../../contexts/ChildContext";
 
 function BottomTabNav() {
   const { pathname } = useLocation();
@@ -48,21 +51,40 @@ export default BottomTabNav;
 
 function CustomTabs() {
   const { pathname } = useLocation();
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isNewToSystem, handleUpdateCalloutState } = React.useContext(ChildContext);
+  console.log(`isNewToSystem`, isNewToSystem)
+  React.useEffect(() => {
+    console.log('use effect')
+    if (isNewToSystem[strings.CALLOUT_NO_TRANSACTIONS] && pathname === strings.REWARDS_PATH) {
+      console.log('why not here')
+      onOpen();
+    }
+  }, [isNewToSystem[strings.CALLOUT_NO_TRANSACTIONS], pathname]);
+
   const CustomTab = React.forwardRef((props, ref) => {
     // 1. Reuse the `useTab` hook
     const { icon, ...restProps } = props;
     const tabProps = useTab({ ...restProps, ref });
-    const isSelected = props.href === pathname
+    const isSelected = props.href === pathname;
 
     // 2. Hook into the Tabs `size`, `variant`, props
     const styles = useMultiStyleConfig("Tabs", tabProps);
+
+    React.useEffect(() => {
+      if (isOpen && pathname === "/tasks") {
+        console.log('not here')
+        onClose();
+        handleUpdateCalloutState([strings.CALLOUT_NO_TRANSACTIONS], false);
+      }
+    }, [isOpen, isSelected, pathname]);
 
     return (
       <Link to={props.href}>
         <Button
           style={{ border: "none" }}
           display="flex"
-          flex= "0 0 25em"
+          flex="0 0 25em"
           flexDirection="column"
           alignItems={"center"}
           justifyContent={"center"}
@@ -70,7 +92,7 @@ function CustomTabs() {
           __css={styles.tab}
           // {...tabProps}
         >
-          <Box as="span" style={{ transform: 'translateX(1px)' }}>
+          <Box as="span" style={{ transform: "translateX(1px)" }}>
             <props.icon activeColor={isSelected && "#139EAA"} width="25px" />
           </Box>
           <Box color={isSelected ? "#139EAA" : "#fff"} fontSize={14} mt={1}>
@@ -83,11 +105,14 @@ function CustomTabs() {
 
   return (
     <Tabs
-      style={{
+      sx={{
         width: "100%",
         padding: "0",
+        position: "relative",
       }}
     >
+      <BottomNavCallout isOpen={isOpen} onClose={onClose} />
+
       <TabList
         style={{
           display: "flex",

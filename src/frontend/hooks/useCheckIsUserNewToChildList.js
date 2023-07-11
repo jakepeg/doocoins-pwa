@@ -1,20 +1,19 @@
 import { get } from "idb-keyval";
 import React from "react";
+import strings from "../utils/constants";
 
 const useCheckIsUserNewToChildList = ({ handleUpdateCalloutState }) => {
   const [isUserNewToChildList, setIsUserNewToChildList] = React.useState();
   const checkIsUserNewToChildList = async () => {
     const [childCallout, children] = await Promise.all([
-      get("childListCallout"),
+      get(`${strings.CALLOUTS_CHILD_LIST}Callout`),
       get("childList"),
     ]);
 
     if (childCallout !== undefined && children !== undefined) {
-      console.log("should be here");
       setIsUserNewToChildList(false);
       handleUpdateCalloutState("childList", false);
     } else {
-      console.log("not here");
       setIsUserNewToChildList(true);
       handleUpdateCalloutState("childList", true);
     }

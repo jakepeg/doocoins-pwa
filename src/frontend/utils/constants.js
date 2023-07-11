@@ -4,6 +4,12 @@ class ConstantStrings {
   WALLET_PATH = "/wallet";
   TASKS_PATH = "/tasks";
   REWARDS_PATH = "/rewards";
+
+  // CALLOUTS
+  CALLOUTS_TASKS = "tasks"
+  CALLOUTS_CHILD_LIST = "childList"
+  CALLOUT_NO_TRANSACTIONS = "transactions"
+  CALLOUT_REWARDS_LIST = "rewards"
 }
 
 const strings = new ConstantStrings();

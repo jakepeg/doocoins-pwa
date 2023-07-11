@@ -18,6 +18,7 @@ import { ReactComponent as DeleteIcon } from "../assets/images/delete.svg";
 import { Skeleton, Stack, Text, useDisclosure } from "@chakra-ui/react";
 import AddItemToListCallout from "../components/Callouts/AddItemToListCallout";
 import { ChildContext } from "../contexts/ChildContext";
+import strings from "../utils/constants";
 
 function ChildList() {
   const { actor } = useAuth();
@@ -177,7 +178,7 @@ function ChildList() {
       ["add_child"]: !prevState.add_child,
     }));
     onClose();
-    handleUpdateCalloutState("childList", false);
+    handleUpdateCalloutState([strings.CALLOUTS_CHILD_LIST], false);
   };
 
   const handleSubmit = async (childName) => {
@@ -307,7 +308,16 @@ function ChildList() {
               onClick={handleToggleAddChildPopup}
             />
           </h2>
-          <AddItemToListCallout isOpen={isOpen} onClose={onClose} />
+          <AddItemToListCallout
+            TextDescription={
+              <>
+                How do you doo?! <br /> Tap the + icon to add a child
+              </>
+            }
+            itemKey={strings.CALLOUTS_CHILD_LIST}
+            isOpen={isOpen && !loader.init && !children?.length}
+            onClose={onClose}
+          />
         </div>
         {loader.init ? (
           <Stack margin={"0 20px 20px 20px"}>

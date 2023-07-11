@@ -17,19 +17,29 @@ import {
 import { ReactComponent as ApproveIcon } from "../assets/images/tick.svg";
 import { ReactComponent as EditIcon } from "../assets/images/pencil.svg";
 import { ReactComponent as DeleteIcon } from "../assets/images/delete.svg";
-import { Skeleton, Stack, Text, useToast } from "@chakra-ui/react";
+import {
+  Skeleton,
+  Stack,
+  Text,
+  useDisclosure,
+  useToast,
+} from "@chakra-ui/react";
 import ApproveDialog from "../components/Dialogs/ApproveDialog";
 import { useNavigate } from "react-router-dom";
 import { ChildContext } from "../contexts/ChildContext";
 import LoadingSpinner from "../components/LoadingSpinner";
+import AddItemToListCallout from "../components/Callouts/AddItemToListCallout";
+import strings from "../utils/constants";
 
 const Tasks = () => {
   const { actor } = useAuth();
   const toast = useToast();
   const navigate = useNavigate();
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const [tasks, setTasks] = React.useState([]);
   const [taskComplete, setTaskComplete] = React.useState(null);
-  const { child, setChild } = React.useContext(ChildContext);
+  const { child, setChild, isNewToSystem, handleUpdateCalloutState } =
+    React.useContext(ChildContext);
   const [loader, setLoader] = React.useState({
     init: true,
     singles: false,
@@ -47,6 +57,12 @@ const Tasks = () => {
   React.useEffect(() => {
     getChildren();
   }, []);
+
+  React.useEffect(() => {
+    if (isNewToSystem[strings.CALLOUTS_TASKS]) {
+      onOpen();
+    }
+  }, [isNewToSystem[strings.CALLOUTS_TASKS]]);
 
   React.useEffect(() => {
     if (child) {
@@ -68,14 +84,11 @@ const Tasks = () => {
   }, []);
 
   const getChildren = async () => {
-    console.log('should be here')
     await get("selectedChild").then(async (data) => {
-      console.log(`data`, data)
       const [balance, name] = await Promise.all([
         get(`balance-${data}`),
         get(`selectedChildName`),
       ]);
-      console.log(`balance`,balance)
       if (data) {
         setChild({
           id: data,
@@ -172,6 +185,8 @@ const Tasks = () => {
       ...prevState,
       ["add_task"]: !prevState.add_task,
     }));
+    onClose();
+    handleUpdateCalloutState([strings.CALLOUTS_TASKS], false);
   };
 
   const handleSubmitTask = (taskName, value) => {
@@ -321,7 +336,10 @@ const Tasks = () => {
       name: selectedTask.name,
       transactionType: "TASK_CREDIT",
     };
-    setChild((prevState) => ({  ...prevState, balance: prevState.balance + selectedTask.value  }));
+    setChild((prevState) => ({
+      ...prevState,
+      balance: prevState.balance + selectedTask.value,
+    }));
     set("transactionList", [new_transactions, ...transactions]);
     setTransactions([new_transactions, ...transactions]);
     // API call approveTask
@@ -362,7 +380,10 @@ const Tasks = () => {
           (transaction) => transaction.id !== new_transactions.id
         );
         setTransactions(filteredTransactions);
-        setChild((prevState) => ({  ...prevState, balance: prevState.balance - selectedTask.value  }));
+        setChild((prevState) => ({
+          ...prevState,
+          balance: prevState.balance - selectedTask.value,
+        }));
         set("transactionList", filteredTransactions);
         console.error(returnedApproveTask.err);
       }
@@ -504,15 +525,26 @@ const Tasks = () => {
           isModalOpen ? modelStyles.blur_background : undefined
         } light-panel`}
       >
-        <div className={`panel-header-wrapper`}>
+        <div className={`panel-header-wrapper`} style={{ position: "relative" }}>
           <h2 className="title-button dark">
-            <span>Tasks</span>{" "}
+            <span>Tasks</span>
             <span
               role="button"
               onClick={handleToggleAddTaskPopup}
               className="plus-sign"
             />
           </h2>
+          <AddItemToListCallout
+            TextDescription={
+              <>
+                Ready to set tasks for {child.name}? <br />
+                Tap the + icon to get started!
+              </>
+            }
+            itemKey={strings.CALLOUTS_TASKS}
+            isOpen={isOpen && !loader.init && !tasks?.length}
+            onClose={onClose}
+          />
         </div>
         {loader.init ? (
           <Stack margin={"0 20px 20px 20px"}>

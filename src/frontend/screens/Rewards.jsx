@@ -15,7 +15,13 @@ import { ReactComponent as ApproveIcon } from "../assets/images/tick.svg";
 import { ReactComponent as GoalIcon } from "../assets/images/goal.svg";
 import { ReactComponent as EditIcon } from "../assets/images/pencil.svg";
 import { ReactComponent as DeleteIcon } from "../assets/images/delete.svg";
-import { Skeleton, Stack, Text, useToast } from "@chakra-ui/react";
+import {
+  Skeleton,
+  Stack,
+  Text,
+  useDisclosure,
+  useToast,
+} from "@chakra-ui/react";
 import DeleteDialog from "../components/Dialogs/DeleteDialog";
 import EditDialog from "../components/Dialogs/EditDialog";
 import AddActionDialog from "../components/Tasks/AddActionDialog";
@@ -23,23 +29,27 @@ import { default as GoalDialog } from "../components/Dialogs/ApproveDialog";
 import { default as ClaimDialog } from "../components/Dialogs/ApproveDialog";
 import { useNavigate } from "react-router-dom";
 import RemoveGoalDialog from "../components/Dialogs/RemoveGoalDialog";
-import { noGoalEntity } from "../utils/constants";
+import strings, { noGoalEntity } from "../utils/constants";
 import { ChildContext } from "../contexts/ChildContext";
 import LoadingSpinner from "../components/LoadingSpinner";
+import SwipeListCallout from "../components/Callouts/SwipeListCallout";
 
 const Rewards = () => {
   const { actor } = useAuth();
   const toast = useToast();
   const navigate = useNavigate();
   const [rewards, setRewards] = React.useState([]);
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const [currentGoal, setCurrentGoal] = React.useState(null);
-  const { child, setChild, setGoal } = React.useContext(ChildContext);
+  const { child, setChild, setGoal, isNewToSystem, handleUpdateCalloutState } =
+    React.useContext(ChildContext);
   const [transactions, setTransactions] = React.useState([]);
   const [loader, setLoader] = React.useState({
     init: true,
     singles: false,
     child: !child ? true : false,
   });
+
   const [selectedReward, setSelectedReward] = React.useState(null);
   const [showPopup, setShowPopup] = React.useState({
     delete: false,
@@ -49,6 +59,12 @@ const Rewards = () => {
     add_reward: false,
     remove_goal: false,
   });
+
+  React.useEffect(() => {
+    if (isNewToSystem[strings.CALLOUT_REWARDS_LIST]) {
+      onOpen();
+    }
+  }, [isNewToSystem[strings.CALLOUT_REWARDS_LIST]]);
 
   React.useEffect(() => {
     getChildren();
@@ -555,6 +571,13 @@ const Rewards = () => {
     }
   };
 
+  const onSwipeStart = () => {
+    if (isOpen) {
+      onClose();
+      handleUpdateCalloutState([strings.CALLOUT_REWARDS_LIST], false);
+    }
+  };
+
   const RewardList = React.useMemo(() => {
     return (
       <>
@@ -571,6 +594,7 @@ const Rewards = () => {
                     leadingActions={null}
                     trailingActions={trailingActions({ reward })}
                     key={reward.id}
+                    onSwipeStart={onSwipeStart}
                   >
                     <div className="list-item" key={parseInt(reward.id)}>
                       <div>{reward.name}</div>
@@ -586,12 +610,17 @@ const Rewards = () => {
                   </SwipeableListItem>
                 ))}
               </SwipeableList>
+              <SwipeListCallout
+                isOpen={isOpen}
+                onClose={onClose}
+                itemKey={strings.CALLOUT_REWARDS_LIST}
+              />
             </ul>
           </div>
         ) : null}
       </>
     );
-  }, [rewards]);
+  }, [rewards, isOpen]);
 
   const isModalOpen =
     showPopup.delete ||

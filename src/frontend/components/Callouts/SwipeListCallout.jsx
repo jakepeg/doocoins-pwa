@@ -1,12 +1,13 @@
 import React from "react";
-import CalloutIcon from "../../assets/images/Callout-top-right.svg";
+import CalloutIcon from "../../assets/images/Callout-top-middle.svg";
 import { Box, ScaleFade } from "@chakra-ui/react";
 import { ChildContext } from "../../contexts/ChildContext";
 
 const WrapperStyles = {
   position: "absolute",
-  right: { base: "10%", sm: "4%" },
+  left: { base: "50%" },
   width: { base: "65%", sm: "45%", md: "35%" },
+  transform: 'translateX(-45%)',
   zIndex: 9999,
   display: "flex",
   justifyContent: "center",
@@ -19,7 +20,7 @@ const TextStyles = {
   position: "absolute",
   width: "70%",
   left: "50%",
-  top: "55%",
+  top: "60%",
   transform: "translateX(-50%) translateY(-55%)",
 };
 
@@ -27,14 +28,8 @@ const IconStyles = {
   width: "100%",
 };
 
-const AddItemToListCallout = ({
-  isOpen,
-  onClose,
-  itemKey,
-  TextDescription,
-}) => {
+const SwipeListCallout = ({ isOpen, onClose, itemKey }) => {
   const { handleUpdateCalloutState } = React.useContext(ChildContext);
-
   React.useEffect(() => {
     let timeout;
     if (isOpen) {
@@ -55,10 +50,10 @@ const AddItemToListCallout = ({
     <ScaleFade isOpen={isOpen} initialScale={0.9} in={isOpen}>
       <Box sx={WrapperStyles}>
         <img src={CalloutIcon} style={IconStyles} />
-        <p style={TextStyles}>{TextDescription}</p>
+        <p style={TextStyles}>Swipe list items to see more actions</p>
       </Box>
     </ScaleFade>
   );
 };
 
-export default AddItemToListCallout;
+export default SwipeListCallout;

@@ -1,8 +1,11 @@
 import React, { createContext } from "react";
 import { useAuth } from "../use-auth-client";
 import { get, set } from "idb-keyval";
-import { noGoalEntity } from "../utils/constants";
+import strings, { noGoalEntity } from "../utils/constants";
 import useCheckIsUserNewToChildList from "../hooks/useCheckIsUserNewToChildList";
+import useCheckIsUserNewToTasks from "../hooks/useCheckIsUserNewToTasks";
+import useCheckIsUserNewToTransactions from "../hooks/useCheckIsUserNewToTransactions";
+import useCheckIsUserNewToSwipeActions from "../hooks/useCheckIsUserNewToSwipeActions";
 
 export const ChildContext = createContext();
 
@@ -11,19 +14,22 @@ export default function ChildProvider({ children }) {
   const [child, setChild] = React.useState(null);
   const [goal, setGoal] = React.useState(null);
   const [isNewToSystem, setIsNewToSystem] = React.useState({
-    childList: false,
-    tasks: false,
-    rewards: false,
+    [strings.CALLOUTS_CHILD_LIST]: false,
+    [strings.CALLOUTS_TASKS]: false,
+    [strings.CALLOUT_NO_TRANSACTIONS]: false,
     wallet: false,
-    swipeList: false,
+    [strings.CALLOUT_REWARDS_LIST]: false,
   });
 
   const handleUpdateCalloutState = (entity, value) => {
     setIsNewToSystem((prevState) => ({ ...prevState, [entity]: value }));
-    set(`${entity}Callout`, value)
+    set(`${entity}Callout`, value);
   };
 
   useCheckIsUserNewToChildList({ handleUpdateCalloutState });
+  useCheckIsUserNewToTasks({ handleUpdateCalloutState });
+  useCheckIsUserNewToTransactions({ handleUpdateCalloutState });
+  useCheckIsUserNewToSwipeActions({ handleUpdateCalloutState })
 
   const getSelectedChild = async () => {
     let response;
@@ -94,7 +100,7 @@ export default function ChildProvider({ children }) {
       getBalance,
       handleUnsetGoal,
       isNewToSystem,
-      handleUpdateCalloutState
+      handleUpdateCalloutState,
     };
   }, [
     child,
@@ -106,7 +112,7 @@ export default function ChildProvider({ children }) {
     getBalance,
     handleUnsetGoal,
     isNewToSystem,
-    handleUpdateCalloutState
+    handleUpdateCalloutState,
   ]);
 
   return (
