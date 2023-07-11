@@ -610,11 +610,11 @@ const Rewards = () => {
                   </SwipeableListItem>
                 ))}
               </SwipeableList>
-              <SwipeListCallout
+              {isOpen && <SwipeListCallout
                 isOpen={isOpen}
                 onClose={onClose}
                 itemKey={strings.CALLOUT_REWARDS_LIST}
-              />
+              />}
             </ul>
           </div>
         ) : null}

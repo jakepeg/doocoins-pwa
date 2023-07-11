@@ -308,16 +308,18 @@ function ChildList() {
               onClick={handleToggleAddChildPopup}
             />
           </h2>
-          <AddItemToListCallout
-            TextDescription={
-              <>
-                How do you doo?! <br /> Tap the + icon to add a child
-              </>
-            }
-            itemKey={strings.CALLOUTS_CHILD_LIST}
-            isOpen={isOpen && !loader.init && !children?.length}
-            onClose={onClose}
-          />
+          {isOpen && (
+            <AddItemToListCallout
+              TextDescription={
+                <>
+                  How do you doo?! <br /> Tap the + icon to add a child
+                </>
+              }
+              itemKey={strings.CALLOUTS_CHILD_LIST}
+              isOpen={isOpen && !loader.init && !children?.length}
+              onClose={onClose}
+            />
+          )}
         </div>
         {loader.init ? (
           <Stack margin={"0 20px 20px 20px"}>

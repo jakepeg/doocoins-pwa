@@ -525,7 +525,10 @@ const Tasks = () => {
           isModalOpen ? modelStyles.blur_background : undefined
         } light-panel`}
       >
-        <div className={`panel-header-wrapper`} style={{ position: "relative" }}>
+        <div
+          className={`panel-header-wrapper`}
+          style={{ position: "relative" }}
+        >
           <h2 className="title-button dark">
             <span>Tasks</span>
             <span
@@ -534,17 +537,19 @@ const Tasks = () => {
               className="plus-sign"
             />
           </h2>
-          <AddItemToListCallout
-            TextDescription={
-              <>
-                Ready to set tasks for {child.name}? <br />
-                Tap the + icon to get started!
-              </>
-            }
-            itemKey={strings.CALLOUTS_TASKS}
-            isOpen={isOpen && !loader.init && !tasks?.length}
-            onClose={onClose}
-          />
+          {isOpen && (
+            <AddItemToListCallout
+              TextDescription={
+                <>
+                  Ready to set tasks for {child.name}? <br />
+                  Tap the + icon to get started!
+                </>
+              }
+              itemKey={strings.CALLOUTS_TASKS}
+              isOpen={isOpen && !loader.init && !tasks?.length}
+              onClose={onClose}
+            />
+          )}
         </div>
         {loader.init ? (
           <Stack margin={"0 20px 20px 20px"}>

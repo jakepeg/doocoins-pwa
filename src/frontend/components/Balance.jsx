@@ -196,15 +196,33 @@ const Balance = (props) => {
               background: "transparent",
               zIndex: 99999,
               minWidth: isAbleToClaim && "25%",
-              minHeight:  isAbleToClaim && "100px",
+              minHeight: isAbleToClaim && "100px",
               transform: isAbleToClaim && `translateX(-20px)`,
               cursor: isAbleToClaim && "pointer",
             }}
             onClick={handleGoalClick}
           >
+            {goal?.hasGoal && isAbleToClaim && (
+              <p
+                className={styles.claim_goal_text}
+                style={{ color: "#fff", marginTop: "4px" }}
+              >
+                {goal.name}
+              </p>
+            )}
             {goal?.hasGoal && !isAbleToClaim ? (
               <>
-                <Box display={'flex'} flexDirection={'column'} alignItems={'center'} sx={{ width: { base: 120, md: 180 }, height: { base: 120, md: 180 }, maxHeight: "320px" }}>
+                <Box
+                  display={"flex"}
+                  className={styles.circular_progress}
+                  flexDirection={"column"}
+                  alignItems={"center"}
+                  sx={{
+                    width: { base: 120, sm: 200, md: 280 },
+                    height: { base: 160, sm: 200, md: 280 },
+                    maxHeight: "320px"
+                  }}
+                >
                   <CircularProgressbar
                     value={percentage}
                     text={`${percentage}%`}
@@ -219,7 +237,7 @@ const Balance = (props) => {
                       trailColor: "transparent",
                     })}
                   />
-                  <p style={{ color: '#fff', marginTop: '4px' }}>{goal.name}</p>
+                  <p style={{ color: "#fff", marginTop: "4px" }}>{goal.name}</p>
                 </Box>
               </>
             ) : null}

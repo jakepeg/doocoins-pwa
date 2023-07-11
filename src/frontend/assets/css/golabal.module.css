@@ -7,6 +7,7 @@
   margin-top: -40px;
   width: 100%;
   background-position: center center;
+  position: relative;
   min-height: 35vh;
 }
 
@@ -37,5 +38,45 @@
   }
   .name {
     font-size: 28px;
+  }
+}
+
+
+.circular_progress {
+  margin-right: 0; 
+}
+
+@media only screen and (min-width: 420px) and (max-width: 800px) {
+  .circular_progress {
+    margin-right: 5vw; 
+  }
+}
+
+.claim_goal_text {
+  position: absolute;
+  bottom: -15%;
+  right: 15%;
+  transform: translate(-30%, 15%);
+}
+
+@media only screen and (min-width: 420px) and (max-width: 720px) {
+  .claim_goal_text {
+    bottom: -50%;
+    right: 20%;
+    transform: translate(-30%, 15%);
+  }
+}
+
+@media only screen and (min-width: 720px) {
+  .claim_goal_text {
+    bottom: -80%;
+    right: 50%;
+    transform: translate(-30%, 15%);
+  }
+}
+
+@media only screen and (orientation: landscape) {
+  .claim_goal_text {
+    bottom: -90%;
   }
 }

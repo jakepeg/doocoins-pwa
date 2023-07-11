@@ -111,7 +111,7 @@ function CustomTabs() {
         position: "relative",
       }}
     >
-      <BottomNavCallout isOpen={isOpen} onClose={onClose} />
+      {isOpen && <BottomNavCallout isOpen={isOpen} onClose={onClose} />}
 
       <TabList
         style={{
