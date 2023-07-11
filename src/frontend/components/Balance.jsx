@@ -237,7 +237,7 @@ const Balance = (props) => {
                       trailColor: "transparent",
                     })}
                   />
-                  <p style={{ color: "#fff", marginTop: "4px" }}>{goal.name}</p>
+                  <p style={{ color: "#fff", marginTop: "4px", textAlign: 'center' }}>{goal.name}</p>
                 </Box>
               </>
             ) : null}
