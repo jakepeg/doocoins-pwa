@@ -305,9 +305,8 @@ input[type="text"]::placeholder {
 }
 
 .child-list-wrapper {
-  padding-left: 20px;
-  padding-right: 20px;
   padding: 1rem;
+  margin-top: 40px;
 }
 
 .swipeable-list-item__content {
