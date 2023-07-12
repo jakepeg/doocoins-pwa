@@ -194,7 +194,7 @@ const Balance = (props) => {
           <Box
             sx={{
               background: "transparent",
-              zIndex: 99999,
+              zIndex: 999,
               minWidth: isAbleToClaim && "25%",
               minHeight: isAbleToClaim && "100px",
               transform: isAbleToClaim && `translateX(-20px)`,
