@@ -71,18 +71,8 @@ function NavDrawer() {
                 color="#0B334D"
                 fontWeight={600}
               >
-                <NavLink to="/about">About</NavLink>
+                <NavLink to="https://www.doo.co" target="_blank">About</NavLink>
               </Text>
-              <Text
-                onClick={onClose}
-                fontSize="xl"
-                color="#0B334D"
-                fontWeight={600}
-              >
-                <NavLink to="/help">Help</NavLink>
-              </Text>
-
-              <Divider />
               <Text
                 onClick={logout}
                 fontSize="xl"
@@ -91,6 +81,16 @@ function NavDrawer() {
                 cursor="pointer"
               >
                 Logout
+              </Text>
+              <Divider />
+              <Text
+                onClick={onClose}
+                fontSize="xl"
+                color="#0B334D"
+                fontWeight={600}
+              >
+                If you require support or have any other questions or feedback email{" "}
+                <a href="mailto:hello.doo.co">hello@doo.co</a>
               </Text>
             </Stack>
           </DrawerBody>
