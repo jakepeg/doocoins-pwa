@@ -55,6 +55,7 @@ function LoggedOut() {
       alignItems={"center"}
       gap={6}
       py={8}
+      backgroundColor={"#0B334D"}
     >
       <Box
         display="flex"

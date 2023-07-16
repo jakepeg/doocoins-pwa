@@ -64,6 +64,9 @@ const Balance = (props) => {
       transactionType: "GOAL_DEBIT",
     };
     handleUpdateTransactions([new_transactions, ...transactions]);
+
+    setChild((prevState) => ({  ...prevState, balance: prevState.balance - goal.value }));
+
     actor
       ?.claimGoal(child.id, reward_id, date)
       .then(async (returnedClaimReward) => {
@@ -220,7 +223,7 @@ const Balance = (props) => {
                   sx={{
                     width: { base: 120, sm: 200, md: 280 },
                     height: { base: 160, sm: 200, md: 280 },
-                    maxHeight: "320px"
+                    maxHeight: "320px",
                   }}
                 >
                   <CircularProgressbar
@@ -237,7 +240,15 @@ const Balance = (props) => {
                       trailColor: "transparent",
                     })}
                   />
-                  <p style={{ color: "#fff", marginTop: "4px", textAlign: 'center' }}>{goal.name}</p>
+                  <p
+                    style={{
+                      color: "#fff",
+                      marginTop: "4px",
+                      textAlign: "center",
+                    }}
+                  >
+                    {goal.name}
+                  </p>
                 </Box>
               </>
             ) : null}

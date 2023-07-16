@@ -4,11 +4,14 @@
   background-repeat: no-repeat;
   background-size: cover;
   padding: 20px 20px 0 20px;
-  margin-top: -40px;
-  width: 100%;
+  /* margin-top: -40px; */
+  /* width: 100%; */
   background-position: center center;
   position: relative;
   min-height: 35vh;
+  transform: translateY(-38px);
+  margin: 0 12px 0 12px;
+  border-radius: 12px 12px 12px 12px;
 }
 
 @media only screen and (max-width: 420px) {
