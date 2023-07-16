@@ -74,7 +74,7 @@ function LoggedOut() {
           Kids Rewards dApp
         </Text>
         <Text fontSize="lg" mt={2} fontWeight={"bold"} color={"#139EAA"}>
-          <Link>find out more</Link>
+          <Link to="https://www.doo.co" target="_blank">find out more</Link>
         </Text>
         <Button
           variant="ghost"
