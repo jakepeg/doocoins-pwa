@@ -15,6 +15,7 @@ const AddChildDialog = ({ handleClosePopup, handleSubmit }) => {
         ref={childRef}
         defaultValue={childRef.current ? childRef.current.value : ""}
         placeholder="name"
+        autoFocus
       />
       <button
         className={modelStyles.popup_edit_action_btn}

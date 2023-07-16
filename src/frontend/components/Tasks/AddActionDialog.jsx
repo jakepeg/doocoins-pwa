@@ -22,6 +22,7 @@ const AddActionDialog = ({
         ref={nameRef}
         defaultValue={nameRef.current ? nameRef.current.value : ""}
         placeholder={namePlaceHolder}
+        autoFocus
       />
       <input
         type="number"
