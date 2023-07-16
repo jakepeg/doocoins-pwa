@@ -59,7 +59,7 @@ const Rewards = () => {
     add_reward: false,
     remove_goal: false,
   });
-
+  console.log(`selectedReward`, selectedReward)
   React.useEffect(() => {
     if (isNewToSystem[strings.CALLOUT_REWARDS_LIST]) {
       onOpen();
@@ -687,6 +687,7 @@ const Rewards = () => {
         <GoalDialog
           handleClosePopup={handleToggleGoalPopup}
           selectedItem={selectedReward}
+          title={selectedReward.name}
           handleApprove={() =>
             handleSetGoal({
               reward_id: parseInt(selectedReward.id),

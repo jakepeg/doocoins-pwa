@@ -7,7 +7,7 @@ const ApproveDialog = ({
   handleClosePopup,
   selectedItem,
   submitBtnLabel = "Approve Task",
-  title = selectedItem.name,
+  title = selectedItem?.name,
 }) => {
   return (
     <ConfirmationPopup handleClosePopup={handleClosePopup}>

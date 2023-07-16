@@ -28,9 +28,9 @@ function NavDrawer() {
         display={"flex"}
         flexDirection={"row"}
         justifyContent={"space-between"}
-        zIndex={9}
-        mx={showMobileLayout && 3}
-        mt={showMobileLayout && 3}
+        style={{ zIndex: 9, position: 'relative' }}
+        px={showMobileLayout && 4}
+        pt={showMobileLayout && 5}
       >
         <NavLink to="/">
           <img

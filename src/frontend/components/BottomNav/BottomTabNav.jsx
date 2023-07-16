@@ -53,11 +53,9 @@ function CustomTabs() {
   const { pathname } = useLocation();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { isNewToSystem, handleUpdateCalloutState } = React.useContext(ChildContext);
-  console.log(`isNewToSystem`, isNewToSystem)
+
   React.useEffect(() => {
-    console.log('use effect')
     if (isNewToSystem[strings.CALLOUT_NO_TRANSACTIONS] && pathname === strings.REWARDS_PATH) {
-      console.log('why not here')
       onOpen();
     }
   }, [isNewToSystem[strings.CALLOUT_NO_TRANSACTIONS], pathname]);
@@ -73,7 +71,6 @@ function CustomTabs() {
 
     React.useEffect(() => {
       if (isOpen && pathname === "/tasks") {
-        console.log('not here')
         onClose();
         handleUpdateCalloutState([strings.CALLOUT_NO_TRANSACTIONS], false);
       }

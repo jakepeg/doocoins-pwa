@@ -17,11 +17,25 @@ function ProtectedRoute({ children }) {
   }
 
   return (
-    <Box className="container" backgroundColor={!showMobileLayout && "#0B334D"} gap={0}>
-      <NavDrawer />
-      {showMobileLayout && (
-        <Balance childName={child?.name} childBalance={child?.balance} />
-      )}
+    <Box
+      className="container"
+      backgroundColor={!showMobileLayout && "#0B334D"}
+      gap={0}
+    >
+      <Box
+        sx={
+          showMobileLayout && {
+            backgroundColor: "#F0F7FC",
+            display: "flex",
+            flexDirection: "column",
+          }
+        }
+      >
+        <NavDrawer />
+        {showMobileLayout && (
+          <Balance childName={child?.name} childBalance={child?.balance} />
+        )}
+      </Box>
       {children}
       {showMobileLayout && <BottomTabNav />}
     </Box>
