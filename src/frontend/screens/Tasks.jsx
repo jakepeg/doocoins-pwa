@@ -477,11 +477,6 @@ const Tasks = () => {
 
   return (
     <>
-      <Balance
-        isModalOpen={isModalOpen ? modelStyles.blur_background : undefined}
-        childName={child?.name}
-        childBalance={child?.balance}
-      />
       {showPopup.delete && (
         <DeleteDialog
           selectedItem={selectedTask}

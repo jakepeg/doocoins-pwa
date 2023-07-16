@@ -123,7 +123,6 @@ const Wallet = () => {
 
   return (
     <>
-      <Balance childName={child.name} childBalance={child.balance} />
       <div className="light-panel transactions">
         <h2 className="title-button dark">
           <span>Transactions</span>

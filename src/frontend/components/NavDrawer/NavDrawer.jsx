@@ -5,7 +5,6 @@ import {
   DrawerCloseButton,
   DrawerContent,
   DrawerOverlay,
-  Link,
   Stack,
   Text,
   useDisclosure,
@@ -15,11 +14,13 @@ import React from "react";
 import ProfileIcon from "../../assets/images/profile-icon.svg";
 import LogoIcon from "../../assets/images/logo.svg";
 import { useAuth } from "../../use-auth-client";
+import useIsMobileLayout from "../../hooks/useIsMobileLayout";
 
 function NavDrawer() {
   const { logout } = useAuth();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const btnRef = React.useRef();
+  const showMobileLayout = useIsMobileLayout();
 
   return (
     <>
@@ -28,6 +29,8 @@ function NavDrawer() {
         flexDirection={"row"}
         justifyContent={"space-between"}
         zIndex={9}
+        mx={showMobileLayout && 3}
+        mt={showMobileLayout && 3}
       >
         <NavLink to="/">
           <img

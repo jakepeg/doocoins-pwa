@@ -298,6 +298,7 @@ function ChildList() {
             ? modelStyles.blur_background
             : undefined
         }`}
+        style={{ background: '#0B334D' }}
       >
         <div className={`child-list-wrapper`} style={{ position: "relative" }}>
           <h2 className="title-button light">

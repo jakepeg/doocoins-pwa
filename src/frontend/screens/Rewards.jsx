@@ -298,7 +298,7 @@ const Rewards = () => {
         if (reward.id === reward_id) {
           return { ...reward, active: true };
         } else {
-          return reward;
+          return { ...reward, active: false };
         }
       });
       setRewards(finalRewards);
@@ -706,11 +706,6 @@ const Rewards = () => {
           valuePlaceHolder="Reward Value"
         />
       )}
-      <Balance
-        isModalOpen={isModalOpen ? modelStyles.blur_background : undefined}
-        childName={child?.name}
-        childBalance={child?.balance}
-      />
 
       <div
         className={`${
