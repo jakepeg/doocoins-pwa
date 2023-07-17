@@ -7,30 +7,32 @@
         "node_compatibility": true
       }
     },
+    "frontend": {
+      "dependencies": [
+        "backend",
+        "internet_identity"
+      ],
+      "frontend": {
+        "entrypoint": "src/frontend/index.html"
+      },
+      "source": [
+        "src/frontend/assets",
+        "src/frontend/dist"
+      ],
+      "type": "assets"
+    },
     "internet_identity": {
       "type": "custom",
       "candid": "https://github.com/dfinity/internet-identity/releases/latest/download/internet_identity.did",
       "wasm": "https://github.com/dfinity/internet-identity/releases/latest/download/internet_identity_dev.wasm.gz",
       "shrink": false,
       "remote": {
-        "candid": "internet_identity.did",
-        "id": {
-          "ic": "rdmx6-jaaaa-aaaaa-aaadq-cai"
-        }
+          "candid": "internet_identity.did",
+          "id": {
+              "ic": "rdmx6-jaaaa-aaaaa-aaadq-cai"
+          }
       }
-    },
-    "frontend": {
-      "dependencies": [
-        "backend"
-      ],
-      "source": [
-        "src/frontend/dist"
-      ],
-      "frontend": {
-        "entrypoint": "src/frontend/dist/index.html"
-      },
-      "type": "assets"
-    }
+  }
   },
   "defaults": {
     "build": {
@@ -39,5 +41,5 @@
     }
   },
   "output_env_file": ".env",
-  "version": 2
+  "version": 1
 }

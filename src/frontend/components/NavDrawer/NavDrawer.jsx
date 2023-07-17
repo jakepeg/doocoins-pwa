@@ -37,7 +37,7 @@ function NavDrawer() {
             role="image"
             aria-label="doocoins"
             src={LogoIcon}
-            style={{ height: "28px", marginLeft: "15px", marginTop: "10px" }}
+            style={{ height: "28px", marginLeft: "0px", marginTop: "10px" }}
           />
         </NavLink>
         <img
@@ -46,7 +46,7 @@ function NavDrawer() {
           ref={btnRef}
           aria-label="open menu"
           src={ProfileIcon}
-          style={{ height: "28px", marginRight: "20px", marginTop: "10px" }}
+          style={{ height: "28px", marginRight: "5px", marginTop: "10px" }}
         />
       </Stack>
       <Drawer
