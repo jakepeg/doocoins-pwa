@@ -15,6 +15,12 @@ main {
   align-items: center !important;
 }
 
+header {
+  -webkit-box-shadow: 0px 10px 37px -12px rgba(0,0,0,0.75);
+-moz-box-shadow: 0px 10px 37px -12px rgba(0,0,0,0.75);
+box-shadow: 0px 10px 37px -12px rgba(0,0,0,0.75);
+}
+
 .screen-title {
   font-size: 24px;
   font-weight: 400;
