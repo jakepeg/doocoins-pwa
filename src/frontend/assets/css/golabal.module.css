@@ -30,6 +30,7 @@
 .balance {
   font-size: 68px;
   font-weight: 400;
+  letter-spacing: -5px;
   color: #ffffff;
   font-family: "Courier New", Courier, monospace;
   transform: translateY(-10px);
@@ -37,7 +38,7 @@
 
 @media only screen and (max-width: 720px) {
   .balance {
-    font-size: 62px;
+    font-size: 50px;
   }
   .name {
     font-size: 28px;

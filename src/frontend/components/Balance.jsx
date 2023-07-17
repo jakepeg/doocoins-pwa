@@ -1,8 +1,8 @@
 import * as React from "react";
 import dc from "../assets/images/dc-thin-white.svg";
-import GoalIcon from "../assets/images/card-header/card-header-claim-2.svg";
-import NoGoalIcon from "../assets/images/card-header/card-header-no-goal-2.svg";
-import PlainGoalBackground from "../assets/images/card-header/card-dc.svg";
+import GoalIcon from "../assets/images/card-header/cc-claim.svg";
+import NoGoalIcon from "../assets/images/card-header/cc-nogoal.svg";
+import PlainGoalBackground from "../assets/images/card-header/cc.svg";
 import styles from "../assets/css/golabal.module.css";
 import { Box, useToast } from "@chakra-ui/react";
 import { get, set } from "idb-keyval";
@@ -238,6 +238,7 @@ const Balance = (props) => {
                       textColor: "#fff",
                       pathColor: "#fff",
                       trailColor: "transparent",
+                      textSize: "1.2em",
                     })}
                   />
                   <p
@@ -245,6 +246,7 @@ const Balance = (props) => {
                       color: "#fff",
                       marginTop: "4px",
                       textAlign: "center",
+                      fontSize: "1em",
                     }}
                   >
                     {goal.name}
