@@ -28,7 +28,7 @@ function NavDrawer() {
         display={"flex"}
         flexDirection={"row"}
         justifyContent={"space-between"}
-        style={{ zIndex: 9, position: 'relative' }}
+        style={{ zIndex: 9, position: "relative" }}
         px={showMobileLayout && 4}
         pt={showMobileLayout && 5}
       >
@@ -37,7 +37,11 @@ function NavDrawer() {
             role="image"
             aria-label="doocoins"
             src={LogoIcon}
-            style={{ height: "28px", marginLeft: "0px", marginTop: "10px" }}
+            style={{
+              height: "28px",
+              marginLeft: showMobileLayout ? 0 : "10px",
+              marginTop: "10px",
+            }}
           />
         </NavLink>
         <img
@@ -46,7 +50,11 @@ function NavDrawer() {
           ref={btnRef}
           aria-label="open menu"
           src={ProfileIcon}
-          style={{ height: "28px", marginRight: "5px", marginTop: "10px" }}
+          style={{
+            height: "28px",
+            marginRight: showMobileLayout ? "5px" : "15px",
+            marginTop: "10px",
+          }}
         />
       </Stack>
       <Drawer
@@ -74,7 +82,9 @@ function NavDrawer() {
                 color="#0B334D"
                 fontWeight={600}
               >
-                <NavLink to="https://www.doo.co" target="_blank">About</NavLink>
+                <NavLink to="https://www.doo.co" target="_blank">
+                  About
+                </NavLink>
               </Text>
               <Text
                 onClick={logout}
@@ -92,8 +102,8 @@ function NavDrawer() {
                 color="#0B334D"
                 fontWeight={600}
               >
-                If you require support or have any other questions or feedback email{" "}
-                <a href="mailto:hello.doo.co">hello@doo.co</a>
+                If you require support or have any other questions or feedback
+                email <a href="mailto:hello.doo.co">hello@doo.co</a>
               </Text>
             </Stack>
           </DrawerBody>

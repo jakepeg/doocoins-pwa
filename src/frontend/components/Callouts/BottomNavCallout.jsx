@@ -6,7 +6,7 @@ import strings from "../../utils/constants";
 
 const WrapperStyles = {
   position: "absolute",
-  width: { base: "65%", sm: "55%", md: "35%", lg: '25%' },
+  width: { base: "80vw", sm: "55vw", md: "35%", lg: '25%' },
   zIndex: 9999,
   left: '50%',
   bottom: { base: '-20%', sm: "-45%", md: '-40%' },
@@ -21,7 +21,7 @@ const TextStyles = {
   position: "absolute",
   width: "70%",
   left: "50%",
-  transform: "translateX(-50%) translateY(-55%)",
+  transform: "translateX(-50%) translateY(-45%)",
 };
 
 const IconStyles = {
