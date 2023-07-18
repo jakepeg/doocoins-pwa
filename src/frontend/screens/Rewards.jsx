@@ -41,7 +41,7 @@ const Rewards = () => {
   const [rewards, setRewards] = React.useState([]);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [currentGoal, setCurrentGoal] = React.useState(null);
-  const { child, setChild, setGoal, isNewToSystem, handleUpdateCalloutState } =
+  const { child, setChild, setGoal, isNewToSystem, handleUpdateCalloutState, blockingChildUpdate } =
     React.useContext(ChildContext);
   const [transactions, setTransactions] = React.useState([]);
   const [loader, setLoader] = React.useState({
@@ -59,7 +59,7 @@ const Rewards = () => {
     add_reward: false,
     remove_goal: false,
   });
-  console.log(`selectedReward`, selectedReward);
+
   React.useEffect(() => {
     if (isNewToSystem[strings.CALLOUT_REWARDS_LIST]) {
       onOpen();
@@ -67,8 +67,10 @@ const Rewards = () => {
   }, [isNewToSystem[strings.CALLOUT_REWARDS_LIST]]);
 
   React.useEffect(() => {
-    getChildren();
-  }, []);
+    if(!blockingChildUpdate) {
+      getChildren();
+    }
+  }, [blockingChildUpdate]);
 
   React.useEffect(() => {
     if (child) {

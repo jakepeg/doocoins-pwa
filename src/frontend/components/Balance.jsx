@@ -11,10 +11,19 @@ import { useAuth } from "../use-auth-client";
 import { useNavigate } from "react-router-dom";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
+import { noGoalEntity } from "../utils/constants";
 
-const Balance = (props) => {
-  const { child, setChild, goal, setGoal, getBalance, handleUnsetGoal } =
-    React.useContext(ChildContext);
+const Balance = () => {
+  const {
+    child,
+    setChild,
+    goal,
+    setGoal,
+    getBalance,
+    handleUnsetGoal,
+    setBlockingChildUpdate,
+    blockingChildUpdate,
+  } = React.useContext(ChildContext);
   const { actor } = useAuth();
   const [isLoading, setIsLoading] = React.useState(false);
   const balance = child?.balance || 0;
@@ -23,18 +32,20 @@ const Balance = (props) => {
   const [transactions, setTransactions] = React.useState([]);
 
   React.useEffect(() => {
-    get("childGoal").then(async (data) => {
-      if (data) {
-        setGoal({
-          name: data.name,
-          value: parseInt(data.value),
-          hasGoal: data.hasGoal,
-          ...data,
-        });
-        setIsLoading(false);
-      }
-    });
-  }, [props.childBalance]);
+    if (!blockingChildUpdate) {
+      get("childGoal").then(async (data) => {
+        if (data) {
+          setGoal({
+            ...data,
+            name: data.name,
+            value: parseInt(data.value),
+            hasGoal: data.hasGoal,
+          });
+          setIsLoading(false);
+        }
+      });
+    }
+  }, [child?.balance, blockingChildUpdate]);
 
   function getTransactions() {
     get("transactionList").then(async (val) => {
@@ -45,6 +56,12 @@ const Balance = (props) => {
   React.useEffect(() => {
     getTransactions();
   }, []);
+
+  React.useEffect(() => {
+    if(child?.id) {
+     getReward();
+    }
+  }, [child?.id])
 
   const handleUpdateTransactions = (transactions) => {
     setTransactions(transactions);
@@ -65,8 +82,11 @@ const Balance = (props) => {
     };
     handleUpdateTransactions([new_transactions, ...transactions]);
 
-    setChild((prevState) => ({  ...prevState, balance: prevState.balance - goal.value }));
-
+    setChild((prevState) => ({
+      ...prevState,
+      balance: prevState.balance - goal.value,
+    }));
+    setBlockingChildUpdate(true);
     actor
       ?.claimGoal(child.id, reward_id, date)
       .then(async (returnedClaimReward) => {
@@ -94,6 +114,7 @@ const Balance = (props) => {
             set("childList", updatedChildrenData);
             await getChildren();
             setIsLoading(false);
+            setBlockingChildUpdate(false);
           });
         } else {
           console.error(returnedClaimReward.err);
@@ -102,9 +123,12 @@ const Balance = (props) => {
               (transaction) => transaction.id !== new_transactions.id
             )
           );
+          setBlockingChildUpdate(false);
         }
       })
-      .finally(() => setIsLoading(false));
+      .finally(() => {
+        setIsLoading(false);
+      });
   }
 
   const getChildren = async () => {
@@ -127,31 +151,55 @@ const Balance = (props) => {
 
   const getReward = (rewardId) => {
     actor
-      ?.getGoals(child.id)
-      .then((returnedRewards) => {
+      ?.getGoals(child?.id)
+      .then(async (returnedRewards) => {
         if ("ok" in returnedRewards) {
           const rewards = Object.values(returnedRewards);
-          if (rewards) {
-            const { name, value, id } = rewards[0].find(
-              (reward) => rewardId === parseInt(reward.id)
-            );
-            const returnedGoal = {
-              name,
-              value: parseInt(value),
-              hasGoal: true,
-              id,
-            };
-            set("childGoal", returnedGoal);
-            setGoal(returnedGoal);
+          let currentGoalId;
+          if(!rewardId) {
+            await actor?.getCurrentGoal(child?.id).then((returnedGoal) => {
+              currentGoalId = parseInt(returnedGoal);
+              
+              return currentGoalId;
+            });
           }
+
+          if (rewards) {
+            const reward = rewards?.[0]?.find(
+              (reward) => rewardId === parseInt(reward.id) || currentGoalId === parseInt(reward.id)
+            );
+
+            if(reward) {
+              const { name, value, id } = reward
+              const returnedGoal = {
+                name,
+                value: parseInt(value),
+                hasGoal: true,
+                id,
+              };
+              set("childGoal", returnedGoal);
+              setGoal(returnedGoal);
+            }
+          }
+          const filteredRewards = rewards?.[0].map((reward) => {
+            return {
+              ...reward,
+              value: parseInt(reward.value),
+              id: parseInt(reward.id),
+              active: currentGoalId === parseInt(reward.id) ? true : false,
+            };
+          });
+          set("rewardList", filteredRewards);
         } else {
+          set("childGoal", noGoalEntity);
+          setGoal(noGoalEntity);
           console.error(returnedRewards.err);
         }
       })
       .finally(() => setIsLoading(false));
   };
   const percentage = (
-    (Number(props.childBalance) / Number(goal?.value)) *
+    (Number(child?.balance) / Number(goal?.value)) *
     100
   ).toFixed(0);
   const isAbleToClaim = balance >= goal?.value && goal?.value > 0;
@@ -176,7 +224,7 @@ const Balance = (props) => {
               : null
           })`,
         }}
-        className={`${styles.hero} ${props.isModalOpen}`}
+        className={`${styles.hero}`} //${props.isModalOpen}
       >
         <Box
           display={"flex"}
@@ -186,11 +234,11 @@ const Balance = (props) => {
           height={"100%"}
         >
           <Box display={"flex"} flexDirection={"column"} gap={0}>
-            <Box className={styles.name}>{props.childName}</Box>
-            {props.childBalance >= 0 && (
+            <Box className={styles.name}>{child?.name}</Box>
+            {child?.balance >= 0 && (
               <Box className={styles.balance}>
                 <img src={dc} className="dc-img-big" alt="DooCoins symbol" />
-                {props.childBalance}
+                {child?.balance}
               </Box>
             )}
           </Box>

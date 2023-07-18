@@ -12,7 +12,8 @@ const Wallet = () => {
   const { actor } = useAuth();
   const navigate = useNavigate();
   const [transactions, setTransactions] = React.useState([]);
-  const { child, setChild } = React.useContext(ChildContext);
+  const { child, setChild, blockingChildUpdate } =
+    React.useContext(ChildContext);
   const [isLoading, setIsLoading] = React.useState({
     transactions: false,
     child: !child ? true : false,
@@ -36,26 +37,28 @@ const Wallet = () => {
   };
 
   React.useEffect(() => {
-    get("selectedChild")
-      .then(async (data) => {
-        const [balance, name] = await Promise.all([
-          get(`balance-${data}`),
-          get(`selectedChildName`),
-        ]);
-        if (data) {
-          setChild({
-            id: data,
-            balance: parseInt(balance),
-            name,
-          });
-        } else {
-          navigate("/");
-        }
-      })
-      .finally(() =>
-        setIsLoading((prevState) => ({ ...prevState, child: false }))
-      );
-  }, []);
+    if (!blockingChildUpdate) {
+      get("selectedChild")
+        .then(async (data) => {
+          const [balance, name] = await Promise.all([
+            get(`balance-${data}`),
+            get(`selectedChildName`),
+          ]);
+          if (data) {
+            setChild({
+              id: data,
+              balance: parseInt(balance),
+              name,
+            });
+          } else {
+            navigate("/");
+          }
+        })
+        .finally(() =>
+          setIsLoading((prevState) => ({ ...prevState, child: false }))
+        );
+    }
+  }, [blockingChildUpdate]);
 
   function getTransactions({ callService = false }) {
     if (child) {
@@ -71,7 +74,10 @@ const Wallet = () => {
                   set("transactionList", transactions[0]);
                   setTransactions(transactions?.[0]);
                 }
-                setIsLoading((prevState) => ({ ...prevState, transactions: false }));
+                setIsLoading((prevState) => ({
+                  ...prevState,
+                  transactions: false,
+                }));
               } else {
                 console.error(returnedTransactions.err);
                 set("transactionList", undefined);

@@ -1,6 +1,5 @@
 import * as React from "react";
 import { get, set } from "idb-keyval";
-import Balance from "../components/Balance";
 import { useAuth } from "../use-auth-client";
 import ChildTask from "../components/Tasks/ChildTask";
 import EditDialog from "../components/Dialogs/EditDialog";
@@ -38,7 +37,7 @@ const Tasks = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [tasks, setTasks] = React.useState([]);
   const [taskComplete, setTaskComplete] = React.useState(null);
-  const { child, setChild, isNewToSystem, handleUpdateCalloutState } =
+  const { child, setChild, isNewToSystem, handleUpdateCalloutState, blockingChildUpdate } =
     React.useContext(ChildContext);
   const [loader, setLoader] = React.useState({
     init: true,
@@ -55,8 +54,10 @@ const Tasks = () => {
   const [transactions, setTransactions] = React.useState([]);
 
   React.useEffect(() => {
-    getChildren();
-  }, []);
+    if (!blockingChildUpdate) {
+      getChildren();
+    }
+  }, [blockingChildUpdate]);
 
   React.useEffect(() => {
     if (isNewToSystem[strings.CALLOUTS_TASKS]) {

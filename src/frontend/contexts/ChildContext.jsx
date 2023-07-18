@@ -13,6 +13,7 @@ export default function ChildProvider({ children }) {
   const { actor } = useAuth();
   const [child, setChild] = React.useState(null);
   const [goal, setGoal] = React.useState(null);
+  const [blockingChildUpdate, setBlockingChildUpdate] = React.useState(false)
   const [isNewToSystem, setIsNewToSystem] = React.useState({
     [strings.CALLOUTS_CHILD_LIST]: false,
     [strings.CALLOUTS_TASKS]: false,
@@ -101,6 +102,8 @@ export default function ChildProvider({ children }) {
       handleUnsetGoal,
       isNewToSystem,
       handleUpdateCalloutState,
+      setBlockingChildUpdate,
+      blockingChildUpdate
     };
   }, [
     child,
@@ -113,6 +116,8 @@ export default function ChildProvider({ children }) {
     handleUnsetGoal,
     isNewToSystem,
     handleUpdateCalloutState,
+    blockingChildUpdate,
+    setBlockingChildUpdate
   ]);
 
   return (

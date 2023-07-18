@@ -15,12 +15,14 @@ import ProfileIcon from "../../assets/images/profile-icon.svg";
 import LogoIcon from "../../assets/images/logo.svg";
 import { useAuth } from "../../use-auth-client";
 import useIsMobileLayout from "../../hooks/useIsMobileLayout";
+import useClearContextState from "../../hooks/useClearContextState";
 
 function NavDrawer() {
   const { logout } = useAuth();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const btnRef = React.useRef();
   const showMobileLayout = useIsMobileLayout();
+  const clearContextState = useClearContextState()
 
   return (
     <>
@@ -87,7 +89,10 @@ function NavDrawer() {
                 </NavLink>
               </Text>
               <Text
-                onClick={logout}
+                onClick={() => {
+                  logout();
+                  clearContextState()
+                }}
                 fontSize="xl"
                 color="#0B334D"
                 fontWeight={600}

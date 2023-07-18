@@ -5,6 +5,7 @@ import { Box, Button, Link, Text } from "@chakra-ui/react";
 import ICBadge from "../assets/images/ic-badge.svg";
 import ShareIcon from "../assets/images/share-icon.svg";
 import logo from "../assets/images/logo.svg";
+import useClearContextState from "../hooks/useClearContextState";
 
 function checkForIOS() {
   // already installed
@@ -36,6 +37,7 @@ function checkForIOS() {
 
 function LoggedOut() {
   const { login, isAuthenticated, isLoading, logout } = useAuth();
+  const clearContextState = useClearContextState()
   if (!isLoading && isAuthenticated) {
     return <Navigate to="/" replace />;
   }
@@ -43,6 +45,7 @@ function LoggedOut() {
   React.useEffect(() => {
     if(!isLoading && !isAuthenticated) {
       logout()
+      clearContextState()
     }
   }, [])
 
