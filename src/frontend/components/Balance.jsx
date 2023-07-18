@@ -221,13 +221,15 @@ const Balance = (props) => {
                   flexDirection={"column"}
                   alignItems={"center"}
                   sx={{
-                    width: { base: 120, sm: 200, md: 280 },
+                    width: { base: 100, sm: 200, md: 280 },
                     height: { base: 160, sm: 200, md: 280 },
                     maxHeight: "320px",
+                    
                   }}
                 >
                   <CircularProgressbar
                     value={percentage}
+                    // width= {"70%"}
                     text={`${percentage}%`}
                     background
                     backgroundPadding={6}
@@ -244,9 +246,11 @@ const Balance = (props) => {
                   <p
                     style={{
                       color: "#fff",
-                      marginTop: "4px",
+                      marginTop: "0px",
                       textAlign: "center",
                       fontSize: "1em",
+                      lineHeight: "1em",
+
                     }}
                   >
                     {goal.name}
