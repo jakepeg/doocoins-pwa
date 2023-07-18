@@ -59,7 +59,7 @@ const Rewards = () => {
     add_reward: false,
     remove_goal: false,
   });
-  console.log(`selectedReward`, selectedReward)
+  console.log(`selectedReward`, selectedReward);
   React.useEffect(() => {
     if (isNewToSystem[strings.CALLOUT_REWARDS_LIST]) {
       onOpen();
@@ -610,11 +610,13 @@ const Rewards = () => {
                   </SwipeableListItem>
                 ))}
               </SwipeableList>
-              {isOpen && <SwipeListCallout
-                isOpen={isOpen}
-                onClose={onClose}
-                itemKey={strings.CALLOUT_REWARDS_LIST}
-              />}
+              {isOpen && rewards.length === 1 && (
+                <SwipeListCallout
+                  isOpen={isOpen}
+                  onClose={onClose}
+                  itemKey={strings.CALLOUT_REWARDS_LIST}
+                />
+              )}
             </ul>
           </div>
         ) : null}

@@ -55,7 +55,7 @@ function CustomTabs() {
   const { isNewToSystem, handleUpdateCalloutState } = React.useContext(ChildContext);
 
   React.useEffect(() => {
-    if (isNewToSystem[strings.CALLOUT_NO_TRANSACTIONS] && pathname === strings.REWARDS_PATH) {
+    if (isNewToSystem[strings.CALLOUT_NO_TRANSACTIONS] && pathname === strings.WALLET_PATH) {
       onOpen();
     }
   }, [isNewToSystem[strings.CALLOUT_NO_TRANSACTIONS], pathname]);
