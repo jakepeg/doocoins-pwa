@@ -14,10 +14,12 @@ import { ChakraProvider } from "@chakra-ui/react";
 import About from "./screens/About";
 import Help from "./screens/Help";
 import ChildProvider from "./contexts/ChildContext";
+import ImageLoader from "./utils/ImageLoader";
 
 function App() {
   return (
     <main id="pageContent">
+    <ImageLoader />
       <ChildProvider>
         <Router>
           <Routes>
