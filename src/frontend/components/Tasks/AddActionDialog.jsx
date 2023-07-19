@@ -22,6 +22,7 @@ const AddActionDialog = ({
         ref={nameRef}
         defaultValue={nameRef.current ? nameRef.current.value : ""}
         placeholder={namePlaceHolder}
+        maxlength="18"
         autoFocus
       />
       <input
@@ -32,6 +33,7 @@ const AddActionDialog = ({
         ref={valueRef}
         defaultValue={valueRef.current ? valueRef.current.value : ""}
         placeholder={valuePlaceHolder}
+        maxlength="5"
       />
       <button
         className={modelStyles.popup_edit_action_btn}

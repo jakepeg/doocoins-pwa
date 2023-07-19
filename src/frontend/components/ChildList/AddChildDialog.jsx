@@ -15,6 +15,7 @@ const AddChildDialog = ({ handleClosePopup, handleSubmit }) => {
         ref={childRef}
         defaultValue={childRef.current ? childRef.current.value : ""}
         placeholder="name"
+        maxlength="10"
         autoFocus
       />
       <button

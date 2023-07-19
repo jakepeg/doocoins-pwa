@@ -9,6 +9,7 @@ const AddChild = (props) => {
           name="child_name"
           className="text-field"
           placeholder="name"
+          maxlength="15"
         />
         <br />
         <br />
