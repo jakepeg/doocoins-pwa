@@ -4,16 +4,25 @@ import Balance from "../components/Balance";
 import LoadingSpinner from "../components/LoadingSpinner";
 import dc from "../assets/images/dc.svg";
 import { useAuth } from "../use-auth-client";
-import { useNavigate } from "react-router-dom";
-import { Box, Skeleton, Stack } from "@chakra-ui/react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { Box, Skeleton, Stack, useDisclosure } from "@chakra-ui/react";
 import { ChildContext } from "../contexts/ChildContext";
+import BottomNavCallout from "../components/Callouts/BottomNavCallout";
+import strings from "../utils/constants";
 
 const Wallet = () => {
   const { actor } = useAuth();
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const [transactions, setTransactions] = React.useState([]);
-  const { child, setChild, blockingChildUpdate } =
-    React.useContext(ChildContext);
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const {
+    child,
+    setChild,
+    blockingChildUpdate,
+    isNewToSystem,
+    handleUpdateCalloutState,
+  } = React.useContext(ChildContext);
   const [isLoading, setIsLoading] = React.useState({
     transactions: false,
     child: !child ? true : false,
@@ -27,6 +36,12 @@ const Wallet = () => {
       }));
     }
   }, [child]);
+
+  React.useEffect(() => {
+    if (isNewToSystem[strings.CALLOUT_NO_TRANSACTIONS] && pathname === strings.WALLET_PATH) {
+      onOpen();
+    }
+  }, [isNewToSystem[strings.CALLOUT_NO_TRANSACTIONS], pathname]);
 
   const humanReadableDate = (timestamp) => {
     const date = new Date(timestamp * 1000); // Convert timestamp to milliseconds
@@ -185,6 +200,7 @@ const Wallet = () => {
           </>
         )}
       </div>
+      {isOpen && !isLoading?.transactions && !transactions?.length && <BottomNavCallout isOpen={isOpen} onClose={onClose} />}
     </>
   );
 };

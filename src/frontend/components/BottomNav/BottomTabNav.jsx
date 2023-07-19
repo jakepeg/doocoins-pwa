@@ -51,14 +51,8 @@ export default BottomTabNav;
 
 function CustomTabs() {
   const { pathname } = useLocation();
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const { isNewToSystem, handleUpdateCalloutState } = React.useContext(ChildContext);
-
-  React.useEffect(() => {
-    if (isNewToSystem[strings.CALLOUT_NO_TRANSACTIONS] && pathname === strings.WALLET_PATH) {
-      onOpen();
-    }
-  }, [isNewToSystem[strings.CALLOUT_NO_TRANSACTIONS], pathname]);
+  const { isNewToSystem, handleUpdateCalloutState } =
+    React.useContext(ChildContext);
 
   const CustomTab = React.forwardRef((props, ref) => {
     // 1. Reuse the `useTab` hook
@@ -70,11 +64,10 @@ function CustomTabs() {
     const styles = useMultiStyleConfig("Tabs", tabProps);
 
     React.useEffect(() => {
-      if (isOpen && pathname === "/tasks") {
-        onClose();
+      if (isNewToSystem[strings.CALLOUT_NO_TRANSACTIONS] && pathname === "/tasks") {
         handleUpdateCalloutState([strings.CALLOUT_NO_TRANSACTIONS], false);
       }
-    }, [isOpen, isSelected, pathname]);
+    }, [isSelected, pathname]);
 
     return (
       <Link to={props.href}>
@@ -85,7 +78,6 @@ function CustomTabs() {
           flexDirection="column"
           alignItems={"center"}
           justifyContent={"center"}
-
           __css={styles.tab}
           // {...tabProps}
         >
@@ -108,8 +100,6 @@ function CustomTabs() {
         position: "relative",
       }}
     >
-      {isOpen && <BottomNavCallout isOpen={isOpen} onClose={onClose} />}
-
       <TabList
         style={{
           display: "flex",

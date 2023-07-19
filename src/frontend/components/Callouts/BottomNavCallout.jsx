@@ -9,7 +9,7 @@ const WrapperStyles = {
   width: { base: "80vw", sm: "55vw", md: "35%", lg: '25%' },
   zIndex: 9999,
   left: '50%',
-  bottom: { base: '-20%', sm: "-45%", md: '-40%' },
+  bottom: { base: '-5%', sm: "-45%", md: '-40%' },
   display: "flex",
   justifyContent: "center",
   alignItems: "center",

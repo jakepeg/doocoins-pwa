@@ -24,13 +24,10 @@ function checkForIOS() {
   const isMacOSWithSafari = isMacOS && webkit && !ua.match(/(Chrome|Firefox)/i);
   
   if (isIOSWithSafari) {
-    console.log("It's iOS with Safari");
     return "iOS";
   } else if (isMacOSWithSafari) {
-    console.log("It's macOS with Safari");
     return "macOS";
   } else {
-    console.log("It's NOT iOS or macOS with Safari");
     return false;
   }
 }
