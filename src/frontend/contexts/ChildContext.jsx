@@ -13,7 +13,8 @@ export default function ChildProvider({ children }) {
   const { actor } = useAuth();
   const [child, setChild] = React.useState(null);
   const [goal, setGoal] = React.useState(null);
-  const [blockingChildUpdate, setBlockingChildUpdate] = React.useState(false)
+  const [blockingChildUpdate, setBlockingChildUpdate] = React.useState(false);
+  const [transactions, setTransactions] = React.useState([]);
   const [isNewToSystem, setIsNewToSystem] = React.useState({
     [strings.CALLOUTS_CHILD_LIST]: false,
     [strings.CALLOUTS_TASKS]: false,
@@ -30,7 +31,7 @@ export default function ChildProvider({ children }) {
   useCheckIsUserNewToChildList({ handleUpdateCalloutState });
   useCheckIsUserNewToTasks({ handleUpdateCalloutState });
   useCheckIsUserNewToTransactions({ handleUpdateCalloutState });
-  useCheckIsUserNewToSwipeActions({ handleUpdateCalloutState })
+  useCheckIsUserNewToSwipeActions({ handleUpdateCalloutState });
 
   const getSelectedChild = async () => {
     let response;
@@ -103,7 +104,9 @@ export default function ChildProvider({ children }) {
       isNewToSystem,
       handleUpdateCalloutState,
       setBlockingChildUpdate,
-      blockingChildUpdate
+      blockingChildUpdate,
+      setTransactions,
+      transactions
     };
   }, [
     child,
@@ -117,7 +120,9 @@ export default function ChildProvider({ children }) {
     isNewToSystem,
     handleUpdateCalloutState,
     blockingChildUpdate,
-    setBlockingChildUpdate
+    setBlockingChildUpdate,
+    setTransactions,
+    transactions
   ]);
 
   return (

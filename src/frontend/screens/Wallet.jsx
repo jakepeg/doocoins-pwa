@@ -1,6 +1,5 @@
 import * as React from "react";
 import { get, set } from "idb-keyval";
-import Balance from "../components/Balance";
 import LoadingSpinner from "../components/LoadingSpinner";
 import dc from "../assets/images/dc.svg";
 import { useAuth } from "../use-auth-client";
@@ -14,7 +13,6 @@ const Wallet = () => {
   const { actor } = useAuth();
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const [transactions, setTransactions] = React.useState([]);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const {
     child,
@@ -22,6 +20,8 @@ const Wallet = () => {
     blockingChildUpdate,
     isNewToSystem,
     handleUpdateCalloutState,
+    transactions,
+    setTransactions
   } = React.useContext(ChildContext);
   const [isLoading, setIsLoading] = React.useState({
     transactions: false,

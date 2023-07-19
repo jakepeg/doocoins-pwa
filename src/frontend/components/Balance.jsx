@@ -23,13 +23,14 @@ const Balance = () => {
     handleUnsetGoal,
     setBlockingChildUpdate,
     blockingChildUpdate,
+    transactions,
+    setTransactions
   } = React.useContext(ChildContext);
   const { actor } = useAuth();
   const [isLoading, setIsLoading] = React.useState(false);
   const balance = child?.balance || 0;
   const navigate = useNavigate();
   const toast = useToast();
-  const [transactions, setTransactions] = React.useState([]);
 
   React.useEffect(() => {
     if (!blockingChildUpdate) {
