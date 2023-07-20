@@ -1,7 +1,7 @@
 import React from "react";
 import { Box } from "@chakra-ui/react";
-import { Link } from "react-router-dom";
-import { set } from "idb-keyval";
+import { Link, useNavigate } from "react-router-dom";
+import { del, set } from "idb-keyval";
 import { ReactComponent as DCIcon } from "../assets/images/dc-white.svg";
 
 export const swipeContainerStyles = {
@@ -10,9 +10,17 @@ export const swipeContainerStyles = {
 };
 
 const ChildItem = ({ child }) => {
-  const handleSelectChild = () => {
+  const navigate = useNavigate()
+  const handleSelectChild = async () => {
+    await Promise.all([
+      del("childGoal"),
+      del("rewardList"),
+      del("taskList"),
+      del("transactionList")
+    ]);    
     set("selectedChild", child.id);
     set("selectedChildName", child.name);
+    navigate('/wallet')
   };
 
   return (
@@ -23,11 +31,11 @@ const ChildItem = ({ child }) => {
         justifyContent={"space-between"}
         alignItems={"center"}
       >
-        <Link to="/wallet">
+        {/* <Link to="/wallet"> */}
           <Box textAlign={"left"} fontSize={"22px"} color={"#fff"}>
             {child.name}
           </Box>
-        </Link>
+        {/* </Link> */}
       </Box>
       <Link to="/wallet">
         <div className="child-balance">
