@@ -37,7 +37,7 @@ const Tasks = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [tasks, setTasks] = React.useState([]);
   const [taskComplete, setTaskComplete] = React.useState(null);
-  const { child, setChild, isNewToSystem, handleUpdateCalloutState, blockingChildUpdate } =
+  const { child, setChild, isNewToSystem, handleUpdateCalloutState, blockingChildUpdate, setBlockingChildUpdate } =
     React.useContext(ChildContext);
   const [loader, setLoader] = React.useState({
     init: true,
@@ -345,6 +345,7 @@ const Tasks = () => {
     setTransactions([new_transactions, ...transactions]);
     // API call approveTask
     handleCloseTogglePopup();
+    setBlockingChildUpdate(true)
     // setLoader((prevState) => ({ ...prevState, init: true }));
     actor?.approveTask(child.id, task_id, date).then((returnedApproveTask) => {
       if ("ok" in returnedApproveTask) {
@@ -370,6 +371,7 @@ const Tasks = () => {
             set("childList", updatedChildrenData);
             await getChildren();
             setLoader((prevState) => ({ ...prevState, init: false }));
+            setBlockingChildUpdate(false)
           } else {
             setLoader((prevState) => ({ ...prevState, init: false }));
             console.error(returnedChilren.err);
@@ -387,6 +389,7 @@ const Tasks = () => {
         }));
         set("transactionList", filteredTransactions);
         console.error(returnedApproveTask.err);
+        setBlockingChildUpdate(false)
       }
     });
   }

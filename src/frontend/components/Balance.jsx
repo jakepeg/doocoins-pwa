@@ -24,7 +24,7 @@ const Balance = () => {
     setBlockingChildUpdate,
     blockingChildUpdate,
     transactions,
-    setTransactions
+    setTransactions,
   } = React.useContext(ChildContext);
   const { actor } = useAuth();
   const [isLoading, setIsLoading] = React.useState(false);
@@ -59,10 +59,10 @@ const Balance = () => {
   }, []);
 
   React.useEffect(() => {
-    if(child?.id) {
-     getReward();
+    if (child?.id) {
+      getReward();
     }
-  }, [child?.id])
+  }, [child?.id]);
 
   const handleUpdateTransactions = (transactions) => {
     setTransactions(transactions);
@@ -157,21 +157,23 @@ const Balance = () => {
         if ("ok" in returnedRewards) {
           const rewards = Object.values(returnedRewards);
           let currentGoalId;
-          if(!rewardId) {
+          if (!rewardId) {
             await actor?.getCurrentGoal(child?.id).then((returnedGoal) => {
               currentGoalId = parseInt(returnedGoal);
-              
+
               return currentGoalId;
             });
           }
 
           if (rewards) {
             const reward = rewards?.[0]?.find(
-              (reward) => rewardId === parseInt(reward.id) || currentGoalId === parseInt(reward.id)
+              (reward) =>
+                rewardId === parseInt(reward.id) ||
+                currentGoalId === parseInt(reward.id)
             );
 
-            if(reward) {
-              const { name, value, id } = reward
+            if (reward) {
+              const { name, value, id } = reward;
               const returnedGoal = {
                 name,
                 value: parseInt(value),
@@ -254,14 +256,6 @@ const Balance = () => {
             }}
             onClick={handleGoalClick}
           >
-            {goal?.hasGoal && isAbleToClaim && (
-              <p
-                className={styles.claim_goal_text}
-                style={{ color: "#fff", marginTop: "4px" }}
-              >
-                {goal.name}
-              </p>
-            )}
             {goal?.hasGoal && !isAbleToClaim ? (
               <>
                 <Box
@@ -273,7 +267,6 @@ const Balance = () => {
                     width: { base: 100, sm: 200, md: 280 },
                     height: { base: 160, sm: 200, md: 280 },
                     maxHeight: "320px",
-                    
                   }}
                 >
                   <CircularProgressbar
@@ -299,7 +292,6 @@ const Balance = () => {
                       textAlign: "center",
                       fontSize: "1em",
                       lineHeight: "1em",
-
                     }}
                   >
                     {goal.name}
@@ -307,6 +299,23 @@ const Balance = () => {
                 </Box>
               </>
             ) : null}
+            {goal?.hasGoal && isAbleToClaim && (
+              <p
+                style={{
+                  color: "#fff",
+                  marginTop: "0px",
+                  textAlign: "center",
+                  fontSize: "1em",
+                  lineHeight: "1em",
+                  position: "absolute",
+                  bottom: "-25%",
+                  right: "0%",
+                  width: "100%",
+                }}
+              >
+                {goal.name}
+              </p>
+            )}
           </Box>
         </Box>
       </header>

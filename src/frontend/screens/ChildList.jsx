@@ -25,6 +25,8 @@ function ChildList() {
   const {
     isNewToSystem: { childList },
     handleUpdateCalloutState,
+    setGoal,
+    setChild
   } = React.useContext(ChildContext);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [children, setChildren] = React.useState(null);
@@ -50,6 +52,12 @@ function ChildList() {
   function getChildren({ callService = false }) {
     del("selectedChild");
     del("selectedChildName");
+    del("childGoal");
+    del("rewardList");
+    del("taskList");
+    del("transactionList");
+    setGoal(null);
+    setChild(null);
     setLoader((prevState) => ({ ...prevState, init: true }));
     get("childList").then(async (val) => {
       if (val === undefined || callService) {

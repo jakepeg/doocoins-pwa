@@ -54,22 +54,6 @@ export default function ChildProvider({ children }) {
     return response;
   };
 
-  const handleSetGoalLocally = async () => {
-    let response;
-    await get("childGoal").then(async (data) => {
-      response = data;
-      if (data) {
-        setGoal({
-          name: data.name,
-          value: parseInt(data.value),
-          hasGoal: data.hasGoal,
-          ...data,
-        });
-      }
-    });
-    return response;
-  };
-
   async function getBalance(childID) {
     return new Promise((resolve, reject) => {
       get("balance-" + childID)
@@ -96,7 +80,6 @@ export default function ChildProvider({ children }) {
       child,
       setChild,
       getSelectedChild,
-      handleSetGoalLocally,
       goal,
       setGoal,
       getBalance,
@@ -112,7 +95,6 @@ export default function ChildProvider({ children }) {
     child,
     setChild,
     getSelectedChild,
-    handleSetGoalLocally,
     goal,
     setGoal,
     getBalance,
