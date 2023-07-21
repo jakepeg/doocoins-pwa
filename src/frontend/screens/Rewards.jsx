@@ -41,7 +41,7 @@ const Rewards = () => {
   const [rewards, setRewards] = React.useState([]);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [currentGoal, setCurrentGoal] = React.useState(null);
-  const { child, setChild, setGoal, isNewToSystem, handleUpdateCalloutState, blockingChildUpdate } =
+  const { child, setChild, setGoal, isNewToSystem, handleUpdateCalloutState, blockingChildUpdate, setBlockingChildUpdate } =
     React.useContext(ChildContext);
   const [transactions, setTransactions] = React.useState([]);
   const [loader, setLoader] = React.useState({
@@ -114,7 +114,7 @@ const Rewards = () => {
     });
   }
 
-  function getRewards({ disableFullLoader, callService = false }) {
+  function getRewards({ disableFullLoader, callService = false, revokeStateUpdate = false }) {
     if (child.id) {
       if (!disableFullLoader) {
         setLoader((prevState) => ({ ...prevState, init: true }));
@@ -142,7 +142,9 @@ const Rewards = () => {
                   };
                 });
                 set("rewardList", filteredRewards);
-                setRewards(filteredRewards);
+                if (!revokeStateUpdate) {
+                  setRewards(filteredRewards);
+                }
                 setLoader((prevState) => ({
                   ...prevState,
                   init: false,
@@ -153,15 +155,17 @@ const Rewards = () => {
               }
             });
           } else {
-            setRewards(
-              val?.map((reward) => {
-                return {
-                  ...reward,
-                  id: parseInt(reward.id),
-                  value: parseInt(reward.value),
-                };
-              })
-            );
+            if (!revokeStateUpdate) {
+              setRewards(
+                val?.map((reward) => {
+                  return {
+                    ...reward,
+                    id: parseInt(reward.id),
+                    value: parseInt(reward.value),
+                  };
+                })
+              );
+            }
             setLoader((prevState) => ({
               ...prevState,
               init: false,
@@ -231,7 +235,7 @@ const Rewards = () => {
       ?.updateGoal(child.id, rewardID, reward_object)
       .then((response) => {
         if ("ok" in response) {
-          getRewards({ disableFullLoader: true, callService: true });
+          getRewards({ disableFullLoader: true, callService: true, revokeStateUpdate: true });
         } else {
           const updatedList = rewards.map((reward) => {
             const updatedReward =
@@ -242,7 +246,6 @@ const Rewards = () => {
           set("rewardList", updatedList);
         }
       })
-      .finally(() => setSelectedReward(null));
   }
 
   function deleteReward(rewardID, rewardName, rewardValue) {
@@ -262,7 +265,7 @@ const Rewards = () => {
       ?.updateGoal(child.id, rewardID, reward_object)
       .then((response) => {
         if ("ok" in response) {
-          getRewards({ disableFullLoader: true, callService: true });
+          getRewards({ disableFullLoader: true, callService: true, revokeStateUpdate: true });
         } else {
           setRewards((prevState) => {
             set("rewardList", [...prevState, reward_object]);
@@ -277,7 +280,6 @@ const Rewards = () => {
           });
         }
       })
-      .finally(() => setSelectedReward(null));
   }
 
   const handleTogglePopup = (isOpen, reward, popup) => {
@@ -343,7 +345,7 @@ const Rewards = () => {
               isClosable: true,
             });
           }
-          getRewards({ disableFullLoader: true, callService: true });
+          getRewards({ disableFullLoader: true, callService: true, revokeStateUpdate: true });
           await getChildren();
         } else {
           console.error(returnedCurrentGoal.err);
@@ -569,7 +571,7 @@ const Rewards = () => {
         .addGoal(reward, child.id)
         .then((response) => {
           if ("ok" in response) {
-            getRewards({ disableFullLoader: true, callService: true });
+            getRewards({ disableFullLoader: true, callService: true, revokeStateUpdate: true });
           } else {
             removeErrorItem();
           }

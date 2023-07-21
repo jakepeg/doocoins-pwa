@@ -88,11 +88,12 @@ const Balance = () => {
       balance: prevState.balance - goal.value,
     }));
     setBlockingChildUpdate(true);
+    handleUnsetGoal();
     actor
-      ?.claimGoal(child.id, reward_id, date)
-      .then(async (returnedClaimReward) => {
-        if ("ok" in returnedClaimReward) {
-          handleUnsetGoal();
+    ?.claimGoal(child.id, reward_id, date)
+    .then(async (returnedClaimReward) => {
+      if ("ok" in returnedClaimReward) {
+          actor?.currentGoal(child.id, 0)
           toast({
             title: `Yay - well deserved, ${child.name}.`,
             status: "success",

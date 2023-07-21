@@ -55,7 +55,7 @@ const Tasks = () => {
 
   React.useEffect(() => {
     if (!blockingChildUpdate) {
-      getChildren();
+      getChildren({ revokeStateUpdate: false });
     }
   }, [blockingChildUpdate]);
 
@@ -84,25 +84,27 @@ const Tasks = () => {
     getTransactions();
   }, []);
 
-  const getChildren = async () => {
+  const getChildren = async ({ revokeStateUpdate = false }) => {
     await get("selectedChild").then(async (data) => {
       const [balance, name] = await Promise.all([
         get(`balance-${data}`),
         get(`selectedChildName`),
       ]);
       if (data) {
+        if(!revokeStateUpdate) {
         setChild({
-          id: data,
-          balance: parseInt(balance),
-          name,
-        });
+            id: data,
+            balance: parseInt(balance),
+            name,
+          });
+        }
       } else {
         navigate("/");
       }
     });
   };
 
-  function getTasks({ disableFullLoader = false, callService = false }) {
+  function getTasks({ disableFullLoader = false, callService = false, revokeStateUpdate = false }) {
     if (child) {
       if (!disableFullLoader) {
         setLoader((prevState) => ({ ...prevState, init: true }));
@@ -123,7 +125,9 @@ const Tasks = () => {
                   };
                 });
                 set("taskList", filteredTasks);
-                setTasks(filteredTasks || []);
+                if(!revokeStateUpdate) {
+                  setTasks(filteredTasks || []);
+                }
               } else {
                 console.error(returnedTasks.err);
               }
@@ -136,15 +140,17 @@ const Tasks = () => {
               }))
             );
         } else {
-          setTasks(
-            val?.map((task) => {
-              return {
-                ...task,
-                id: parseInt(task.id),
-                value: parseInt(task.value),
-              };
-            }) || []
-          );
+          if(!revokeStateUpdate) {
+            setTasks(
+              val?.map((task) => {
+                return {
+                  ...task,
+                  id: parseInt(task.id),
+                  value: parseInt(task.value),
+                };
+              }) || []
+            );
+          }
           setLoader((prevState) => ({
             ...prevState,
             init: false,
@@ -208,7 +214,7 @@ const Tasks = () => {
         .addTask(task, child.id)
         .then((response) => {
           if ("ok" in response) {
-            getTasks({ disableFullLoader: true, callService: true });
+            getTasks({ disableFullLoader: true, callService: true, revokeStateUpdate: true });
           } else {
             removeErrorItem();
           }
@@ -264,7 +270,7 @@ const Tasks = () => {
       ?.updateTask(child.id, taskID, task_object)
       .then((response) => {
         if ("ok" in response) {
-          getTasks({ disableFullLoader: true, callService: true });
+          getTasks({ disableFullLoader: true, callService: true, revokeStateUpdate: true });
         } else {
           const updatedList = tasks.map((task) => {
             const updatedTask = task.id === task_object.id ? prevTask : task;
@@ -274,7 +280,6 @@ const Tasks = () => {
           set("taskList", updatedList);
         }
       })
-      .finall(() => setSelectedTask(null));
   }
 
   function deleteTask(taskID, taskName, taskValue) {
@@ -294,7 +299,7 @@ const Tasks = () => {
       ?.updateTask(child.id, taskID, task_object)
       .then((response) => {
         if ("ok" in response) {
-          getTasks({ disableFullLoader: true, callService: true });
+          getTasks({ disableFullLoader: true, callService: true, revokeStateUpdate: true });
         } else {
           setTasks((prevState) => {
             set("taskList", [...prevState, task_object]);
@@ -309,7 +314,6 @@ const Tasks = () => {
           });
         }
       })
-      .finally(() => setSelectedTask(null));
   }
 
   async function getBalance(childID) {
@@ -369,7 +373,7 @@ const Tasks = () => {
               })
             );
             set("childList", updatedChildrenData);
-            await getChildren();
+            await getChildren({ revokeStateUpdate: true });
             setLoader((prevState) => ({ ...prevState, init: false }));
             setBlockingChildUpdate(false)
           } else {
