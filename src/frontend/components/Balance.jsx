@@ -250,8 +250,8 @@ const Balance = () => {
               background: "transparent",
               zIndex: 999,
               minWidth: isAbleToClaim && "25%",
-              minHeight: isAbleToClaim && "100px",
-              transform: isAbleToClaim && `translateX(-20px)`,
+              minHeight: isAbleToClaim && { base: "70%", sm: "80%" },
+              transform: isAbleToClaim && { base: `translateX(-4vw)` },
               cursor: isAbleToClaim && "pointer",
             }}
             onClick={handleGoalClick}
@@ -300,21 +300,24 @@ const Balance = () => {
               </>
             ) : null}
             {goal?.hasGoal && isAbleToClaim && (
-              <p
-                style={{
+              <Box
+                sx={{
                   color: "#fff",
                   marginTop: "0px",
                   textAlign: "center",
                   fontSize: "1em",
                   lineHeight: "1em",
                   position: "absolute",
-                  bottom: "-25%",
+                  bottom: { base: "-0%", sm: "-0%" },
                   right: "0%",
-                  width: "100%",
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  width: '100%'
                 }}
               >
                 {goal.name}
-              </p>
+              </Box>
             )}
           </Box>
         </Box>

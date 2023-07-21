@@ -384,6 +384,11 @@ const Rewards = () => {
     };
     set("transactionList", [new_transactions, ...transactions]);
     setTransactions([new_transactions, ...transactions]);
+    setChild((prevState) => ({
+      ...prevState,
+      balance: prevState.balance - selectedReward.value,
+    }));
+    setBlockingChildUpdate(true)
     actor
       ?.claimGoal(child.id, reward_id, date)
       .then(async (returnedClaimReward) => {
@@ -407,6 +412,7 @@ const Rewards = () => {
             );
             set("childList", updatedChildrenData);
             await getChildren();
+            setBlockingChildUpdate(false)
             setLoader((prevState) => ({ ...prevState, init: false }));
           });
         } else {
@@ -416,6 +422,7 @@ const Rewards = () => {
           setTransactions(filteredTransactions);
           set("transactionList", filteredTransactions);
           setLoader((prevState) => ({ ...prevState, init: false }));
+          setBlockingChildUpdate(false)
         }
       });
   }

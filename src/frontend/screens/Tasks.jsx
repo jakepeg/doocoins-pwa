@@ -540,7 +540,7 @@ const Tasks = () => {
             <AddItemToListCallout
               TextDescription={
                 <>
-                  Ready to set tasks for {child.name}? <br />
+                  Ready to set tasks for {child?.name}? <br />
                   Tap the + icon to get started!
                 </>
               }
