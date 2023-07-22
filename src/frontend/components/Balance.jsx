@@ -60,7 +60,7 @@ const Balance = () => {
 
   React.useEffect(() => {
     if (child?.id) {
-      getReward();
+      getReward({});
     }
   }, [child?.id]);
 
@@ -93,14 +93,13 @@ const Balance = () => {
     ?.claimGoal(child.id, reward_id, date)
     .then(async (returnedClaimReward) => {
       if ("ok" in returnedClaimReward) {
-          actor?.currentGoal(child.id, 0)
           toast({
             title: `Yay - well deserved, ${child.name}.`,
             status: "success",
             duration: 4000,
             isClosable: true,
           });
-          getReward(reward_id);
+          getReward({ rewardId: reward_id, revokeStateUpdate: true });
           actor?.getChildren().then(async (returnedChilren) => {
             const children = Object.values(returnedChilren);
             const updatedChildrenData = await Promise.all(
@@ -151,7 +150,7 @@ const Balance = () => {
     });
   };
 
-  const getReward = (rewardId) => {
+  const getReward = ({ rewardId, revokeStateUpdate = false }) => {
     actor
       ?.getGoals(child?.id)
       .then(async (returnedRewards) => {
@@ -182,7 +181,9 @@ const Balance = () => {
                 id,
               };
               set("childGoal", returnedGoal);
-              setGoal(returnedGoal);
+              if(!revokeStateUpdate) {
+                setGoal(returnedGoal);
+              }
             }
           }
           const filteredRewards = rewards?.[0].map((reward) => {
@@ -196,7 +197,9 @@ const Balance = () => {
           set("rewardList", filteredRewards);
         } else {
           set("childGoal", noGoalEntity);
-          setGoal(noGoalEntity);
+          if(!revokeStateUpdate) {
+            setGoal(noGoalEntity);
+          }
           console.error(returnedRewards.err);
         }
       })
@@ -310,11 +313,11 @@ const Balance = () => {
                   lineHeight: "1em",
                   position: "absolute",
                   bottom: { base: "-0%", sm: "-0%" },
-                  right: "0%",
+                  transform: 'translateX(-5%) translateY(6px)',
                   display: 'flex',
                   justifyContent: 'center',
                   alignItems: 'center',
-                  width: '100%'
+                  width: '120%'
                 }}
               >
                 {goal.name}
