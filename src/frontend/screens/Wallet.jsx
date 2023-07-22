@@ -73,7 +73,7 @@ const Wallet = () => {
           setIsLoading((prevState) => ({ ...prevState, child: false }))
         );
     }
-  }, [blockingChildUpdate]);
+  }, []);
 
   function getTransactions({ callService = false }) {
     if (child) {

@@ -65,7 +65,7 @@ const Tasks = () => {
     if (!blockingChildUpdate) {
       getChildren({ revokeStateUpdate: false });
     }
-  }, [blockingChildUpdate]);
+  }, []);
 
   React.useEffect(() => {
     if (isNewToSystem[strings.CALLOUTS_TASKS]) {
@@ -354,9 +354,19 @@ const Tasks = () => {
   function handleTaskComplete(task_id) {
     let dateNum = Math.floor(Date.now() / 1000);
     let date = dateNum.toString();
+
+    let maxIdObject = null;
+
+    // Iterate through the data array to find the object with the highest "id"
+    for (const item of transactions) {
+      if (!maxIdObject || Number(item.id) > Number(maxIdObject.id)) {
+        maxIdObject = item;
+      }
+    }
+
     const new_transactions = {
       completedDate: date,
-      id: transactions?.[0]?.id ? parseInt(transactions?.[0]?.id) + 1 : 1,
+      id: maxIdObject?.id ? parseInt(maxIdObject?.id) + 1 : 1,
       value: selectedTask.value,
       name: selectedTask.name,
       transactionType: "TASK_CREDIT",

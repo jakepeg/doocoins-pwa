@@ -69,9 +69,9 @@ const Rewards = () => {
 
   React.useEffect(() => {
     if(!blockingChildUpdate) {
-      getChildren();
+      getChildren({});
     }
-  }, [blockingChildUpdate]);
+  }, []);
 
   React.useEffect(() => {
     if (child) {
@@ -82,18 +82,20 @@ const Rewards = () => {
     }
   }, [child]);
 
-  const getChildren = async () => {
+  const getChildren = async ({ revokeStateUpdate = false }) => {
     await get("selectedChild").then(async (data) => {
       const [balance, name] = await Promise.all([
         get(`balance-${data}`),
         get(`selectedChildName`),
       ]);
       if (data) {
-        setChild({
-          id: data,
-          balance: parseInt(balance),
-          name,
-        });
+        if(!revokeStateUpdate) {
+          setChild({
+            id: data,
+            balance: parseInt(balance),
+            name,
+          });
+        }
       } else {
         navigate("/");
       }
@@ -347,7 +349,7 @@ const Rewards = () => {
             });
           }
           getRewards({ disableFullLoader: true, callService: true, revokeStateUpdate: true });
-          await getChildren();
+          await getChildren({});
         } else {
           console.error(returnedCurrentGoal.err);
           const finalRewards = rewards.map((reward) => {
@@ -377,10 +379,19 @@ const Rewards = () => {
     handleToggleClaimPopup();
     let dateNum = Math.floor(Date.now() / 1000);
     let date = dateNum.toString();
-    // setLoader((prevState) => ({ ...prevState, init: true }));
+    
+    let maxIdObject = null;
+
+    // Iterate through the data array to find the object with the highest "id"
+    for (const item of transactions) {
+      if (!maxIdObject || Number(item.id) > Number(maxIdObject.id)) {
+        maxIdObject = item;
+      }
+    }
+
     const new_transactions = {
       completedDate: date,
-      id: transactions?.[0]?.id ? parseInt(transactions?.[0]?.id) + 1 : 1,
+      id: maxIdObject?.id ? parseInt(maxIdObject?.id) + 1 : 1,
       value: selectedReward.value,
       name: selectedReward.name,
       transactionType: "GOAL_DEBIT",
@@ -414,7 +425,7 @@ const Rewards = () => {
               })
             );
             set("childList", updatedChildrenData);
-            await getChildren();
+            await getChildren({ revokeStateUpdate: true });
             setBlockingChildUpdate(false)
             setLoader((prevState) => ({ ...prevState, init: false }));
           });

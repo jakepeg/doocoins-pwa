@@ -33,20 +33,25 @@ const Balance = () => {
   const toast = useToast();
 
   React.useEffect(() => {
+    console.log('renders balance');
     if (!blockingChildUpdate) {
-      get("childGoal").then(async (data) => {
-        if (data) {
-          setGoal({
-            ...data,
-            name: data.name,
-            value: parseInt(data.value),
-            hasGoal: data.hasGoal,
-          });
-          setIsLoading(false);
-        }
-      });
+      getChildGoal()
     }
-  }, [child?.balance, blockingChildUpdate]);
+  }, []);
+
+  const getChildGoal = () => {
+    get("childGoal").then(async (data) => {
+      if (data) {
+        setGoal({
+          ...data,
+          name: data.name,
+          value: parseInt(data.value),
+          hasGoal: data.hasGoal,
+        });
+        setIsLoading(false);
+      }
+    });
+  }
 
   function getTransactions() {
     get("transactionList").then(async (val) => {
@@ -90,9 +95,9 @@ const Balance = () => {
     setBlockingChildUpdate(true);
     handleUnsetGoal();
     actor
-    ?.claimGoal(child.id, reward_id, date)
-    .then(async (returnedClaimReward) => {
-      if ("ok" in returnedClaimReward) {
+      ?.claimGoal(child.id, reward_id, date)
+      .then(async (returnedClaimReward) => {
+        if ("ok" in returnedClaimReward) {
           toast({
             title: `Yay - well deserved, ${child.name}.`,
             status: "success",
@@ -113,7 +118,7 @@ const Balance = () => {
               })
             );
             set("childList", updatedChildrenData);
-            await getChildren();
+            await getChildren({ revokeStateUpdate: true });
             setIsLoading(false);
             setBlockingChildUpdate(false);
           });
@@ -132,18 +137,21 @@ const Balance = () => {
       });
   }
 
-  const getChildren = async () => {
+  const getChildren = async ({ revokeStateUpdate = false }) => {
+    console.log(`balance child`, revokeStateUpdate);
     await get("selectedChild").then(async (data) => {
       const [balance, name] = await Promise.all([
         get(`balance-${data}`),
         get(`selectedChildName`),
       ]);
       if (data) {
-        setChild({
-          id: data,
-          balance: parseInt(balance),
-          name,
-        });
+        if (!revokeStateUpdate) {
+          setChild({
+            id: data,
+            balance: parseInt(balance),
+            name,
+          });
+        }
       } else {
         navigate("/");
       }
@@ -181,7 +189,7 @@ const Balance = () => {
                 id,
               };
               set("childGoal", returnedGoal);
-              if(!revokeStateUpdate) {
+              if (!revokeStateUpdate) {
                 setGoal(returnedGoal);
               }
             }
@@ -197,7 +205,7 @@ const Balance = () => {
           set("rewardList", filteredRewards);
         } else {
           set("childGoal", noGoalEntity);
-          if(!revokeStateUpdate) {
+          if (!revokeStateUpdate) {
             setGoal(noGoalEntity);
           }
           console.error(returnedRewards.err);
@@ -313,11 +321,11 @@ const Balance = () => {
                   lineHeight: "1em",
                   position: "absolute",
                   bottom: { base: "-0%", sm: "-0%" },
-                  transform: 'translateX(-5%) translateY(6px)',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  width: '120%'
+                  transform: "translateX(-5%) translateY(6px)",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  width: "120%",
                 }}
               >
                 {goal.name}
