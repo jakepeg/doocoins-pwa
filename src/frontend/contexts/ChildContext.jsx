@@ -35,27 +35,6 @@ export default function ChildProvider({ children }) {
   useCheckIsUserNewToTransactions({ handleUpdateCalloutState });
   useCheckIsUserNewToSwipeActions({ handleUpdateCalloutState });
 
-  const getSelectedChild = async () => {
-    let response;
-    await get("selectedChild").then(async (data) => {
-      const [balance, name] = await Promise.all([
-        get(`balance-${data}`),
-        get(`selectedChildName`),
-      ]);
-      if (data) {
-        const selectedChild = {
-          id: data,
-          balance: parseInt(balance),
-          name,
-        };
-        setChild(selectedChild);
-      }
-      response = data;
-    });
-
-    return response;
-  };
-
   async function getBalance(childID) {
     return new Promise((resolve, reject) => {
       get("balance-" + childID)
@@ -81,7 +60,6 @@ export default function ChildProvider({ children }) {
     return {
       child,
       setChild,
-      getSelectedChild,
       goal,
       setGoal,
       getBalance,
@@ -96,7 +74,6 @@ export default function ChildProvider({ children }) {
   }, [
     child,
     setChild,
-    getSelectedChild,
     goal,
     setGoal,
     getBalance,

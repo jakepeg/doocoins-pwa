@@ -69,7 +69,7 @@ const Rewards = () => {
 
   React.useEffect(() => {
     if(!blockingChildUpdate) {
-      getChildren({});
+      // getChildren({});
     }
   }, []);
 

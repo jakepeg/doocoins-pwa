@@ -63,7 +63,7 @@ const Tasks = () => {
 
   React.useEffect(() => {
     if (!blockingChildUpdate) {
-      getChildren({ revokeStateUpdate: false });
+      // getChildren({ revokeStateUpdate: false });
     }
   }, []);
 

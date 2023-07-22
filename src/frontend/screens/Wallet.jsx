@@ -60,11 +60,11 @@ const Wallet = () => {
             get(`selectedChildName`),
           ]);
           if (data) {
-            setChild({
-              id: data,
-              balance: parseInt(balance),
-              name,
-            });
+            // setChild({
+            //   id: data,
+            //   balance: parseInt(balance),
+            //   name,
+            // });
           } else {
             navigate("/");
           }

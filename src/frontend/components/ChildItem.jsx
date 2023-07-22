@@ -1,8 +1,9 @@
 import React from "react";
 import { Box } from "@chakra-ui/react";
 import { Link, useNavigate } from "react-router-dom";
-import { set } from "idb-keyval";
+import { get, set } from "idb-keyval";
 import { ReactComponent as DCIcon } from "../assets/images/dc-white.svg";
+import { ChildContext } from "../contexts/ChildContext";
 
 export const swipeContainerStyles = {
   backgroundColor: "#FFF",
@@ -11,9 +12,21 @@ export const swipeContainerStyles = {
 
 const ChildItem = ({ child }) => {
   const navigate = useNavigate();
+  const { setChild } = React.useContext(ChildContext);
+
+  const setChildData = async () => {
+    setChild({
+      id: child?.id,
+      balance: parseInt(child?.balance),
+      name: child.name,
+    });
+  };
+
   const handleSelectChild = async () => {
+    setChildData();
     set("selectedChild", child.id);
     set("selectedChildName", child.name);
+
     navigate("/wallet");
   };
 
