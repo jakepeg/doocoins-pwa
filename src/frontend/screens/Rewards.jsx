@@ -33,6 +33,7 @@ import strings, { noGoalEntity } from "../utils/constants";
 import { ChildContext } from "../contexts/ChildContext";
 import LoadingSpinner from "../components/LoadingSpinner";
 import SwipeListCallout from "../components/Callouts/SwipeListCallout";
+import AddRewardCalloutWrapper from "../components/Rewards/AddRewardCalloutWrapper";
 
 const Rewards = () => {
   const { actor } = useAuth();
@@ -49,7 +50,7 @@ const Rewards = () => {
     singles: false,
     child: !child ? true : false,
   });
-
+  const [addClicked, setAddClicked] = React.useState(false)
   const [selectedReward, setSelectedReward] = React.useState(null);
   const [showPopup, setShowPopup] = React.useState({
     delete: false,
@@ -524,6 +525,7 @@ const Rewards = () => {
   };
 
   const handleToggleAddRewardPopup = () => {
+    setAddClicked(true)
     setShowPopup((prevState) => ({
       ...prevState,
       ["add_reward"]: !prevState.add_reward,
@@ -726,7 +728,7 @@ const Rewards = () => {
           isModalOpen ? modelStyles.blur_background : undefined
         } light-panel`}
       >
-        <div className={`panel-header-wrapper`}>
+        <div className={`panel-header-wrapper`} style={{ position: "relative" }}>
           <h2 className="title-button dark">
             <span>Rewards</span>{" "}
             <span
@@ -735,6 +737,7 @@ const Rewards = () => {
               className="plus-sign"
             />
           </h2>
+          <AddRewardCalloutWrapper addClicked={addClicked} loader={loader} rewards={rewards} />
         </div>
         {loader.init ? (
           <Stack margin={"0 20px 20px 20px"}>

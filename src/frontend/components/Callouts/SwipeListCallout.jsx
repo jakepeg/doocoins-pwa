@@ -6,7 +6,7 @@ import { ChildContext } from "../../contexts/ChildContext";
 const WrapperStyles = {
   position: "absolute",
   left: { base: "50%" },
-  width: { base: "65%", sm: "45%", md: "35%" },
+  width: { base: "75vw", sm: "45%", md: "35%" },
   transform: 'translateX(-45%)',
   zIndex: 9999,
   display: "flex",

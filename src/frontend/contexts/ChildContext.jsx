@@ -21,6 +21,8 @@ export default function ChildProvider({ children }) {
     [strings.CALLOUT_NO_TRANSACTIONS]: false,
     wallet: false,
     [strings.CALLOUT_REWARDS_LIST]: false,
+    [strings.CALLOUT_TASKS_LIST]: false,
+    [strings.CALLOUTS_REWARDS]: false,
   });
 
   const handleUpdateCalloutState = (entity, value) => {

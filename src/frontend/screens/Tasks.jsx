@@ -29,6 +29,7 @@ import { ChildContext } from "../contexts/ChildContext";
 import LoadingSpinner from "../components/LoadingSpinner";
 import AddItemToListCallout from "../components/Callouts/AddItemToListCallout";
 import strings from "../utils/constants";
+import TaskListCalloutWrapper from "../components/Tasks/TaskListCalloutWrapper";
 
 const Tasks = () => {
   const { actor } = useAuth();
@@ -37,8 +38,14 @@ const Tasks = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [tasks, setTasks] = React.useState([]);
   const [taskComplete, setTaskComplete] = React.useState(null);
-  const { child, setChild, isNewToSystem, handleUpdateCalloutState, blockingChildUpdate, setBlockingChildUpdate } =
-    React.useContext(ChildContext);
+  const {
+    child,
+    setChild,
+    isNewToSystem,
+    handleUpdateCalloutState,
+    blockingChildUpdate,
+    setBlockingChildUpdate,
+  } = React.useContext(ChildContext);
   const [loader, setLoader] = React.useState({
     init: true,
     singles: false,
@@ -52,6 +59,7 @@ const Tasks = () => {
     approve: false,
   });
   const [transactions, setTransactions] = React.useState([]);
+  const [startSwiping, setStartSwiping] = React.useState(false);
 
   React.useEffect(() => {
     if (!blockingChildUpdate) {
@@ -91,8 +99,8 @@ const Tasks = () => {
         get(`selectedChildName`),
       ]);
       if (data) {
-        if(!revokeStateUpdate) {
-        setChild({
+        if (!revokeStateUpdate) {
+          setChild({
             id: data,
             balance: parseInt(balance),
             name,
@@ -104,7 +112,11 @@ const Tasks = () => {
     });
   };
 
-  function getTasks({ disableFullLoader = false, callService = false, revokeStateUpdate = false }) {
+  function getTasks({
+    disableFullLoader = false,
+    callService = false,
+    revokeStateUpdate = false,
+  }) {
     if (child) {
       if (!disableFullLoader) {
         setLoader((prevState) => ({ ...prevState, init: true }));
@@ -125,7 +137,7 @@ const Tasks = () => {
                   };
                 });
                 set("taskList", filteredTasks);
-                if(!revokeStateUpdate) {
+                if (!revokeStateUpdate) {
                   setTasks(filteredTasks || []);
                 }
               } else {
@@ -140,7 +152,7 @@ const Tasks = () => {
               }))
             );
         } else {
-          if(!revokeStateUpdate) {
+          if (!revokeStateUpdate) {
             setTasks(
               val?.map((task) => {
                 return {
@@ -214,7 +226,11 @@ const Tasks = () => {
         .addTask(task, child.id)
         .then((response) => {
           if ("ok" in response) {
-            getTasks({ disableFullLoader: true, callService: true, revokeStateUpdate: true });
+            getTasks({
+              disableFullLoader: true,
+              callService: true,
+              revokeStateUpdate: true,
+            });
           } else {
             removeErrorItem();
           }
@@ -266,20 +282,22 @@ const Tasks = () => {
     setTasks(updatedList);
     set("taskList", updatedList);
 
-    actor
-      ?.updateTask(child.id, taskID, task_object)
-      .then((response) => {
-        if ("ok" in response) {
-          getTasks({ disableFullLoader: true, callService: true, revokeStateUpdate: true });
-        } else {
-          const updatedList = tasks.map((task) => {
-            const updatedTask = task.id === task_object.id ? prevTask : task;
-            return updatedTask;
-          });
-          setTasks(updatedList);
-          set("taskList", updatedList);
-        }
-      })
+    actor?.updateTask(child.id, taskID, task_object).then((response) => {
+      if ("ok" in response) {
+        getTasks({
+          disableFullLoader: true,
+          callService: true,
+          revokeStateUpdate: true,
+        });
+      } else {
+        const updatedList = tasks.map((task) => {
+          const updatedTask = task.id === task_object.id ? prevTask : task;
+          return updatedTask;
+        });
+        setTasks(updatedList);
+        set("taskList", updatedList);
+      }
+    });
   }
 
   function deleteTask(taskID, taskName, taskValue) {
@@ -295,25 +313,27 @@ const Tasks = () => {
     setTasks(finalTask);
     set("taskList", finalTask);
     // setLoader((prevState) => ({ ...prevState, init: true }));
-    actor
-      ?.updateTask(child.id, taskID, task_object)
-      .then((response) => {
-        if ("ok" in response) {
-          getTasks({ disableFullLoader: true, callService: true, revokeStateUpdate: true });
-        } else {
-          setTasks((prevState) => {
-            set("taskList", [...prevState, task_object]);
-            return [...prevState, task_object];
-          });
-          toast({
-            title: "An error occurred.",
-            description: `Can't perform delete, please try again later.`,
-            status: "error",
-            duration: 4000,
-            isClosable: true,
-          });
-        }
-      })
+    actor?.updateTask(child.id, taskID, task_object).then((response) => {
+      if ("ok" in response) {
+        getTasks({
+          disableFullLoader: true,
+          callService: true,
+          revokeStateUpdate: true,
+        });
+      } else {
+        setTasks((prevState) => {
+          set("taskList", [...prevState, task_object]);
+          return [...prevState, task_object];
+        });
+        toast({
+          title: "An error occurred.",
+          description: `Can't perform delete, please try again later.`,
+          status: "error",
+          duration: 4000,
+          isClosable: true,
+        });
+      }
+    });
   }
 
   async function getBalance(childID) {
@@ -349,7 +369,7 @@ const Tasks = () => {
     setTransactions([new_transactions, ...transactions]);
     // API call approveTask
     handleCloseTogglePopup();
-    setBlockingChildUpdate(true)
+    setBlockingChildUpdate(true);
     // setLoader((prevState) => ({ ...prevState, init: true }));
     actor?.approveTask(child.id, task_id, date).then((returnedApproveTask) => {
       if ("ok" in returnedApproveTask) {
@@ -375,7 +395,7 @@ const Tasks = () => {
             set("childList", updatedChildrenData);
             await getChildren({ revokeStateUpdate: true });
             setLoader((prevState) => ({ ...prevState, init: false }));
-            setBlockingChildUpdate(false)
+            setBlockingChildUpdate(false);
           } else {
             setLoader((prevState) => ({ ...prevState, init: false }));
             console.error(returnedChilren.err);
@@ -393,7 +413,7 @@ const Tasks = () => {
         }));
         set("transactionList", filteredTransactions);
         console.error(returnedApproveTask.err);
-        setBlockingChildUpdate(false)
+        setBlockingChildUpdate(false);
       }
     });
   }
@@ -445,12 +465,16 @@ const Tasks = () => {
     []
   );
 
+  const onSwipeStart = () => {
+    setStartSwiping(true);
+  };
+
   const TaskList = React.useMemo(() => {
     return (
       <>
         {tasks?.length ? (
           <div className="example">
-            <ul className="child-list">
+            <ul className="child-list" style={{ position: "relative" }}>
               <SwipeableList
                 threshold={0.25}
                 type={ListType.IOS}
@@ -461,17 +485,22 @@ const Tasks = () => {
                     leadingActions={null}
                     trailingActions={trailingActions({ task })}
                     key={task.id}
+                    onSwipeStart={onSwipeStart}
                   >
                     <ChildTask key={task.id} task={task} />
                   </SwipeableListItem>
                 ))}
               </SwipeableList>
+              <TaskListCalloutWrapper
+                tasks={tasks}
+                startSwiping={startSwiping}
+              />
             </ul>
           </div>
         ) : null}
       </>
     );
-  }, [tasks]);
+  }, [tasks, startSwiping]);
 
   const isModalOpen =
     showPopup.delete ||

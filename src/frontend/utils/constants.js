@@ -7,9 +7,11 @@ class ConstantStrings {
 
   // CALLOUTS
   CALLOUTS_TASKS = "tasks"
+  CALLOUTS_REWARDS = 'addRewards'
   CALLOUTS_CHILD_LIST = "childList"
   CALLOUT_NO_TRANSACTIONS = "transactions"
   CALLOUT_REWARDS_LIST = "rewards"
+  CALLOUT_TASKS_LIST = "tasksList"
 }
 
 const strings = new ConstantStrings();
