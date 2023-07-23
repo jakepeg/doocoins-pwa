@@ -10,9 +10,9 @@ import {
   useTab,
 } from "@chakra-ui/react";
 import React from "react";
-import WalletIcon from "./WalletIcon";
-import TasksIcon from "./TasksIcon";
-import RewardsIcon from "./RewardsIcon";
+import WalletIcon from "./WalletIcon2";
+import TasksIcon from "./TasksIcon2";
+import RewardsIcon from "./RewardsIcon2";
 import strings from "../../utils/constants";
 import BottomNavCallout from "../Callouts/BottomNavCallout";
 import { ChildContext } from "../../contexts/ChildContext";
@@ -115,13 +115,13 @@ function CustomTabs() {
         }}
       >
         <CustomTab icon={WalletIcon} href="/wallet">
-          Wallet
+          {/* Wallet */}
         </CustomTab>
         <CustomTab icon={TasksIcon} href="/tasks">
-          Tasks
+          {/* Tasks */}
         </CustomTab>
         <CustomTab icon={RewardsIcon} href="/rewards">
-          Rewards
+          {/* Rewards */}
         </CustomTab>
       </TabList>
     </Tabs>
