@@ -10,7 +10,7 @@ const AddChildDialog = ({ handleClosePopup, handleSubmit }) => {
       <input
         type="text"
         name="child"
-        style={{ marginTop: "18px" }}
+        style={{ marginTop: "8px" }}
         className={`text-field ${modelStyles.popup_input_edit_field}`}
         ref={childRef}
         defaultValue={childRef.current ? childRef.current.value : ""}

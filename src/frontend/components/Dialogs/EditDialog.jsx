@@ -19,7 +19,7 @@ const EditDialog = ({
       <input
         type="text"
         name="task"
-        style={{ marginTop: "18px" }}
+        style={{ marginTop: "8px" }}
         className={`text-field ${modelStyles.popup_input_edit_field}`}
         ref={nameRef}
         defaultValue={selectedItem.name ? selectedItem.name : undefined}
@@ -30,7 +30,7 @@ const EditDialog = ({
         <input
           type="number"
           name="value"
-          style={{ marginTop: "18px" }}
+          style={{ marginTop: "8px" }}
           className={`text-field ${modelStyles.popup_input_edit_field}`}
           ref={valueRef}
           defaultValue={
@@ -49,6 +49,7 @@ const EditDialog = ({
       </button>
       <p
         className={modelStyles.popup_cancel_action_btn}
+        style={{ marginTop: "8px" }}
         onClick={handleCloseEditPopup}
       >
         Cancel

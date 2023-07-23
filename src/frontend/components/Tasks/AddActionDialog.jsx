@@ -17,7 +17,7 @@ const AddActionDialog = ({
       <input
         type="text"
         name="task"
-        style={{ marginTop: "18px" }}
+        style={{ marginTop: "8px" }}
         className={`text-field ${modelStyles.popup_input_edit_field}`}
         ref={nameRef}
         defaultValue={nameRef.current ? nameRef.current.value : ""}
@@ -28,7 +28,7 @@ const AddActionDialog = ({
       <input
         type="number"
         name="value"
-        style={{ marginTop: "18px" }}
+        style={{ marginTop: "8px" }}
         className={`text-field ${modelStyles.popup_input_edit_field}`}
         ref={valueRef}
         defaultValue={valueRef.current ? valueRef.current.value : ""}
@@ -44,6 +44,7 @@ const AddActionDialog = ({
       </button>
       <p
         role="button"
+        style={{ marginTop: "8px" }}
         className={modelStyles.popup_cancel_action_btn}
         onClick={handleClosePopup}
       >
