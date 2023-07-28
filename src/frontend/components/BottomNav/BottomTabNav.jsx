@@ -34,7 +34,7 @@ function BottomTabNav() {
           left="50%"
           transform={`translateX(-50%)`}
           justifyContent="space-between"
-          zIndex={1}
+          zIndex={6}
           height={"auto"}
           margin={"0 auto"}
           // backgroundColor={"#0B334D"}
