@@ -1,5 +1,6 @@
 import React from "react";
 import { ReactComponent as DCIcon } from "../../assets/images/dc.svg";
+import { ReactComponent as DotArrow } from "../../assets/images/dotarrow.svg";
 import { Box, Text } from "@chakra-ui/react";
 
 const ChildTask = ({ task }) => {
@@ -21,6 +22,7 @@ const ChildTask = ({ task }) => {
       <div className="child-balance">
         <DCIcon className="balance-dc-icon" width="18px" height="18px" />
         <Box fontSize={"20px"}>{parseInt(task.value)}</Box>
+        <DotArrow height="14px" />
       </div>
     </>
   );

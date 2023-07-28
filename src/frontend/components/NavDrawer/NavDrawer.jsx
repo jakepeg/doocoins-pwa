@@ -102,14 +102,30 @@ function NavDrawer() {
               </Text>
               <Divider />
               <Text
+                fontSize="xl"
+                color="#0B334D"
+                fontWeight={400}
+              >
+                Support and feedback
+              </Text>
+              <Text
                 onClick={onClose}
                 fontSize="xl"
                 color="#0B334D"
                 fontWeight={600}
               >
-                If you require support or have any other questions or feedback
-                email <a href="mailto:hello.doo.co">hello@doo.co</a>
+                Email <a href="mailto:hello@doo.co">hello@doo.co</a>
               </Text>
+              <Text
+                onClick={onClose}
+                fontSize="xl"
+                color="#0B334D"
+                fontWeight={600}
+              >
+                Discord <a href="https://discord.gg/UhzNDvbnPX">discord.gg/UhzNDvbnPX</a>
+              </Text>
+
+
             </Stack>
           </DrawerBody>
         </DrawerContent>

@@ -2,6 +2,7 @@ import * as React from "react";
 import { get, set } from "idb-keyval";
 import Balance from "../components/Balance";
 import dc from "../assets/images/dc.svg";
+import { ReactComponent as DotArrow } from "../assets/images/dotarrow.svg";
 import { useAuth } from "../use-auth-client";
 import modelStyles from "../components/popup/confirmation_popup.module.css";
 import {
@@ -622,13 +623,14 @@ const Rewards = () => {
                   >
                     <div className="list-item" key={parseInt(reward.id)}>
                       <div>{reward.name}</div>
-                      <div>
+                      <div className="item-reward-value">
                         <img
                           src={dc}
                           className="dc-img-small"
                           alt="DooCoins symbol"
                         />
                         {parseInt(reward.value)}
+                        <DotArrow className="dot-arrow" height="14px" />
                       </div>
                     </div>
                   </SwipeableListItem>
