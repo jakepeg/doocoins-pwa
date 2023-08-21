@@ -125,7 +125,7 @@ actor {
             Text.equal,
         );
 
-        let finalPointer : Nat = Option.get(currentTaskNumberPointer, 0);
+        let finalPointer : Nat = if(task.id >= 0) { task.id } else { Option.get(currentTaskNumberPointer, 0) };
         let taskFinal : Types.Task = {
             name = task.name;
             value = task.value;

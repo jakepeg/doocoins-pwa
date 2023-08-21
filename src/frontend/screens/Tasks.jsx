@@ -213,7 +213,7 @@ const Tasks = () => {
       const task = {
         name: taskName,
         value: parseInt(value),
-        id: tasks?.[0]?.id + 1 || 1,
+        id: tasks?.[0]?.id ? (tasks?.[0]?.id + 1) : 1,
         isLocal: true,
       };
       handleToggleAddTaskPopup();

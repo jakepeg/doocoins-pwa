@@ -20,7 +20,7 @@ module {
     public type TaskCall = {
         name : Text;
         value : Nat;
-
+        id: Nat;
     };
 
     public type Goal = {
