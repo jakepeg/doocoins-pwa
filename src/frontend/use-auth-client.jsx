@@ -35,6 +35,7 @@ const defaultOptions = {
     identityProvider:   process.env.DFX_NETWORK === "ic"
      ? NFID_AUTH_URL
        : `http://localhost:4943?canisterId=${process.env.CANISTER_ID_INTERNET_IDENTITY}#authorize`,
+    maxTimeToLive: BigInt (7) * BigInt(24) * BigInt(3_600_000_000_000), // 1 week
   },
 
 
