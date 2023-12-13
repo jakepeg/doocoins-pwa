@@ -324,7 +324,7 @@ actor {
     return #ok(Trie.toArray(myChildTransactionsFormatted, extractTransactions));
   };
 
-  //Get childs goals
+  //Get childs goals (rewards)
   //
   //----------------------------------------------------------------------------------------------------
 
