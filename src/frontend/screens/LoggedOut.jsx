@@ -35,12 +35,18 @@ function checkForIOS() {
 function LoggedOut() {
   const { login, isAuthenticated, isLoading, logout } = useAuth();
   const clearContextState = useClearContextState()
+  console.log(`isLoading`, isLoading);
+  console.log(`isAuthenticated`, isAuthenticated);
   if (!isLoading && isAuthenticated) {
+    console.log(`going ChildList`);
     return <Navigate to="/" replace />;
   }
 
   React.useEffect(() => {
+    alert(`Auth client loading: ${isLoading}`)
     if(!isLoading && !isAuthenticated) {
+      console.log('logging out...', `isAuthenticated`, isAuthenticated, `isLoading`, isLoading);
+      alert(`clearing the user state isLoading: ${isLoading} & isAuthenticated: ${isAuthenticated}`)
       logout()
       clearContextState()
     }

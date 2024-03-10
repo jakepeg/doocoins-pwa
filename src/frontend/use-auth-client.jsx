@@ -2,7 +2,6 @@ import { AuthClient } from "@dfinity/auth-client";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { canisterId, createActor } from "../declarations/backend";
 import { del } from "idb-keyval";
-
 const AuthContext = createContext();
 
     const APPLICATION_NAME = "DooCoins";
@@ -17,8 +16,8 @@ const defaultOptions = {
   createOptions: {
     idleOptions: {
       // Set to true if you do not want idle functionality
-      disableIdle: true,
-      disableDefaultIdleCallback: true,
+      disableIdle: false,
+      disableDefaultIdleCallback: false,
     },
   },
   /**
@@ -59,8 +58,13 @@ export const useAuthClient = (options = defaultOptions) => {
   useEffect(() => {
     // Initialize AuthClient
     setIsLoading(true)
+    console.log('the authclient', AuthClient)
     AuthClient.create(options.createOptions).then(async (client) => {
+      console.log(`client`, client)
+      alert(`Client: ${JSON.stringify(client)}`)
       updateClient(client);
+    }).catch((error) => {
+      console.log('Error found in authclient', error)
     }).finally(() => {
       setIsLoading(false)
     });
@@ -77,6 +81,8 @@ export const useAuthClient = (options = defaultOptions) => {
 
   async function updateClient(client) {
     const isAuthenticated = await client.isAuthenticated();
+    console.log(`isAuthenticated`, isAuthenticated);
+    alert(`Update client function Line: 82 isAuthenticated: ${isAuthenticated}`)
     setIsAuthenticated(isAuthenticated);
 
     const identity = client.getIdentity();
