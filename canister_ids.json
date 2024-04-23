@@ -1,8 +1,13 @@
 {
   "backend": {
-    "ic": "f5cpb-qyaaa-aaaah-qdbeq-cai"
+    "ic": "f5cpb-qyaaa-aaaah-qdbeq-cai",
+    "staging": "ssj5f-kyaaa-aaaah-qdcyq-cai"
   },
   "frontend": {
-    "ic": "fube5-gqaaa-aaaah-qdbfa-cai"
+    "ic": "fube5-gqaaa-aaaah-qdbfa-cai",
+    "staging": "s3kwz-4qaaa-aaaah-qdcza-cai"
+  },
+  "internet_identity": {
+    "staging": "s4lqn-riaaa-aaaah-qdczq-cai"
   }
 }

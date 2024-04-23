@@ -17,6 +17,7 @@ const defaultOptions = {
   createOptions: {
     idleOptions: {
       // Set to true if you do not want idle functionality
+      // idleTimeout: 1000 * 60 * 60 * 24 * 30, // 30 days
       disableIdle: true,
       disableDefaultIdleCallback: true,
     },
@@ -26,19 +27,22 @@ const defaultOptions = {
    */
   // loginOptions: {
   //   identityProvider:
-  //     process.env.DFX_NETWORK === "ic"
+  //     process.env.DFX_NETWORK === "staging"
   //       ? "https://identity.ic0.app/#authorize"
   //       : `http://localhost:4943?canisterId=${process.env.CANISTER_ID_INTERNET_IDENTITY}#authorize`,
+  //       maxTimeToLive: BigInt (30) * BigInt(24) * BigInt(3_600_000_000_000),
+  // },
+
+  // loginOptions: {
+  //   identityProvider:   process.env.DFX_NETWORK === "ic"
+  //    ? NFID_AUTH_URL : NFID_AUTH_URL,
+  //   maxTimeToLive: BigInt (30) * BigInt(24) * BigInt(3_600_000_000_000), // 30 days
   // },
 
   loginOptions: {
-    identityProvider:   process.env.DFX_NETWORK === "ic"
-     ? NFID_AUTH_URL : NFID_AUTH_URL,
-  //     : `http://localhost:4943?canisterId=${process.env.CANISTER_ID_INTERNET_IDENTITY}#authorize`,
+    identityProvider: NFID_AUTH_URL,
     maxTimeToLive: BigInt (30) * BigInt(24) * BigInt(3_600_000_000_000), // 30 days
   },
-
-
 };
 
 /**
