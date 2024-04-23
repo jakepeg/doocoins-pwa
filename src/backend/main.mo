@@ -56,7 +56,7 @@ actor {
       Nat.equal,
     );
     Debug.print "before setting timers after childID!";
-    func burnCode() : async () {
+    func burnCodeAsync() : async () {
       Debug.print "Starting the burn function!";
       Debug.print(debug_show (pin) # "     " #debug_show (childId)); // Often used with `debug_show` to convert values to Text
 
@@ -67,10 +67,10 @@ actor {
     };
     Debug.print("Setting timers!" #debug_show (Int.abs(now - oneMinute)));
     ignore setTimer<system>(
-      #seconds(60*60),
+      #seconds(60),
       func() : async () {
 
-        await burnCode();
+        await burnCodeAsync();
       },
     );
     return pin;
@@ -126,6 +126,7 @@ actor {
     );
 
     childIdsFromPin := childPinToId;
+    let burnt = await burnCode(nullToNat(childPinStore));
     return childPinStore;
   };
 
@@ -683,6 +684,18 @@ actor {
       };
     };
   };
+
+  private func nullToNat(msg : ?Nat) : Nat {
+    switch (msg) {
+      case (?string) {
+        return string;
+      };
+      case (null) {
+        return 0;
+      };
+    };
+  };
+
 
   private func returnTransactionDetails(childId : Text) : (Trie.Trie<Nat, Types.Transaction>, Nat) {
     let myTransactions : ?Trie.Trie<Nat, Types.Transaction> = Trie.find(
