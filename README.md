@@ -15,5 +15,6 @@ dfx deploy
 ```
 
 Once deployed, start the development server with `npm start`.
+Use `npm startkids`
 
 # doocoins-pwa

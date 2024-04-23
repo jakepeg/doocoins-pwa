@@ -14,6 +14,8 @@
     "start:dfx": "dfx start --background --clean --host \"127.0.0.1:4943\"",
     "start": "vite src/frontend --config vite.config.react.js",
     "build": "vite build src/frontend --config vite.config.react.js",
+    "startkids": "vite src/frontend_kids --config vite.configkids.react.js",
+    "buildkids": "vite build src/frontend_kids --config vite.configkids.react.js",
     "prestart": "npm run generate",
     "generate": "dfx generate backend"
   },
