@@ -69,10 +69,10 @@ function LoggedOut() {
       >
         <img className="logo" src={logo} alt="DooCoins" />
         <Text fontSize="3xl" color={"#fff"}>
-          DooCoins
+          DooCoins Kids
         </Text>
         <Text fontSize="xl" color={"#fff"}>
-          Kids Rewards dApp
+          Kids Rewards App
         </Text>
         <Text fontSize="lg" mt={2} fontWeight={"bold"} color={"#139EAA"}>
           <Link href="https://www.doo.co" target="_blank">find out more</Link>

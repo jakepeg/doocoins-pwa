@@ -7,6 +7,9 @@
     "ic": "fube5-gqaaa-aaaah-qdbfa-cai",
     "staging": "s3kwz-4qaaa-aaaah-qdcza-cai"
   },
+  "frontend_kids": {
+    "staging": "tddd2-sqaaa-aaaah-qdc5a-cai"
+  },
   "internet_identity": {
     "staging": "s4lqn-riaaa-aaaah-qdczq-cai"
   }
