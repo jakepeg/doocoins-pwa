@@ -21,6 +21,20 @@
       ],
       "type": "assets"
     },
+    "frontend_kids": {
+      "dependencies": [
+        "backend",
+        "internet_identity"
+      ],
+      "frontend_kids": {
+        "entrypoint": "src/frontend_kids/index.html"
+      },
+      "source": [
+        "src/frontend_kids/assets",
+        "src/frontend_kids/dist"
+      ],
+      "type": "assets"
+    },
     "internet_identity": {
       "type": "custom",
       "candid": "https://github.com/dfinity/internet-identity/releases/latest/download/internet_identity.did",

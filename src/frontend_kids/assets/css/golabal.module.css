@@ -1,0 +1,89 @@
+.hero {
+  color: #fff;
+  background-image: url("../images/card-header/cc.svg");
+  background-repeat: no-repeat;
+  background-size: cover;
+  padding: 20px 20px 0 20px;
+  /* margin-top: -40px; */
+  /* width: 100%; */
+  background-position: center center;
+  position: relative;
+  min-height: 35vh;
+  transform: translateY(-38px);
+  margin: 0 5px 0 5px;
+  border-radius: 12px 12px 12px 12px;
+}
+
+@media only screen and (max-width: 420px) {
+  .hero {
+    min-height: 30vh !important;
+    padding-top: 40px !important;
+  }
+}
+
+.name {
+  font-size: 30px;
+  margin-top: -10px;
+  font-weight: 300;
+  color: #ffffff;
+}
+
+.balance {
+  font-size: 68px;
+  font-weight: 400;
+  letter-spacing: -5px;
+  color: #ffffff;
+  font-family: "Courier New", Courier, monospace;
+  transform: translateY(-10px);
+}
+
+@media only screen and (max-width: 720px) {
+  .balance {
+    font-size: 40px;
+  }
+  .name {
+    font-size: 28px;
+  }
+}
+
+
+.circular_progress {
+  margin-right: 0; 
+}
+
+@media only screen and (min-width: 420px) and (max-width: 800px) {
+  .circular_progress {
+    margin-right: 5vw; 
+  }
+}
+
+.claim_goal_text {
+  position: absolute;
+  bottom: -25%;
+  right: 0%;
+  width: 100%;
+  text-align: center;
+  /* transform: translate(-15%, 15%); */
+}
+
+@media only screen and (min-width: 420px) and (max-width: 720px) {
+  .claim_goal_text {
+    bottom: -50%;
+    right: 20%;
+    transform: translate(-30%, 15%);
+  }
+}
+
+@media only screen and (min-width: 720px) {
+  .claim_goal_text {
+    bottom: -80%;
+    right: 50%;
+    transform: translate(-30%, 15%);
+  }
+}
+
+@media only screen and (orientation: landscape) {
+  .claim_goal_text {
+    bottom: -90%;
+  }
+}
