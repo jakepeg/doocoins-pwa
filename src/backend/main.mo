@@ -8,8 +8,15 @@ import Iter "mo:base/Iter";
 import Option "mo:base/Option";
 import Types "./Types";
 import Buffer "mo:base/Buffer";
+import Time "mo:base/Time";
+import Fuzz "mo:fuzz";
+import { setTimer; recurringTimer } = "mo:base/Timer";
+import Int "mo:base/Int";
+import Debug "mo:base/Debug";
 
 actor {
+
+  type TimerId = Nat;
 
   stable var anonIdNew : Text = "2vxsx-fae"; // Reject AnonymousIdentity
 
@@ -33,8 +40,94 @@ actor {
   //for mapping child's doocoins balance to child
   stable var childToBalance : Trie.Trie<Text, Nat> = Trie.empty();
 
+  stable var childPins : Trie.Trie<Text, Nat> = Trie.empty();
+  stable var childIdsFromPin : Trie.Trie<Nat, Text> = Trie.empty();
+
   //who am I
   //----------------------------------------------------------------------------------------------------
+
+  public shared (msg) func burnCode<system>(pin : Nat) : async Nat {
+    Debug.print "in burn function!";
+    let now = Time.now();
+    let oneMinute = 1_000_000_000 * 60 * 1;
+    let childId = Trie.find(
+      childIdsFromPin,
+      keyNat(pin),
+      Nat.equal,
+    );
+    Debug.print "before setting timers after childID!";
+    func burnCode() : async () {
+      Debug.print "Starting the burn function!";
+      Debug.print(debug_show (pin) # "     " #debug_show (childId)); // Often used with `debug_show` to convert values to Text
+
+      let (newChildPins, oldPin) = Trie.remove(childPins, keyText(nullToText(childId)), Text.equal);
+      let (newChildIdsFromPin, oldIds) = Trie.remove(childIdsFromPin, keyNat(pin), Nat.equal);
+      childPins := newChildPins;
+      childIdsFromPin := newChildIdsFromPin;
+    };
+    Debug.print("Setting timers!" #debug_show (Int.abs(now - oneMinute)));
+    ignore setTimer<system>(
+      #seconds(60*60),
+      func() : async () {
+
+        await burnCode();
+      },
+    );
+    return pin;
+
+  };
+
+  func _randomPin() : async Nat {
+    let fuzz = Fuzz.Fuzz();
+    let randInt16 = fuzz.nat.randomRange(1111, 9999);
+    return randInt16;
+  };
+
+  public shared (msg) func checkMagiCode(pin : Nat) : async ?Text {
+    Debug.print("checking at the magic code");
+    let childId = Trie.find(
+      childIdsFromPin,
+      keyNat(pin),
+      Nat.equal,
+    );
+    if (childId != null) {
+      return childId;
+    };
+    return ?"";
+  };
+
+  public shared (msg) func magicCode(childId : Text) : async ?Nat {
+    let pinExists = Trie.find(
+      childPins,
+      keyText(childId),
+      Text.equal,
+    );
+    if (pinExists != null) {
+      return pinExists;
+    };
+    let pin : Nat = await _randomPin();
+    let (newChildPins, oldPins) = Trie.put(
+      childPins,
+      keyText(childId),
+      Text.equal,
+      pin,
+    );
+    childPins := newChildPins;
+    let childPinStore = Trie.find(
+      childPins,
+      keyText(childId),
+      Text.equal,
+    );
+    let (childPinToId, childPinToOld) = Trie.put(
+      childIdsFromPin,
+      keyNat(pin),
+      Nat.equal,
+      childId,
+    );
+
+    childIdsFromPin := childPinToId;
+    return childPinStore;
+  };
 
   public shared query (msg) func whoami() : async Principal {
     msg.caller;
@@ -558,6 +651,9 @@ actor {
   private func keyText(x : Text) : Trie.Key<Text> {
     return { key = x; hash = Text.hash(x) };
   };
+  private func keyTextNull(x : Text) : Trie.Key<Text> {
+    return { key = x; hash = Text.hash(x) };
+  };
 
   private func keyNat(x : Nat) : Trie.Key<Nat> {
     return { key = x; hash = Hash.hash(x) };
@@ -575,6 +671,17 @@ actor {
   };
   private func extractGoals(k : Nat, v : Types.Goal) : Types.Goal {
     return v;
+  };
+
+  private func nullToText(msg : ?Text) : Text {
+    switch (msg) {
+      case (?string) {
+        return string;
+      };
+      case (null) {
+        return "";
+      };
+    };
   };
 
   private func returnTransactionDetails(childId : Text) : (Trie.Trie<Nat, Types.Transaction>, Nat) {
