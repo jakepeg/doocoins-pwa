@@ -70,30 +70,16 @@ function NavDrawer() {
           <DrawerCloseButton />
           <DrawerBody>
             <Stack style={{ marginTop: "32px" }} spacing={3}>
+
               <Text
                 onClick={onClose}
                 fontSize="xl"
                 color="#0B334D"
                 fontWeight={600}
               >
-                <NavLink to="/">My Children</NavLink>
+                <NavLink to="https://www.doo.co" target="_blank">About DooCoins</NavLink>
               </Text>
-              <Text
-                onClick={onClose}
-                fontSize="xl"
-                color="#0B334D"
-                fontWeight={600}
-              >
-                <NavLink to="https://www.doo.co" target="_blank">About</NavLink>
-              </Text>
-              <Text
-                onClick={onClose}
-                fontSize="xl"
-                color="#0B334D"
-                fontWeight={600}
-              >
-                <NavLink to="https://www.doo.co/privacy.html" target="_blank">Privacy Policy</NavLink>
-              </Text>
+              <Divider />
               <Text
                 onClick={() => {
                   logout();
@@ -106,30 +92,10 @@ function NavDrawer() {
               >
                 Logout
               </Text>
-              <Divider />
-              <Text
-                fontSize="xl"
-                color="#0B334D"
-                fontWeight={400}
-              >
-                Support and feedback
-              </Text>
-              <Text
-                onClick={onClose}
-                fontSize="xl"
-                color="#0B334D"
-                fontWeight={600}
-              >
-                Email <a href="mailto:hello@doo.co">hello@doo.co</a>
-              </Text>
-              <Text
-                onClick={onClose}
-                fontSize="xl"
-                color="#0B334D"
-                fontWeight={600}
-              >
-                Discord <a href="https://discord.gg/UhzNDvbnPX">discord.gg/UhzNDvbnPX</a>
-              </Text>
+
+
+
+
             </Stack>
           </DrawerBody>
         </DrawerContent>
