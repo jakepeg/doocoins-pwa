@@ -40,10 +40,18 @@ actor {
   //for mapping child's doocoins balance to child
   stable var childToBalance : Trie.Trie<Text, Nat> = Trie.empty();
 
+  //for magicCode child app onboarding OTP
   stable var childPins : Trie.Trie<Text, Nat> = Trie.empty();
   stable var childIdsFromPin : Trie.Trie<Nat, Text> = Trie.empty();
 
   //who am I
+  //----------------------------------------------------------------------------------------------------
+
+  public shared query (msg) func whoami() : async Principal {
+    msg.caller;
+  };
+
+  //magicCode child app onboarding OTP
   //----------------------------------------------------------------------------------------------------
 
   public shared (msg) func burnCode<system>(pin : Nat) : async Nat {
@@ -67,14 +75,13 @@ actor {
     };
     Debug.print("Setting timers!" #debug_show (Int.abs(now - oneMinute)));
     ignore setTimer<system>(
-      #seconds(60),
+      #seconds(60 * 10), // 10 mins
       func() : async () {
 
         await burnCodeAsync();
       },
     );
     return pin;
-
   };
 
   func _randomPin() : async Nat {
@@ -128,10 +135,6 @@ actor {
     childIdsFromPin := childPinToId;
     let burnt = await burnCode(nullToNat(childPinStore));
     return childPinStore;
-  };
-
-  public shared query (msg) func whoami() : async Principal {
-    msg.caller;
   };
 
   //count users
@@ -695,7 +698,6 @@ actor {
       };
     };
   };
-
 
   private func returnTransactionDetails(childId : Text) : (Trie.Trie<Nat, Types.Transaction>, Nat) {
     let myTransactions : ?Trie.Trie<Nat, Types.Transaction> = Trie.find(

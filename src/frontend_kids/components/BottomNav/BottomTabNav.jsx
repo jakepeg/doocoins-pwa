@@ -38,7 +38,7 @@ function BottomTabNav() {
           height={"auto"}
           margin={"0 auto"}
           // backgroundColor={"#0B334D"}
-          backgroundColor={"#ffffff"}
+          backgroundColor={"#0B334D"}
         >
           <CustomTabs />
         </Flex>

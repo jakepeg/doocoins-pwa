@@ -1,5 +1,6 @@
 body {
-  background-color: hsl(204, 75%, 17%);
+  /* background-color: hsl(204, 75%, 17%) !important; */
+  background-color: #F0F7FC !important;
   font-family: "Lato", sans-serif;
   margin: 0;
 }
