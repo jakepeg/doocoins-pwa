@@ -138,7 +138,7 @@ box-shadow: 0px 10px 37px -12px rgba(0,0,0,0.75);
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  background-color: #139EAA;
+  background-color: #00A4D7;
   position: relative;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25);
   cursor: pointer;
@@ -241,8 +241,13 @@ box-shadow: 0px 10px 37px -12px rgba(0,0,0,0.75);
   cursor: pointer;
 }
 
+.invite {
+  background-color: #FBB03B;
+  cursor: pointer;
+}
+
 .edit {
-  background-color: #139EAA;
+  background-color: #00A4D7;
   cursor: pointer;
 }
 
@@ -269,7 +274,7 @@ box-shadow: 0px 10px 37px -12px rgba(0,0,0,0.75);
 }
 
 .text-field {
-  border: 2px solid #139EAA;
+  border: 2px solid #00A4D7;
   background-color: #446275;
   border-radius: 6px;
   color: #fff;
@@ -284,8 +289,8 @@ input[type="text"]::placeholder {
 }
 
 .button {
-  border: 2px solid #139EAA;
-  background-color: #139EAA;
+  border: 2px solid #00A4D7;
+  background-color: #00A4D7;
   border-radius: 6px;
   color: #fff;
   padding: 10px;

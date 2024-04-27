@@ -15,6 +15,7 @@ import {
 } from "react-swipeable-list";
 import { ReactComponent as EditIcon } from "../assets/images/pencil.svg";
 import { ReactComponent as DeleteIcon } from "../assets/images/delete.svg";
+import { ReactComponent as InviteIcon } from "../assets/images/invite.svg";
 import { Skeleton, Stack, Text, useDisclosure } from "@chakra-ui/react";
 import AddItemToListCallout from "../components/Callouts/AddItemToListCallout";
 import { ChildContext } from "../contexts/ChildContext";
@@ -206,6 +207,22 @@ function ChildList() {
   const trailingActions = React.useCallback(
     ({ child }) => (
       <TrailingActions>
+
+<SwipeAction
+          className="invite"
+          onClick={() => handleTogglePopup(true, child, "edit")}
+        >
+          <div className="action-btn ">
+            <div className="ItemColumnCentered">
+              <InviteIcon width="22px" height="22px" />
+              <Text fontSize={"xs"} color={"#fff"}>
+                Invite
+              </Text>
+            </div>
+          </div>
+        </SwipeAction>
+
+
         <SwipeAction
           className="edit"
           onClick={() => handleTogglePopup(true, child, "edit")}
