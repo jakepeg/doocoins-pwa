@@ -82,9 +82,9 @@ function CustomTabs() {
           // {...tabProps}
         >
           <Box as="span" style={{ transform: "translateX(1px)" }}>
-            <props.icon activeColor={isSelected && "#139EAA"} width="25px" />
+            <props.icon activeColor={isSelected && "#00A4D7"} width="25px" />
           </Box>
-          <Box color={isSelected ? "#139EAA" : "#fff"} fontSize={14} mt={1}>
+          <Box color={isSelected ? "#00A4D7" : "#fff"} fontSize={14} mt={1}>
             {tabProps.children}
           </Box>
         </Button>

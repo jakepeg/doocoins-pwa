@@ -74,7 +74,7 @@ function LoggedOut() {
         <Text fontSize="xl" color={"#fff"}>
           Kids Rewards dApp
         </Text>
-        <Text fontSize="lg" mt={2} fontWeight={"bold"} color={"#139EAA"}>
+        <Text fontSize="lg" mt={2} fontWeight={"bold"} color={"#00A4D7"}>
           <Link href="https://www.doo.co" target="_blank">find out more</Link>
         </Text>
         <Button
