@@ -71,12 +71,14 @@ export const useAuthClient = (options = defaultOptions) => {
   }, []);
 
   const login = () => {
-    authClient.login({
-      ...options.loginOptions,
-      onSuccess: () => {
-        updateClient(authClient);
-      },
-    });
+    // TODO call checkMagiCode and return child id on success
+    // authClient.login({
+    //   ...options.loginOptions,
+    //   onSuccess: () => {
+    //     updateClient(authClient);
+    //   },
+    // });
+    setIsAuthenticated(true)
   };
 
   async function updateClient(client) {

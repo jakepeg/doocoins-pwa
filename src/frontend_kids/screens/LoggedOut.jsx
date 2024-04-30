@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useAuth } from "../use-auth-client";
 import { Navigate } from "react-router-dom";
 import { Box, Button, Link, Text } from "@chakra-ui/react";
@@ -6,6 +6,7 @@ import ICBadge from "../assets/images/ic-badge.svg";
 import ShareIcon from "../assets/images/share-icon.svg";
 import logo from "../assets/images/logo.svg";
 import useClearContextState from "../hooks/useClearContextState";
+import MagicCode from "../components/MagicCode";
 
 function checkForIOS() {
   // already installed
@@ -34,17 +35,29 @@ function checkForIOS() {
 
 function LoggedOut() {
   const { login, isAuthenticated, isLoading, logout } = useAuth();
-  const clearContextState = useClearContextState()
+  const [code, setCode] = useState(null);
+  const [error, setError] = useState("");
+  const clearContextState = useClearContextState();
+
+  React.useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      logout();
+      clearContextState();
+    }
+  }, []);
+
+  const verifyChild = async () => {
+    console.log(`code`, code);
+    if (!code) {
+      setError("Please enter verification code");
+      return;
+    }
+    const data = await login();
+  };
+
   if (!isLoading && isAuthenticated) {
     return <Navigate to="/" replace />;
   }
-
-  React.useEffect(() => {
-    if(!isLoading && !isAuthenticated) {
-      logout()
-      clearContextState()
-    }
-  }, [])
 
   return (
     <Box
@@ -75,8 +88,19 @@ function LoggedOut() {
           Kids Rewards App
         </Text>
         <Text fontSize="lg" mt={2} fontWeight={"bold"} color={"#00A4D7"}>
-          <Link href="https://www.doo.co" target="_blank">find out more</Link>
+          <Link href="https://www.doo.co" target="_blank">
+            find out more
+          </Link>
         </Text>
+        <Text fontSize="2xl" color={"#fff"} mt={4}>
+          Enter Magic Code
+        </Text>
+        <MagicCode updateCode={setCode} />
+        {error ? (
+          <Text fontSize="xl" color="red.400" mt={4}>
+            {error}
+          </Text>
+        ) : null}
         <Button
           variant="ghost"
           color={"#fff"}
@@ -84,7 +108,7 @@ function LoggedOut() {
           style={{ width: "100%" }}
           className="button"
           type="button"
-          onClick={login}
+          onClick={verifyChild}
           fontSize={18}
           fontWeight={"medium"}
           py={6}
@@ -95,11 +119,21 @@ function LoggedOut() {
         </Button>
 
         <Box>
-      {checkForIOS() ? <div className="install-prompt"><p className="light prompt-text">Install for a better experience</p><p className="light prompt-text">Tap <img src={ShareIcon} className="share-icon" alt="Install PWA" /> then "Add to Home Screen" </p>
-</div> : ''}
-    </Box>
-
-
+          {checkForIOS() ? (
+            <div className="install-prompt">
+              <p className="light prompt-text">
+                Install for a better experience
+              </p>
+              <p className="light prompt-text">
+                Tap{" "}
+                <img src={ShareIcon} className="share-icon" alt="Install PWA" />{" "}
+                then "Add to Home Screen"{" "}
+              </p>
+            </div>
+          ) : (
+            ""
+          )}
+        </Box>
       </Box>
       <Box>
         <img src={ICBadge} alt="Internet Computer" />
