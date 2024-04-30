@@ -15,6 +15,7 @@ import About from "./screens/About";
 import Help from "./screens/Help";
 import ChildProvider from "./contexts/ChildContext";
 import ImageLoader from "./utils/ImageLoader";
+import InviteChild from "./screens/InviteChild";
 
 function App() {
   return (
@@ -28,6 +29,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <ChildList />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/invite"
+              element={
+                <ProtectedRoute>
+                  <InviteChild />
                 </ProtectedRoute>
               }
             />

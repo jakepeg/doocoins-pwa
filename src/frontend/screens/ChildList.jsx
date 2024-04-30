@@ -20,9 +20,11 @@ import { Skeleton, Stack, Text, useDisclosure } from "@chakra-ui/react";
 import AddItemToListCallout from "../components/Callouts/AddItemToListCallout";
 import { ChildContext } from "../contexts/ChildContext";
 import strings from "../utils/constants";
+import { useNavigate } from "react-router-dom";
 
 function ChildList() {
   const { actor } = useAuth();
+  const navigate = useNavigate()
   const {
     isNewToSystem: { childList },
     handleUpdateCalloutState,
@@ -207,10 +209,9 @@ function ChildList() {
   const trailingActions = React.useCallback(
     ({ child }) => (
       <TrailingActions>
-
-<SwipeAction
+        <SwipeAction
           className="invite"
-          onClick={() => handleTogglePopup(true, child, "edit")}
+          onClick={() => navigate("/invite", { state: { child } })}
         >
           <div className="action-btn ">
             <div className="ItemColumnCentered">
