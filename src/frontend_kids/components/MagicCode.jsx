@@ -2,13 +2,10 @@ import { Box, Input } from '@chakra-ui/react';
 import React, { useEffect, useRef, useState } from 'react';
 
 const MagicCode = ({ updateCode }) => {
-  // State to hold the values of each input
   const [inputs, setInputs] = useState(Array(4).fill(""));
 
-  // Array of refs to access inputs
   const inputRefs = useRef(inputs.map(() => React.createRef()));
 
-  // Handle change in inputs
   const handleChange = (value, index) => {
     const newInputs = [...inputs];
     newInputs[index] = value;
@@ -16,21 +13,50 @@ const MagicCode = ({ updateCode }) => {
 
     updateCode(newInputs.join(''));
 
-    // Automatically move to next input if there's a next input and current input is filled
     if (value.length > 0 && index < inputs.length - 1) {
       inputRefs.current[index + 1].current.focus();
     }
   };
 
-  // Handle backspace for empty inputs to move focus to previous input
   const handleKeyDown = (event, index) => {
     if (event.key === "Backspace" && inputs[index] === '' && index > 0) {
       inputRefs.current[index - 1].current.focus();
     }
   };
 
+  const handlePaste = (event) => {
+    event.preventDefault();
+    const paste = event.clipboardData.getData('text').replace(/\n/g, '').split('').slice(0, inputs.length);
+    const newInputs = [...inputs];
+
+    // Start pasting from the first input or the current focused input
+    let startIndex = inputRefs.current.findIndex(ref => ref.current === document.activeElement);
+    startIndex = startIndex === -1 ? 0 : startIndex;
+
+    for (let i = 0; i < paste.length; i++) {
+      if (startIndex + i < inputs.length) {
+        newInputs[startIndex + i] = paste[i];
+        if (inputRefs.current[startIndex + i + 1]) {
+          inputRefs.current[startIndex + i + 1].current.focus();
+        }
+      }
+    }
+
+    setInputs(newInputs);
+    updateCode(newInputs.join(''));
+  };
+
+  useEffect(() => {
+    const inputsContainer = document.querySelector(".magic-code-input-container");
+    inputsContainer.addEventListener('paste', handlePaste);
+
+    return () => {
+      inputsContainer.removeEventListener('paste', handlePaste);
+    };
+  }, [inputs]);
+
   return (
-    <Box display='flex' gap='2'>
+    <Box display='flex' gap='2' className='magic-code-input-container'>
       {inputs.map((input, index) => (
         <Input
           key={index}

@@ -1,21 +1,31 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 import LoadingSpinner from "../components/LoadingSpinner";
-import modelStyles from "../components/popup/confirmation_popup.module.css";
 import { Box, Button, Text } from "@chakra-ui/react";
+import { useAuth } from "../use-auth-client";
 
 const InviteChild = () => {
+  const { actor } = useAuth();
   const child = useLocation()?.state?.child;
-  const [hasNFT, setHasNFT] = useState(true);
+  const [hasNFT] = useState(true);
   const [loading, setLoading] = useState(true);
-  const [magicCode, setMagicCode] = useState([1, 2, 3, 4]);
-    console.log(`child`, child);
+  const [magicCode, setMagicCode] = useState([]);
+  console.log(`child`, child);
   const navigate = useNavigate();
 
-  useEffect(() => {
+  async function generateOtp() {
+    const response = await actor?.magicCode(child?.id);
+    const code = response?.[0]?.toString()
+    if (code) {
+      setMagicCode(code?.split(''))
+    }
+
     setLoading(false);
-    // TODO Call backend to check if user owns Dooza NFT
-  }, []);
+  }
+
+  useEffect(() => {
+    child?.id && generateOtp();
+  }, [actor]);
 
   if (!child) {
     return (

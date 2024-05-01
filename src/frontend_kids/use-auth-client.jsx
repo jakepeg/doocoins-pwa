@@ -1,7 +1,6 @@
-import { AuthClient } from "@dfinity/auth-client";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { canisterId, createActor } from "../declarations/backend";
-import { del } from "idb-keyval";
+import { createStore, del, get } from "idb-keyval";
 
 const AuthContext = createContext();
 
@@ -9,6 +8,7 @@ const AuthContext = createContext();
     const APPLICATION_LOGO_URL = "https://nfid.one/icons/favicon-96x96.png";
     const AUTH_PATH = "/authenticate/?applicationName="+APPLICATION_NAME+"&applicationLogo="+APPLICATION_LOGO_URL+"#authorize";
     const NFID_AUTH_URL = "https://nfid.one" + AUTH_PATH;
+const store = createStore('db', 'kids');
 
 const defaultOptions = {
   /**
@@ -41,7 +41,7 @@ const defaultOptions = {
 
   loginOptions: {
     identityProvider: NFID_AUTH_URL,
-    maxTimeToLive: BigInt (30) * BigInt(24) * BigInt(3_600_000_000_000), // 30 days
+    maxTimeToLive: BigInt(30) * BigInt(24) * BigInt(3_600_000_000_000), // 30 days
   },
 };
 
@@ -58,27 +58,48 @@ export const useAuthClient = (options = defaultOptions) => {
   const [identity, setIdentity] = useState(null);
   const [principal, setPrincipal] = useState(null);
   const [actor, setActor] = useState(null);
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Initialize AuthClient
     setIsLoading(true)
-    AuthClient.create(options.createOptions).then(async (client) => {
-      updateClient(client);
-    }).finally(() => {
-      setIsLoading(false)
+    const actor = createActor(canisterId, {
+      agentOptions: {
+        identity,
+      },
     });
+
+    setActor(actor);
+    get("selectedChild", store)
+      .then((data) => {
+        console.log(`selectedChild`, data);
+        if (data) {
+          setIsAuthenticated(true);
+          return;
+        }
+        setIsAuthenticated(false);
+      })
+      .catch(() => {
+        setIsAuthenticated(false);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   }, []);
 
-  const login = () => {
-    // TODO call checkMagiCode and return child id on success
-    // authClient.login({
-    //   ...options.loginOptions,
-    //   onSuccess: () => {
-    //     updateClient(authClient);
-    //   },
-    // });
-    setIsAuthenticated(true)
+  const login = async (code) => {
+    try {
+      const data = await actor?.checkMagiCode(Number(code));
+      if (data?.[0]) {
+        setIsAuthenticated(true);
+      } else {
+        del("selectedChild");
+        setIsAuthenticated(false);
+      }
+      return data?.[0];
+    } catch (error) {
+      setIsAuthenticated(false);
+      return { error: error?.message };
+    }
   };
 
   async function updateClient(client) {
@@ -103,17 +124,15 @@ export const useAuthClient = (options = defaultOptions) => {
   }
 
   async function logout() {
-    del("childList")
-    del("childGoal")
-    del("rewardList")
-    del("selectedChild")
-    del("selectedChildName")
-    del("taskList")
-    del("transactionList")
-    if(authClient) {
-      await authClient?.logout();
-      await updateClient(authClient);
-    }
+    del("childList", store)
+    del("childGoal", store)
+    del("rewardList", store)
+    del("selectedChild", store)
+    del("selectedChildName", store)
+    del("taskList", store)
+    del("transactionList", store)
+
+    setIsAuthenticated(false)
   }
 
   return {
@@ -124,7 +143,8 @@ export const useAuthClient = (options = defaultOptions) => {
     identity,
     principal,
     actor,
-    isLoading
+    isLoading,
+    store
   };
 };
 

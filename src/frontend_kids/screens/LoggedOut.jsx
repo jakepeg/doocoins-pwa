@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import { useAuth } from "../use-auth-client";
 import { Navigate } from "react-router-dom";
-import { Box, Button, Link, Text } from "@chakra-ui/react";
+import { Box, Button, Link, Text, isChakraTheme } from "@chakra-ui/react";
 import ICBadge from "../assets/images/ic-badge.svg";
 import ShareIcon from "../assets/images/share-icon.svg";
 import logo from "../assets/images/logo.svg";
 import useClearContextState from "../hooks/useClearContextState";
 import MagicCode from "../components/MagicCode";
+import { set } from "idb-keyval";
 
 function checkForIOS() {
   // already installed
@@ -23,7 +24,7 @@ function checkForIOS() {
   const isSafari = isIOS && webkit && !ua.match(/CriOS/i);
   const isIOSWithSafari = isIOS && isSafari;
   const isMacOSWithSafari = isMacOS && webkit && !ua.match(/(Chrome|Firefox)/i);
-  
+
   if (isIOSWithSafari) {
     return "iOS";
   } else if (isMacOSWithSafari) {
@@ -34,10 +35,11 @@ function checkForIOS() {
 }
 
 function LoggedOut() {
-  const { login, isAuthenticated, isLoading, logout } = useAuth();
+  const { login, isAuthenticated, isLoading, logout, store } = useAuth();
   const [code, setCode] = useState(null);
   const [error, setError] = useState("");
   const clearContextState = useClearContextState();
+  const [checkingCode, setCheckingCode] = useState(false)
 
   React.useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -47,12 +49,27 @@ function LoggedOut() {
   }, []);
 
   const verifyChild = async () => {
-    console.log(`code`, code);
+    if (checkingCode) {
+      return;
+    }
     if (!code) {
       setError("Please enter verification code");
       return;
     }
-    const data = await login();
+    setCheckingCode(true)
+    const data = await login(code);
+    setCheckingCode(false)
+
+    if (!data) {
+      setError("Incorrect magic code.");
+      return;
+    }
+    if (data?.error) {
+      setError(data?.error);
+      return;
+    }
+
+    set("selectedChild", data, store)
   };
 
   if (!isLoading && isAuthenticated) {
@@ -114,9 +131,16 @@ function LoggedOut() {
           py={6}
           _hover={{}}
           _active={{}}
+          disabled={checkingCode}
         >
-          Connect
+          {checkingCode ? 'Verifying...' : 'Connect'}
         </Button>
+
+        <Text fontSize="lg" mt={2} fontWeight={"bold"} color={"#00A4D7"}>
+          <Link href="/" target="_blank">
+            I don't have a code!
+          </Link>
+        </Text>
 
         <Box>
           {checkForIOS() ? (
