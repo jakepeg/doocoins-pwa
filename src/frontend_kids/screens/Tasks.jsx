@@ -32,7 +32,7 @@ import strings from "../utils/constants";
 import TaskListCalloutWrapper from "../components/Tasks/TaskListCalloutWrapper";
 
 const Tasks = () => {
-  const { actor } = useAuth();
+  const { actor, store } = useAuth();
   const toast = useToast();
   const navigate = useNavigate();
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -117,12 +117,13 @@ const Tasks = () => {
     callService = false,
     revokeStateUpdate = false,
   }) {
+    console.log(`child`, child);
     if (child) {
       if (!disableFullLoader) {
         setLoader((prevState) => ({ ...prevState, init: true }));
       }
 
-      get("taskList").then(async (val) => {
+      get("taskList", store).then(async (val) => {
         if (val === undefined || callService) {
           actor
             ?.getTasks(child.id)
@@ -136,7 +137,7 @@ const Tasks = () => {
                     value: parseInt(task.value),
                   };
                 });
-                set("taskList", filteredTasks);
+                set("taskList", filteredTasks, store);
                 if (!revokeStateUpdate) {
                   setTasks(filteredTasks || []);
                 }
@@ -218,7 +219,7 @@ const Tasks = () => {
       };
       handleToggleAddTaskPopup();
       setTasks((prevState) => {
-        set("taskList", [task, ...prevState]);
+        set("taskList", [task, ...prevState], store);
         return [task, ...prevState];
       });
       // setLoader((prevState) => ({ ...prevState, singles: true }));
@@ -252,10 +253,10 @@ const Tasks = () => {
         isClosable: true,
       });
       const finalTasks = tasks.filter((task) => !task?.isLocal);
-      set("taskList", finalTasks);
+      set("taskList", finalTasks, store);
       setTasks(finalTasks);
     } else {
-      set("taskList", []);
+      set("taskList", [], store);
       setTasks([]);
     }
   };
@@ -280,7 +281,7 @@ const Tasks = () => {
       }
     });
     setTasks(updatedList);
-    set("taskList", updatedList);
+    set("taskList", updatedList, store);
 
     actor?.updateTask(child.id, taskID, task_object).then((response) => {
       if ("ok" in response) {
@@ -295,7 +296,7 @@ const Tasks = () => {
           return updatedTask;
         });
         setTasks(updatedList);
-        set("taskList", updatedList);
+        set("taskList", updatedList, store);
       }
     });
   }
@@ -311,7 +312,7 @@ const Tasks = () => {
     handleCloseDeletePopup();
     const finalTask = tasks.filter((task) => task.id !== taskID);
     setTasks(finalTask);
-    set("taskList", finalTask);
+    set("taskList", finalTask, store);
     // setLoader((prevState) => ({ ...prevState, init: true }));
     actor?.updateTask(child.id, taskID, task_object).then((response) => {
       if ("ok" in response) {
@@ -322,7 +323,7 @@ const Tasks = () => {
         });
       } else {
         setTasks((prevState) => {
-          set("taskList", [...prevState, task_object]);
+          set("taskList", [...prevState, task_object], store);
           return [...prevState, task_object];
         });
         toast({
@@ -338,10 +339,10 @@ const Tasks = () => {
 
   async function getBalance(childID) {
     return new Promise((resolve, reject) => {
-      get("balance-" + childID)
+      get("balance-" + childID, store)
         .then((val) => {
           actor?.getBalance(childID).then((returnedBalance) => {
-            set("balance-" + childID, parseInt(returnedBalance));
+            set("balance-" + childID, parseInt(returnedBalance), store);
             resolve(returnedBalance);
           });
         })
@@ -375,7 +376,7 @@ const Tasks = () => {
       ...prevState,
       balance: prevState.balance + selectedTask.value,
     }));
-    set("transactionList", [new_transactions, ...transactions]);
+    set("transactionList", [new_transactions, ...transactions], store);
     setTransactions([new_transactions, ...transactions]);
     // API call approveTask
     handleCloseTogglePopup();
@@ -402,7 +403,7 @@ const Tasks = () => {
                 };
               })
             );
-            set("childList", updatedChildrenData);
+            set("childList", updatedChildrenData, store);
             await getChildren({ revokeStateUpdate: true });
             setLoader((prevState) => ({ ...prevState, init: false }));
             setBlockingChildUpdate(false);
@@ -421,7 +422,7 @@ const Tasks = () => {
           ...prevState,
           balance: prevState.balance - selectedTask.value,
         }));
-        set("transactionList", filteredTransactions);
+        set("transactionList", filteredTransactions, store);
         console.error(returnedApproveTask.err);
         setBlockingChildUpdate(false);
       }
@@ -565,7 +566,7 @@ const Tasks = () => {
       <div
         className={`${
           isModalOpen ? modelStyles.blur_background : undefined
-        } light-panel`}
+        } light-panel max-w-screen`}
       >
         <div
           className={`panel-header-wrapper`}
@@ -573,25 +574,7 @@ const Tasks = () => {
         >
           <h2 className="title-button dark">
             <span>Tasks</span>
-            <span
-              role="button"
-              onClick={handleToggleAddTaskPopup}
-              className="plus-sign"
-            />
           </h2>
-          {isOpen && (
-            <AddItemToListCallout
-              TextDescription={
-                <>
-                  Ready to set tasks for {child?.name}? <br />
-                  Tap the + icon to get started!
-                </>
-              }
-              itemKey={strings.CALLOUTS_TASKS}
-              isOpen={isOpen && !loader.init && !tasks?.length}
-              onClose={onClose}
-            />
-          )}
         </div>
         {loader.init ? (
           <Stack margin={"0 20px 20px 20px"}>

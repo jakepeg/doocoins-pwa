@@ -2,7 +2,6 @@ import React from "react";
 import LoggedOut from "./screens/LoggedOut";
 import { AuthProvider } from "./use-auth-client";
 import "./assets/css/main.css";
-import ChildList from "./screens/ChildList";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./screens/Home";
 import Rewards from "./screens/Rewards";
@@ -27,7 +26,7 @@ function App() {
               path="/"
               element={
                 <ProtectedRoute>
-                  <ChildList />
+                  <Wallet />
                 </ProtectedRoute>
               }
             />
@@ -52,14 +51,6 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Tasks />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/wallet"
-              element={
-                <ProtectedRoute>
-                  <Wallet />
                 </ProtectedRoute>
               }
             />

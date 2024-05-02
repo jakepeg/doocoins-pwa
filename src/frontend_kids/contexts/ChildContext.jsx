@@ -10,7 +10,7 @@ import useCheckIsUserNewToSwipeActions from "../hooks/useCheckIsUserNewToSwipeAc
 export const ChildContext = createContext();
 
 export default function ChildProvider({ children }) {
-  const { actor } = useAuth();
+  const { actor, store } = useAuth();
   const [child, setChild] = React.useState(null);
   const [goal, setGoal] = React.useState(null);
   const [blockingChildUpdate, setBlockingChildUpdate] = React.useState(false);
@@ -27,7 +27,7 @@ export default function ChildProvider({ children }) {
 
   const handleUpdateCalloutState = (entity, value) => {
     setIsNewToSystem((prevState) => ({ ...prevState, [entity]: value }));
-    set(`${entity}Callout`, value);
+    set(`${entity}Callout`, value, store);
   };
 
   useCheckIsUserNewToChildList({ handleUpdateCalloutState });
@@ -35,12 +35,16 @@ export default function ChildProvider({ children }) {
   useCheckIsUserNewToTransactions({ handleUpdateCalloutState });
   useCheckIsUserNewToSwipeActions({ handleUpdateCalloutState });
 
+  const handleUpdateChild = (...args) => {
+    setChild((prevState) => ({ ...prevState, ...args?.[0] }))
+  }
+
   async function getBalance(childID) {
     return new Promise((resolve, reject) => {
-      get("balance-" + childID)
+      get("balance-" + childID, store)
         .then((val) => {
           actor?.getBalance(childID).then((returnedBalance) => {
-            set("balance-" + childID, parseInt(returnedBalance));
+            set("balance-" + childID, parseInt(returnedBalance), store);
             resolve(returnedBalance);
           });
         })
@@ -53,7 +57,7 @@ export default function ChildProvider({ children }) {
   const handleUnsetGoal = () => {
     actor?.currentGoal(child.id, 0).then(async (returnedCurrentGoal) => {});
     setGoal(noGoalEntity);
-    set("childGoal", noGoalEntity);
+    set("childGoal", noGoalEntity, store);
   };
 
   const values = React.useCallback(() => {
@@ -69,7 +73,8 @@ export default function ChildProvider({ children }) {
       setBlockingChildUpdate,
       blockingChildUpdate,
       setTransactions,
-      transactions
+      transactions,
+      handleUpdateChild
     };
   }, [
     child,
@@ -83,7 +88,8 @@ export default function ChildProvider({ children }) {
     blockingChildUpdate,
     setBlockingChildUpdate,
     setTransactions,
-    transactions
+    transactions,
+    handleUpdateChild
   ]);
 
   return (

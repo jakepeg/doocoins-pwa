@@ -8,6 +8,7 @@ import logo from "../assets/images/logo.svg";
 import useClearContextState from "../hooks/useClearContextState";
 import MagicCode from "../components/MagicCode";
 import { set } from "idb-keyval";
+import { ChildContext } from "../contexts/ChildContext";
 
 function checkForIOS() {
   // already installed
@@ -36,6 +37,7 @@ function checkForIOS() {
 
 function LoggedOut() {
   const { login, isAuthenticated, isLoading, logout, store } = useAuth();
+  const { getBalance, handleUpdateChild } = React.useContext(ChildContext);
   const [code, setCode] = useState(null);
   const [error, setError] = useState("");
   const clearContextState = useClearContextState();
@@ -70,6 +72,11 @@ function LoggedOut() {
     }
 
     set("selectedChild", data, store)
+    const balance = await getBalance(data);
+    // TODO replace below set with backend method
+    set("selectedChildName", "Test", store)
+
+    handleUpdateChild({ id: data, name: 'Test', balance: parseInt(balance) })
   };
 
   if (!isLoading && isAuthenticated) {

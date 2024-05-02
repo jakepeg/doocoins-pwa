@@ -10,7 +10,7 @@ import BottomNavCallout from "../components/Callouts/BottomNavCallout";
 import strings from "../utils/constants";
 
 const Wallet = () => {
-  const { actor } = useAuth();
+  const { actor, store } = useAuth();
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -53,18 +53,18 @@ const Wallet = () => {
 
   React.useEffect(() => {
     if (!blockingChildUpdate) {
-      get("selectedChild")
+      get("selectedChild", store)
         .then(async (data) => {
           const [balance, name] = await Promise.all([
-            get(`balance-${data}`),
-            get(`selectedChildName`),
+            get(`balance-${data}`, store),
+            get(`selectedChildName`, store),
           ]);
           if (data) {
-            // setChild({
-            //   id: data,
-            //   balance: parseInt(balance),
-            //   name,
-            // });
+            setChild({
+              id: data,
+              balance: parseInt(balance),
+              name,
+            });
           } else {
             navigate("/");
           }
@@ -77,7 +77,7 @@ const Wallet = () => {
 
   function getTransactions({ callService = false }) {
     if (child) {
-      get("transactionList").then(async (val) => {
+      get("transactionList", store).then(async (val) => {
         if (val == undefined || callService) {
           setIsLoading((prevState) => ({ ...prevState, transactions: true }));
           actor
@@ -86,7 +86,7 @@ const Wallet = () => {
               if ("ok" in returnedTransactions) {
                 const transactions = Object.values(returnedTransactions);
                 if (transactions.length) {
-                  set("transactionList", transactions[0]);
+                  set("transactionList", transactions[0], store);
                   setTransactions(transactions?.[0]);
                 }
                 setIsLoading((prevState) => ({
@@ -95,7 +95,7 @@ const Wallet = () => {
                 }));
               } else {
                 console.error(returnedTransactions.err);
-                set("transactionList", undefined);
+                set("transactionList", undefined, store);
               }
             })
             .finally(() =>
@@ -144,7 +144,7 @@ const Wallet = () => {
 
   return (
     <>
-      <div className="light-panel transactions">
+      <div className="light-panel transactions max-w-screen">
         <h2 className="title-button dark">
           <span>Transactions</span>
         </h2>

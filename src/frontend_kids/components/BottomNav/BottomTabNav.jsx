@@ -114,7 +114,7 @@ function CustomTabs() {
           paddingBottom: "10px",
         }}
       >
-        <CustomTab icon={WalletIcon} href="/wallet">
+        <CustomTab icon={WalletIcon} href="/">
           {/* Wallet */}
         </CustomTab>
         <CustomTab icon={TasksIcon} href="/tasks">
