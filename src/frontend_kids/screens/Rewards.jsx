@@ -726,29 +726,15 @@ const Rewards = () => {
           submitBtnLabel="Set Goal"
         />
       )}
-      {showPopup.add_reward && (
-        <AddActionDialog
-          handleSubmitForm={handleSubmitReward}
-          handleClosePopup={handleToggleAddRewardPopup}
-          title="Add a Reward"
-          namePlaceHolder="Reward Name"
-          valuePlaceHolder="Reward Value"
-        />
-      )}
 
       <div
         className={`${
           isModalOpen ? modelStyles.blur_background : undefined
-        } light-panel`}
+        } light-panel max-w-screen`}
       >
         <div className={`panel-header-wrapper`} style={{ position: "relative" }}>
           <h2 className="title-button dark">
             <span>Rewards</span>{" "}
-            <span
-              role="button"
-              onClick={handleToggleAddRewardPopup}
-              className="plus-sign"
-            />
           </h2>
           <AddRewardCalloutWrapper addClicked={addClicked} loader={loader} rewards={rewards} />
         </div>
