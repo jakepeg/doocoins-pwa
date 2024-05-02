@@ -13,6 +13,7 @@ import Fuzz "mo:fuzz";
 import { setTimer; recurringTimer } = "mo:base/Timer";
 import Int "mo:base/Int";
 import Debug "mo:base/Debug";
+import Array "mo:base/Array";
 
 actor {
 
@@ -43,6 +44,10 @@ actor {
   //for magicCode child app onboarding OTP
   stable var childPins : Trie.Trie<Text, Nat> = Trie.empty();
   stable var childIdsFromPin : Trie.Trie<Nat, Text> = Trie.empty();
+
+  stable var childRequestsTasks : Trie.Trie<Text, Types.TaskReqMap> = Trie.empty();
+
+  stable var childRequestsRewards : Trie.Trie<Text, Types.RewardReqMap> = Trie.empty();
 
   //who am I
   //----------------------------------------------------------------------------------------------------
@@ -150,9 +155,9 @@ actor {
   public shared (msg) func addChild(child : Types.ChildCall) : async Result.Result<Types.Child, Types.Error> {
     let callerId = msg.caller;
 
-    if (Principal.toText(callerId) == anonIdNew) {
-      return #err(#NotAuthorized);
-    };
+    // if (Principal.toText(callerId) == anonIdNew) {
+    //   return #err(#NotAuthorized);
+    // };
 
     let childId = Principal.toText(callerId) # "-" # Nat.toText(childNumber);
     childNumber += 1;
@@ -670,6 +675,13 @@ actor {
   private func extractTasks(k : Nat, v : Types.Task) : Types.Task {
     return v;
   };
+  private func extractTasksReq(k : Text, v : Types.TaskRequest) : Types.TaskRequest {
+    return v;
+  };
+
+  private func extractReReq(k : Text, v : Types.RewardRequest) : Types.RewardRequest {
+    return v;
+  };
   private func extractTransactions(k : Nat, v : Types.Transaction) : Types.Transaction {
     return v;
   };
@@ -720,5 +732,222 @@ actor {
     );
     let currentBalanceFormatted = Option.get(currentBalance, 0);
     return currentBalanceFormatted;
+  };
+
+  //Request rewards and task complete
+  //Parametes needed: childId and updated child object.
+  //   //----------------------------------------------------------------------------------------------------
+  //   requestTaskComplete(childID, taskID)
+
+  // On the kids app, the child can say they completed a task, it will get added to a task_requests data store e.g.
+  // req_id = iterate an id?
+  // childID
+  // taskID
+
+  public shared (msg) func requestTaskComplete(childId : Text, taskId : Nat) : async Text {
+
+    let randomPin = await _randomPin();
+    let requestId = childId # "-" #Nat.toText(taskId) #Nat.toText(randomPin);
+    let task : Types.TaskRequest = { childId; taskId; id = requestId };
+
+    let allChildTasks = Trie.find(
+      childRequestsTasks,
+      keyText(childId),
+      Text.equal,
+    );
+
+    let allChildrenTaskormatted = Option.get(allChildTasks, Trie.empty());
+
+    let (allChildTasksLV2, oldLV2) = Trie.put(
+      allChildrenTaskormatted,
+      keyText(requestId),
+      Text.equal,
+      task,
+    );
+
+    let (allChildTasksUpdate, oldLV1) = Trie.put(
+      childRequestsTasks,
+      keyText(childId),
+      Text.equal,
+      allChildTasksLV2,
+    );
+
+    childRequestsTasks := allChildTasksUpdate;
+
+    return requestId;
+
+  };
+
+  public shared (msg) func requestClaimReward(childId : Text, rewardId : Nat) : async Text {
+    let randomPin = await _randomPin();
+    let requestId = childId # "-" #Nat.toText(rewardId) #Nat.toText(randomPin);
+    let task : Types.RewardRequest = {
+      childId;
+      reward = rewardId;
+      id = requestId;
+    };
+
+    let allChildRewards = Trie.find(
+      childRequestsRewards,
+      keyText(childId),
+      Text.equal,
+    );
+
+    let allChildrenRewardsFormatted = Option.get(allChildRewards, Trie.empty());
+
+    let (allChildRewardssLV2, oldLV2) = Trie.put(
+      allChildrenRewardsFormatted,
+      keyText(requestId),
+      Text.equal,
+      task,
+    );
+
+    let (allChildRewardsUpdate, oldLV1) = Trie.put(
+      childRequestsRewards,
+      keyText(childId),
+      Text.equal,
+      allChildRewardssLV2,
+    );
+
+    childRequestsRewards := allChildRewardsUpdate;
+
+    return requestId;
+
+  };
+
+  public shared (msg) func getRewardReqs(childId : Text) : async [Types.RewardRequest] {
+    let rewardsRequestBuffer : Buffer.Buffer<Types.RewardRequest> = Buffer.Buffer<Types.RewardRequest>(0);
+
+    let allChildRewards = Trie.find(
+      childRequestsRewards,
+      keyText(childId),
+      Text.equal,
+    );
+
+    let allChildrenRewardsFormatted = Option.get(allChildRewards, Trie.empty());
+
+    let agnosticArchivedRewardslist = Trie.toArray(allChildrenRewardsFormatted, extractReReq);
+
+    for (reward in agnosticArchivedRewardslist.vals()) {
+      rewardsRequestBuffer.add(reward);
+    };
+
+    return Buffer.toArray(rewardsRequestBuffer);
+  };
+
+  public shared (msg) func getTaskReqs(childId : Text) : async [Types.TaskRequest] {
+    let tasksRequestBuffer : Buffer.Buffer<Types.TaskRequest> = Buffer.Buffer<Types.TaskRequest>(0);
+
+    let allChildTasks = Trie.find(
+      childRequestsTasks,
+      keyText(childId),
+      Text.equal,
+    );
+
+    let allChildrenTasksFormatted = Option.get(allChildTasks, Trie.empty());
+
+    let agnosticArchivedTaskList = Trie.toArray(allChildrenTasksFormatted, extractTasksReq);
+
+    for (task in agnosticArchivedTaskList.vals()) {
+      tasksRequestBuffer.add(task);
+    };
+
+    return Buffer.toArray(tasksRequestBuffer);
+  };
+
+  public shared (msg) func removeTaskReq(childId : Text, id : Text) : async Text {
+
+    let allChildTasks = Trie.find(
+      childRequestsTasks,
+      keyText(childId),
+      Text.equal,
+    );
+
+    let allChildrenTaskormatted = Option.get(allChildTasks, Trie.empty());
+
+    let (allChildTasksLV2, oldLV2) = Trie.remove(
+      allChildrenTaskormatted,
+      keyText(id),
+      Text.equal,
+    );
+
+    let (allChildTasksUpdate, oldLV1) = Trie.put(
+      childRequestsTasks,
+      keyText(childId),
+      Text.equal,
+      allChildTasksLV2,
+    );
+
+    childRequestsTasks := allChildTasksUpdate;
+
+    return id;
+  };
+
+  public shared (msg) func removeRewardReq(childId : Text, id : Text) : async Text {
+
+    let allChildRewards = Trie.find(
+      childRequestsRewards,
+      keyText(childId),
+      Text.equal,
+    );
+
+    let allChildrenRewardsFormatted = Option.get(allChildRewards, Trie.empty());
+
+    let (allChildRewardssLV2, oldLV2) = Trie.remove(
+      allChildrenRewardsFormatted,
+      keyText(id),
+      Text.equal,
+    );
+
+    let (allChildRewardsUpdate, oldLV1) = Trie.put(
+      childRequestsRewards,
+      keyText(childId),
+      Text.equal,
+      allChildRewardssLV2,
+    );
+
+    childRequestsRewards := allChildRewardsUpdate;
+
+    return id;
+  };
+
+  private func extractCallerFromId(childId : Text) : Text {
+    let words = Text.split(childId, #char '-');
+    let wordsArray = Iter.toArray(words);
+    let wordsSlices = Array.slice<Text>(wordsArray, 0, wordsArray.size() -1);
+    var fromIter : Text = "";
+    var counter = 0;
+    for (word in wordsSlices) {
+      if (counter == 0) {
+        fromIter := fromIter #word;
+        counter := counter +1;
+      } else {
+        fromIter := fromIter # "-" #word;
+        counter := counter +1;
+      };
+    };
+    return fromIter;
+  };
+
+  public shared (msg) func getChild(childId : Text) : async Text {
+    let fromIter = extractCallerFromId(childId);
+    let callerId = Principal.fromText(nullToText(?fromIter));
+    let allChildren = Trie.find(
+      profiles,
+      keyPrincipal(callerId),
+      Principal.equal,
+    );
+    let allChildrenFormatted = Option.get(allChildren, Trie.empty());
+    let child = Trie.find(
+      allChildrenFormatted,
+      keyText(childId),
+      Text.equal,
+    );
+    switch (child) {
+      case null { return "" };
+      case (?e) {
+        return e.name;
+      };
+    };
   };
 };
