@@ -45,8 +45,8 @@ actor {
   stable var childPins : Trie.Trie<Text, Nat> = Trie.empty();
   stable var childIdsFromPin : Trie.Trie<Nat, Text> = Trie.empty();
 
+  //for child to request task complete and request claim reward
   stable var childRequestsTasks : Trie.Trie<Text, Types.TaskReqMap> = Trie.empty();
-
   stable var childRequestsRewards : Trie.Trie<Text, Types.RewardReqMap> = Trie.empty();
 
   //who am I
@@ -155,9 +155,9 @@ actor {
   public shared (msg) func addChild(child : Types.ChildCall) : async Result.Result<Types.Child, Types.Error> {
     let callerId = msg.caller;
 
-    // if (Principal.toText(callerId) == anonIdNew) {
-    //   return #err(#NotAuthorized);
-    // };
+    if (Principal.toText(callerId) == anonIdNew) {
+      return #err(#NotAuthorized);
+    };
 
     let childId = Principal.toText(callerId) # "-" # Nat.toText(childNumber);
     childNumber += 1;
@@ -185,7 +185,7 @@ actor {
     );
     childToBalance := childtobalancemap;
 
-    //Initializing goal number to this child
+    //Initializing goal (reward) number to this child
 
     let (newChildToGoalNumber, existingGoal) = Trie.put(
       childToGoalNumber,
@@ -510,7 +510,7 @@ actor {
 
   };
 
-  //Claim childs goal
+  //Claim childs goal (reward)
   //Parametes needed: childId and goalId
   //----------------------------------------------------------------------------------------------------
   public shared (msg) func claimGoal(childId : Text, goalId : Nat, completedDate : Text) : async Result.Result<(), Types.Error> {
