@@ -28,13 +28,13 @@ const TaskListCalloutWrapper = ({ startSwiping, tasks }) => {
 
   return (
     <>
-      {isOpenAddTask && tasks.length === 1 && (
+      {/* {isOpenAddTask && tasks.length === 1 && (
         <SwipeListCallout
           isOpen={isOpenAddTask}
           onClose={onCloseAddTask}
           itemKey={strings.CALLOUT_TASKS_LIST}
         />
-      )}
+      )} */}
     </>
   );
 };

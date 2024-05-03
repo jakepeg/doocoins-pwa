@@ -486,22 +486,13 @@ const Tasks = () => {
         {tasks?.length ? (
           <div className="example">
             <ul className="child-list" style={{ position: "relative" }}>
-              <SwipeableList
-                threshold={0.25}
-                type={ListType.IOS}
-                fullSwipe={false}
-              >
                 {tasks.map((task) => (
-                  <SwipeableListItem
-                    leadingActions={null}
-                    trailingActions={trailingActions({ task })}
+                  <React.Fragment
                     key={task.id}
-                    onSwipeStart={onSwipeStart}
                   >
                     <ChildTask key={task.id} task={task} />
-                  </SwipeableListItem>
+                  </React.Fragment>
                 ))}
-              </SwipeableList>
               <TaskListCalloutWrapper
                 tasks={tasks}
                 startSwiping={startSwiping}

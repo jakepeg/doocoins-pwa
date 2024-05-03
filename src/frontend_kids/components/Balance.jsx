@@ -33,7 +33,6 @@ const Balance = () => {
   const toast = useToast();
 
   React.useEffect(() => {
-    console.log('renders balance');
     if (!blockingChildUpdate) {
       getChildGoal()
     }

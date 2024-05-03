@@ -36,7 +36,7 @@ function checkForIOS() {
 }
 
 function LoggedOut() {
-  const { login, isAuthenticated, isLoading, logout, store } = useAuth();
+  const { login, isAuthenticated, isLoading, logout, store, actor } = useAuth();
   const { getBalance, handleUpdateChild } = React.useContext(ChildContext);
   const [code, setCode] = useState(null);
   const [error, setError] = useState("");
@@ -73,8 +73,9 @@ function LoggedOut() {
 
     set("selectedChild", data, store)
     const balance = await getBalance(data);
-    // TODO replace below set with backend method
-    set("selectedChildName", "Test", store)
+    const name = await actor.getChild(data);
+    console.log(`name`, name);
+    set("selectedChildName", name, store)
 
     handleUpdateChild({ id: data, name: 'Test', balance: parseInt(balance) })
   };

@@ -71,7 +71,6 @@ export const useAuthClient = (options = defaultOptions) => {
     setActor(actor);
     get("selectedChild", store)
       .then((data) => {
-        console.log(`selectedChild`, data);
         if (data) {
           setIsAuthenticated(true);
           return;

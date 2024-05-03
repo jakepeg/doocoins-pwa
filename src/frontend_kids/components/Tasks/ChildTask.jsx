@@ -1,6 +1,6 @@
 import React from "react";
 import { ReactComponent as DCIcon } from "../../assets/images/dc.svg";
-import { ReactComponent as DotArrow } from "../../assets/images/dotarrow.svg";
+import { ReactComponent as TickIcon } from "../../assets/images/tick.svg";
 import { Box, Text } from "@chakra-ui/react";
 
 const ChildTask = ({ task }) => {
@@ -12,18 +12,28 @@ const ChildTask = ({ task }) => {
         alignItems={"center"}
         className="list-item"
         role="link"
+        as="li"
+        px={5}
         key={parseInt(task.id)}
       >
-        <Text textAlign={"left"} fontSize={"20px"}>
+        <Text textAlign={"left"} fontSize={"24px"}>
           {task.name}
         </Text>
-      </Box>
 
-      <div className="child-balance">
-        <DCIcon className="balance-dc-icon" width="18px" height="18px" />
-        <Box fontSize={"20px"}>{parseInt(task.value)}</Box>
-        <DotArrow height="14px" />
-      </div>
+        <div className="child-balance">
+          <DCIcon className="balance-dc-icon" width="24px" height="24px" />
+          <Box fontSize={"24px"}>{parseInt(task.value)}</Box>
+          <Box
+            p={1}
+            background="#129FAA"
+            ml={4}
+            cursor="pointer"
+            borderRadius={100}
+          >
+            <TickIcon width="20px" height="20px" />
+          </Box>
+        </div>
+      </Box>
     </>
   );
 };

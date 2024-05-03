@@ -16,7 +16,9 @@ import { ReactComponent as ApproveIcon } from "../assets/images/tick.svg";
 import { ReactComponent as GoalIcon } from "../assets/images/goal.svg";
 import { ReactComponent as EditIcon } from "../assets/images/pencil.svg";
 import { ReactComponent as DeleteIcon } from "../assets/images/delete.svg";
+import { ReactComponent as TickIcon } from "../assets/images/tick.svg";
 import {
+  Box,
   Skeleton,
   Stack,
   Text,
@@ -37,7 +39,7 @@ import SwipeListCallout from "../components/Callouts/SwipeListCallout";
 import AddRewardCalloutWrapper from "../components/Rewards/AddRewardCalloutWrapper";
 
 const Rewards = () => {
-  const { actor } = useAuth();
+  const { actor, store } = useAuth();
   const toast = useToast();
   const navigate = useNavigate();
   const [rewards, setRewards] = React.useState([]);
@@ -84,10 +86,10 @@ const Rewards = () => {
   }, [child]);
 
   const getChildren = async ({ revokeStateUpdate = false }) => {
-    await get("selectedChild").then(async (data) => {
+    await get("selectedChild", store).then(async (data) => {
       const [balance, name] = await Promise.all([
-        get(`balance-${data}`),
-        get(`selectedChildName`),
+        get(`balance-${data}`, store),
+        get(`selectedChildName`, store),
       ]);
       if (data) {
         if(!revokeStateUpdate) {
@@ -105,10 +107,10 @@ const Rewards = () => {
 
   async function getBalance(childID) {
     return new Promise((resolve, reject) => {
-      get("balance-" + childID)
+      get("balance-" + childID, store)
         .then((val) => {
           actor?.getBalance(childID).then((returnedBalance) => {
-            set("balance-" + childID, parseInt(returnedBalance));
+            set("balance-" + childID, parseInt(returnedBalance), store);
             resolve(returnedBalance);
           });
         })
@@ -124,7 +126,7 @@ const Rewards = () => {
         setLoader((prevState) => ({ ...prevState, init: true }));
       }
 
-      get("rewardList")
+      get("rewardList", store)
         .then(async (val) => {
           if (val === undefined || callService) {
             actor?.getGoals(child.id).then(async (returnedRewards) => {
@@ -145,7 +147,7 @@ const Rewards = () => {
                       currentGoalId === parseInt(reward.id) ? true : false,
                   };
                 });
-                set("rewardList", filteredRewards);
+                set("rewardList", filteredRewards, store);
                 if (!revokeStateUpdate) {
                   setRewards(filteredRewards);
                 }
@@ -195,10 +197,10 @@ const Rewards = () => {
         isClosable: true,
       });
       const finalRewards = rewards.filter((reward) => !reward?.isLocal);
-      set("rewardList", finalRewards);
+      set("rewardList", finalRewards, store);
       setRewards(finalRewards);
     } else {
-      set("rewardList", undefined);
+      set("rewardList", undefined, store);
       setRewards([]);
     }
   };
@@ -219,7 +221,7 @@ const Rewards = () => {
         name: rewardName,
         id: parseInt(rewardID),
       };
-      set("childGoal", returnedGoal);
+      set("childGoal", returnedGoal, store);
       setGoal(returnedGoal);
     }
     handleCloseEditPopup();
@@ -234,7 +236,7 @@ const Rewards = () => {
       }
     });
     setRewards(updatedList);
-    set("rewardList", updatedList);
+    set("rewardList", updatedList, store);
     actor
       ?.updateGoal(child.id, rewardID, reward_object)
       .then((response) => {
@@ -247,7 +249,7 @@ const Rewards = () => {
             return updatedReward;
           });
           setRewards(updatedList);
-          set("rewardList", updatedList);
+          set("rewardList", updatedList, store);
         }
       })
   }
@@ -262,7 +264,7 @@ const Rewards = () => {
     };
     const finalRewards = rewards.filter((reward) => reward.id !== rewardID);
     setRewards(finalRewards);
-    set("rewardList", finalRewards);
+    set("rewardList", finalRewards, store);
     handleCloseDeletePopup();
     // setLoader((prevState) => ({ ...prevState, init: true }));
     actor
@@ -272,7 +274,7 @@ const Rewards = () => {
           getRewards({ disableFullLoader: true, callService: true, revokeStateUpdate: true });
         } else {
           setRewards((prevState) => {
-            set("rewardList", [...prevState, reward_object]);
+            set("rewardList", [...prevState, reward_object], store);
             return [...prevState, reward_object];
           });
           toast({
@@ -300,7 +302,7 @@ const Rewards = () => {
         name: selectedReward.name,
         id: parseInt(selectedReward.id),
       };
-      set("childGoal", returnedGoal);
+      set("childGoal", returnedGoal, store);
       setGoal(returnedGoal);
       const finalRewards = rewards.map((reward) => {
         if (reward.id === reward_id) {
@@ -310,9 +312,9 @@ const Rewards = () => {
         }
       });
       setRewards(finalRewards);
-      set("rewardList", finalRewards);
+      set("rewardList", finalRewards, store);
     } else {
-      set("childGoal", noGoalEntity);
+      set("childGoal", noGoalEntity, store);
       setGoal(noGoalEntity);
       handleCloseRemoveGoalPopup();
       const finalRewards = rewards.map((reward) => {
@@ -323,7 +325,7 @@ const Rewards = () => {
         }
       });
       setRewards(finalRewards);
-      set("rewardList", finalRewards);
+      set("rewardList", finalRewards, store);
     }
     // if (!disableFullLoader) {
     // setLoader((prevState) => ({ ...prevState, init: true }));
@@ -361,13 +363,13 @@ const Rewards = () => {
             }
           });
           setRewards(finalRewards);
-          set("rewardList", finalRewards);
+          set("rewardList", finalRewards, store);
         }
       });
   }
 
   function getTransactions() {
-    get("transactionList").then(async (val) => {
+    get("transactionList", store).then(async (val) => {
       setTransactions(val || []);
     });
   }
@@ -397,7 +399,7 @@ const Rewards = () => {
       name: selectedReward.name,
       transactionType: "GOAL_DEBIT",
     };
-    set("transactionList", [new_transactions, ...transactions]);
+    set("transactionList", [new_transactions, ...transactions], store);
     setTransactions([new_transactions, ...transactions]);
     setChild((prevState) => ({
       ...prevState,
@@ -425,7 +427,7 @@ const Rewards = () => {
                 };
               })
             );
-            set("childList", updatedChildrenData);
+            set("childList", updatedChildrenData, store);
             await getChildren({ revokeStateUpdate: true });
             setBlockingChildUpdate(false)
             setLoader((prevState) => ({ ...prevState, init: false }));
@@ -435,7 +437,7 @@ const Rewards = () => {
             (transaction) => transaction.id !== new_transactions.id
           );
           setTransactions(filteredTransactions);
-          set("transactionList", filteredTransactions);
+          set("transactionList", filteredTransactions, store);
           setLoader((prevState) => ({ ...prevState, init: false }));
           setBlockingChildUpdate(false)
         }
@@ -576,7 +578,7 @@ const Rewards = () => {
         isLocal: true,
       };
       setRewards((prevState) => {
-        set("rewardList", [reward, ...prevState]);
+        set("rewardList", [reward, ...prevState], store);
         return [reward, ...prevState];
       });
       // setLoader((prevState) => ({ ...prevState, singles: true }));
@@ -609,40 +611,39 @@ const Rewards = () => {
         {rewards?.length ? (
           <div className="example">
             <ul className="list-wrapper">
-              <SwipeableList
-                threshold={0.25}
-                type={ListType.IOS}
-                fullSwipe={false}
-              >
                 {rewards.map((reward) => (
-                  <SwipeableListItem
-                    leadingActions={null}
-                    trailingActions={trailingActions({ reward })}
+                  <React.Fragment
                     key={reward.id}
-                    onSwipeStart={onSwipeStart}
                   >
-                    <div className="list-item" key={parseInt(reward.id)}>
-                      <div>{reward.name}</div>
-                      <div className="item-reward-value">
+                    <Box px={5} as="li" className="list-item" key={parseInt(reward.id)}>
+                      <Text textAlign={"left"} fontSize={"24px"}>{reward.name}</Text>
+                      <div className="child-balance">
                         <img
                           src={dc}
                           className="dc-img-small"
                           alt="DooCoins symbol"
                         />
-                        {parseInt(reward.value)}
-                        <DotArrow className="dot-arrow" height="14px" />
+                        <Box fontSize={"24px"}>{parseInt(reward.value)}</Box>
+                        <Box
+                          p={1}
+                          background="#129FAA"
+                          ml={4}
+                          cursor="pointer"
+                          borderRadius={100}
+                        >
+                          <TickIcon width="20px" height="20px" />
+                        </Box>
                       </div>
-                    </div>
-                  </SwipeableListItem>
+                    </Box>
+                  </React.Fragment>
                 ))}
-              </SwipeableList>
-              {isOpen && rewards.length === 1 && (
+              {/* {isOpen && rewards.length === 1 && (
                 <SwipeListCallout
                   isOpen={isOpen}
                   onClose={onClose}
                   itemKey={strings.CALLOUT_REWARDS_LIST}
                 />
-              )}
+              )} */}
             </ul>
           </div>
         ) : null}
@@ -736,7 +737,6 @@ const Rewards = () => {
           <h2 className="title-button dark">
             <span>Rewards</span>{" "}
           </h2>
-          <AddRewardCalloutWrapper addClicked={addClicked} loader={loader} rewards={rewards} />
         </div>
         {loader.init ? (
           <Stack margin={"0 20px 20px 20px"}>
