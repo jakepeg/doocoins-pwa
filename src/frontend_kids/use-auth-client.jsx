@@ -4,55 +4,9 @@ import { createStore, del, get } from "idb-keyval";
 
 const AuthContext = createContext();
 
-    const APPLICATION_NAME = "DooCoins";
-    const APPLICATION_LOGO_URL = "https://nfid.one/icons/favicon-96x96.png";
-    const AUTH_PATH = "/authenticate/?applicationName="+APPLICATION_NAME+"&applicationLogo="+APPLICATION_LOGO_URL+"#authorize";
-    const NFID_AUTH_URL = "https://nfid.one" + AUTH_PATH;
 const store = createStore('db', 'kids');
 
-const defaultOptions = {
-  /**
-   *  @type {import("@dfinity/auth-client").AuthClientCreateOptions}
-   */
-  createOptions: {
-    idleOptions: {
-      // Set to true if you do not want idle functionality
-      // idleTimeout: 1000 * 60 * 60 * 24 * 30, // 30 days
-      disableIdle: true,
-      disableDefaultIdleCallback: true,
-    },
-  },
-  /**
-   * @type {import("@dfinity/auth-client").AuthClientLoginOptions}
-   */
-  // loginOptions: {
-  //   identityProvider:
-  //     process.env.DFX_NETWORK === "staging"
-  //       ? "https://identity.ic0.app/#authorize"
-  //       : `http://localhost:4943?canisterId=${process.env.CANISTER_ID_INTERNET_IDENTITY}#authorize`,
-  //       maxTimeToLive: BigInt (30) * BigInt(24) * BigInt(3_600_000_000_000),
-  // },
-
-  // loginOptions: {
-  //   identityProvider:   process.env.DFX_NETWORK === "ic"
-  //    ? NFID_AUTH_URL : NFID_AUTH_URL,
-  //   maxTimeToLive: BigInt (30) * BigInt(24) * BigInt(3_600_000_000_000), // 30 days
-  // },
-
-  loginOptions: {
-    identityProvider: NFID_AUTH_URL,
-    maxTimeToLive: BigInt(30) * BigInt(24) * BigInt(3_600_000_000_000), // 30 days
-  },
-};
-
-/**
- *
- * @param options - Options for the AuthClient
- * @param {AuthClientCreateOptions} options.createOptions - Options for the AuthClient.create() method
- * @param {AuthClientLoginOptions} options.loginOptions - Options for the AuthClient.login() method
- * @returns
- */
-export const useAuthClient = (options = defaultOptions) => {
+export const useAuthClient = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [authClient, setAuthClient] = useState(null);
   const [identity, setIdentity] = useState(null);
@@ -62,11 +16,7 @@ export const useAuthClient = (options = defaultOptions) => {
 
   useEffect(() => {
     setIsLoading(true)
-    const actor = createActor(canisterId, {
-      agentOptions: {
-        identity,
-      },
-    });
+    const actor = createActor(canisterId);
 
     setActor(actor);
     get("selectedChild", store)
@@ -101,27 +51,6 @@ export const useAuthClient = (options = defaultOptions) => {
     }
   };
 
-  async function updateClient(client) {
-    const isAuthenticated = await client.isAuthenticated();
-    setIsAuthenticated(isAuthenticated);
-
-    const identity = client.getIdentity();
-    setIdentity(identity);
-
-    const principal = identity.getPrincipal();
-    setPrincipal(principal);
-
-    setAuthClient(client);
-
-    const actor = createActor(canisterId, {
-      agentOptions: {
-        identity,
-      },
-    });
-
-    setActor(actor);
-  }
-
   async function logout() {
     del("childList", store)
     del("childGoal", store)
@@ -147,9 +76,6 @@ export const useAuthClient = (options = defaultOptions) => {
   };
 };
 
-/**
- * @type {React.FC}
- */
 export const AuthProvider = ({ children }) => {
   const auth = useAuthClient();
 

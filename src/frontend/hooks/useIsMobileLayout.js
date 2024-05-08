@@ -8,7 +8,8 @@ const useIsMobileLayout = () => {
   return (
     pathname === strings.TASKS_PATH ||
     pathname === strings.REWARDS_PATH ||
-    pathname === strings.WALLET_PATH
+    pathname === strings.WALLET_PATH || 
+    pathname === strings.ALERTS_PATH
   );
 };
 

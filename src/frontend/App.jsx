@@ -16,6 +16,7 @@ import Help from "./screens/Help";
 import ChildProvider from "./contexts/ChildContext";
 import ImageLoader from "./utils/ImageLoader";
 import InviteChild from "./screens/InviteChild";
+import Alerts from "./screens/Alerts";
 
 function App() {
   return (
@@ -61,6 +62,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Tasks />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/alerts"
+              element={
+                <ProtectedRoute>
+                  <Alerts />
                 </ProtectedRoute>
               }
             />

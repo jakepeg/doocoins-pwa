@@ -15,6 +15,7 @@ import TasksIcon from "./TasksIcon2";
 import RewardsIcon from "./RewardsIcon2";
 import strings from "../../utils/constants";
 import BottomNavCallout from "../Callouts/BottomNavCallout";
+import { ReactComponent as NotificationIcon } from "../../assets/images/notification-icon.svg";
 import { ChildContext } from "../../contexts/ChildContext";
 
 function BottomTabNav() {
@@ -24,7 +25,8 @@ function BottomTabNav() {
     <>
       {(pathname === strings.TASKS_PATH ||
         pathname === strings.REWARDS_PATH ||
-        pathname === strings.WALLET_PATH) && (
+        pathname === strings.WALLET_PATH ||
+        pathname === strings.ALERTS_PATH) && (
         <Flex
           align="end"
           justify="end"
@@ -114,15 +116,10 @@ function CustomTabs() {
           paddingBottom: "10px",
         }}
       >
-        <CustomTab icon={WalletIcon} href="/wallet">
-          {/* Wallet */}
-        </CustomTab>
-        <CustomTab icon={TasksIcon} href="/tasks">
-          {/* Tasks */}
-        </CustomTab>
-        <CustomTab icon={RewardsIcon} href="/rewards">
-          {/* Rewards */}
-        </CustomTab>
+        <CustomTab icon={WalletIcon} href="/wallet" />
+        <CustomTab icon={TasksIcon} href="/tasks" />
+        <CustomTab icon={RewardsIcon} href="/rewards" />
+        <CustomTab icon={NotificationIcon} href="/alerts" />
       </TabList>
     </Tabs>
   );

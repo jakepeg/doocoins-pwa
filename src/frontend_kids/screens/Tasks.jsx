@@ -177,7 +177,7 @@ const Tasks = () => {
   }
 
   React.useEffect(() => {
-    if (child) getTasks(child);
+    if (child) getTasks({ callService: true });
   }, [actor, child]);
 
   const handleTogglePopup = (isOpen, task, popup) => {
@@ -476,8 +476,25 @@ const Tasks = () => {
     []
   );
 
-  const onSwipeStart = () => {
-    setStartSwiping(true);
+  const handleReq = async (selectedTask) => {
+    try {
+      await actor.requestTaskComplete(child.id, selectedTask.id)
+      toast({
+        title: `well done ${child.name}, the task is pending`,
+        status: "success",
+        duration: 4000,
+        isClosable: true,
+      });
+
+    } catch (error) {
+      toast({
+        title: "An error occurred.",
+        description: `Apologies, please try again later.`,
+        status: "error",
+        duration: 4000,
+        isClosable: true,
+      })
+    }
   };
 
   const TaskList = React.useMemo(() => {
@@ -490,7 +507,7 @@ const Tasks = () => {
                   <React.Fragment
                     key={task.id}
                   >
-                    <ChildTask key={task.id} task={task} />
+                    <ChildTask handleReq={handleReq} key={task.id} task={task} />
                   </React.Fragment>
                 ))}
               <TaskListCalloutWrapper

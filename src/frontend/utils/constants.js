@@ -2,6 +2,7 @@ class ConstantStrings {
   // App URL Path
   ABOUT_PATH = "/about";
   WALLET_PATH = "/wallet";
+  ALERTS_PATH = "/alerts";
   TASKS_PATH = "/tasks";
   REWARDS_PATH = "/rewards";
 
