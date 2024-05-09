@@ -29,6 +29,7 @@ module {
     childId : Text;
     taskId : Nat;
     name:Text;
+    value:Nat;
   };
 
   public type RewardRequest = {
@@ -36,6 +37,7 @@ module {
     childId : Text;
     reward : Nat;
     value:Nat;
+    name:Text;
   };
 
   public type Goal = {
