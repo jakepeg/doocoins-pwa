@@ -28,12 +28,14 @@ module {
     id : Text;
     childId : Text;
     taskId : Nat;
+    name:Text;
   };
 
   public type RewardRequest = {
     id : Text;
     childId : Text;
     reward : Nat;
+    value:Nat;
   };
 
   public type Goal = {
