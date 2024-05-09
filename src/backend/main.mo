@@ -744,11 +744,16 @@ actor {
   // childID
   // taskID
 
-  public shared (msg) func requestTaskComplete(childId : Text, taskId : Nat,name:Text) : async Text {
+  public shared (msg) func requestTaskComplete(childId : Text, taskId : Nat, name : Text) : async Text {
 
     let randomPin = await _randomPin();
     let requestId = childId # "-" #Nat.toText(taskId) #Nat.toText(randomPin);
-    let task : Types.TaskRequest = { childId; taskId; id = requestId; name = name; };
+    let task : Types.TaskRequest = {
+      childId;
+      taskId;
+      id = requestId;
+      name = name;
+    };
 
     let allChildTasks = Trie.find(
       childRequestsTasks,
@@ -778,7 +783,7 @@ actor {
 
   };
 
-  public shared (msg) func requestClaimReward(childId : Text, rewardId : Nat,value:Nat) : async Text {
+  public shared (msg) func requestClaimReward(childId : Text, rewardId : Nat, value : Nat) : async Text {
     let randomPin = await _randomPin();
     let requestId = childId # "-" #Nat.toText(rewardId) #Nat.toText(randomPin);
     let task : Types.RewardRequest = {
@@ -834,6 +839,48 @@ actor {
     };
 
     return Buffer.toArray(rewardsRequestBuffer);
+  };
+
+
+
+   public shared (msg) func hasRewards(childId : Text) : async Nat {
+    let rewardsRequestBuffer : Buffer.Buffer<Types.RewardRequest> = Buffer.Buffer<Types.RewardRequest>(0);
+
+    let allChildRewards = Trie.find(
+      childRequestsRewards,
+      keyText(childId),
+      Text.equal,
+    );
+
+    let allChildrenRewardsFormatted = Option.get(allChildRewards, Trie.empty());
+
+    let agnosticArchivedRewardslist = Trie.toArray(allChildrenRewardsFormatted, extractReReq);
+
+    for (reward in agnosticArchivedRewardslist.vals()) {
+      rewardsRequestBuffer.add(reward);
+    };
+
+    return rewardsRequestBuffer.size();
+  };
+
+  public shared (msg) func hasTasks(childId : Text) : async Nat {
+    let tasksRequestBuffer : Buffer.Buffer<Types.TaskRequest> = Buffer.Buffer<Types.TaskRequest>(0);
+
+    let allChildTasks = Trie.find(
+      childRequestsTasks,
+      keyText(childId),
+      Text.equal,
+    );
+
+    let allChildrenTasksFormatted = Option.get(allChildTasks, Trie.empty());
+
+    let agnosticArchivedTaskList = Trie.toArray(allChildrenTasksFormatted, extractTasksReq);
+
+    for (task in agnosticArchivedTaskList.vals()) {
+      tasksRequestBuffer.add(task);
+    };
+
+    return tasksRequestBuffer.size();
   };
 
   public shared (msg) func getTaskReqs(childId : Text) : async [Types.TaskRequest] {
