@@ -744,7 +744,7 @@ actor {
   // childID
   // taskID
 
-  public shared (msg) func requestTaskComplete(childId : Text, taskId : Nat, name : Text) : async Text {
+  public shared (msg) func requestTaskComplete(childId : Text, taskId : Nat, name : Text, value : Nat) : async Text {
 
     let randomPin = await _randomPin();
     let requestId = childId # "-" #Nat.toText(taskId) #Nat.toText(randomPin);
@@ -753,6 +753,7 @@ actor {
       taskId;
       id = requestId;
       name = name;
+      value = value;
     };
 
     let allChildTasks = Trie.find(
@@ -783,7 +784,7 @@ actor {
 
   };
 
-  public shared (msg) func requestClaimReward(childId : Text, rewardId : Nat, value : Nat) : async Text {
+  public shared (msg) func requestClaimReward(childId : Text, rewardId : Nat, value : Nat,name:Text) : async Text {
     let randomPin = await _randomPin();
     let requestId = childId # "-" #Nat.toText(rewardId) #Nat.toText(randomPin);
     let task : Types.RewardRequest = {
@@ -791,6 +792,7 @@ actor {
       reward = rewardId;
       id = requestId;
       value = value;
+      name = name;
     };
 
     let allChildRewards = Trie.find(
@@ -841,9 +843,7 @@ actor {
     return Buffer.toArray(rewardsRequestBuffer);
   };
 
-
-
-   public shared (msg) func hasRewards(childId : Text) : async Nat {
+  public shared (msg) func hasRewards(childId : Text) : async Nat {
     let rewardsRequestBuffer : Buffer.Buffer<Types.RewardRequest> = Buffer.Buffer<Types.RewardRequest>(0);
 
     let allChildRewards = Trie.find(
