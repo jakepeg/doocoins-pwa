@@ -744,11 +744,11 @@ actor {
   // childID
   // taskID
 
-  public shared (msg) func requestTaskComplete(childId : Text, taskId : Nat) : async Text {
+  public shared (msg) func requestTaskComplete(childId : Text, taskId : Nat,name:Text) : async Text {
 
     let randomPin = await _randomPin();
     let requestId = childId # "-" #Nat.toText(taskId) #Nat.toText(randomPin);
-    let task : Types.TaskRequest = { childId; taskId; id = requestId };
+    let task : Types.TaskRequest = { childId; taskId; id = requestId; name = name; };
 
     let allChildTasks = Trie.find(
       childRequestsTasks,
@@ -778,13 +778,14 @@ actor {
 
   };
 
-  public shared (msg) func requestClaimReward(childId : Text, rewardId : Nat) : async Text {
+  public shared (msg) func requestClaimReward(childId : Text, rewardId : Nat,value:Nat) : async Text {
     let randomPin = await _randomPin();
     let requestId = childId # "-" #Nat.toText(rewardId) #Nat.toText(randomPin);
     let task : Types.RewardRequest = {
       childId;
       reward = rewardId;
       id = requestId;
+      value = value;
     };
 
     let allChildRewards = Trie.find(
