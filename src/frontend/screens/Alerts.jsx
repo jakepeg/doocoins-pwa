@@ -31,7 +31,7 @@ const Alerts = () => {
 
   React.useEffect(() => {
     if (child) {
-      getAlerts({ callService: true  });
+      getAlerts({ callService: true });
     }
   }, [actor, child]);
 
@@ -48,10 +48,8 @@ const Alerts = () => {
         .then(async (val) => {
           if (val === undefined || callService) {
             actor?.getTaskReqs(child.id).then(async (returnedTasksReq) => {
-              console.log(`returnedTasksReq`, returnedTasksReq);
               const tasksReq = Object.values(returnedTasksReq);
               set("tasksReq", tasksReq);
-
               setList((prevState) => ({
                 ...prevState,
                 tasks: tasksReq,
@@ -63,11 +61,11 @@ const Alerts = () => {
             if (!revokeStateUpdate) {
               setList((prevState) => ({
                 ...prevState,
-                tasks: val?.map((reward) => {
+                tasks: val?.map((task) => {
                   return {
-                    ...reward,
-                    id: parseInt(reward.id),
-                    value: parseInt(reward.value),
+                    ...task,
+                    id: parseInt(task.id),
+                    value: parseInt(task.value),
                   };
                 }),
               }));
@@ -83,14 +81,13 @@ const Alerts = () => {
         .then(async (val) => {
           if (val === undefined || callService) {
             actor?.getRewardReqs(child.id).then(async (returnedRewardsReq) => {
-              if ("ok" in returnedRewardsReq) {
-                const rewardsReq = Object.values(returnedRewardsReq);
-                set("rewardsReq", rewardsReq);
+              set("rewardsReq", returnedRewardsReq);
 
-                setLoading(false);
-              } else {
-                setLoading(false);
-              }
+              setList((prevState) => ({
+                ...prevState,
+                rewards: returnedRewardsReq,
+              }));
+              setLoading(false);
             });
           } else {
             if (!revokeStateUpdate) {
@@ -126,9 +123,8 @@ const Alerts = () => {
         isClosable: true,
       });
       const finalTasks = list.tasks.filter((reward) => !reward?.isLocal);
-      console.log(`finalTasks`, finalTasks);
       set("tasksReq", finalTasks);
-      //   setRewards(finalTasks);
+      setList((prevState) => ({ ...prevState, tasks: finalTasks }));
     } else {
       del("tasksReq", undefined);
       setList((prevState) => ({ ...prevState, tasks: [] }));
@@ -144,66 +140,104 @@ const Alerts = () => {
         duration: 4000,
         isClosable: true,
       });
-      const finalTasks = list.tasks.filter((reward) => !reward?.isLocal);
-      console.log(`finalTasks`, finalTasks);
-      set("tasksReq", finalTasks);
-      //   setRewards(finalTasks);
+      const rewardsTasks = list.rewards.filter((reward) => !reward?.isLocal);
+      set("rewardsReq", rewardsTasks);
+      setList((prevState) => ({ ...prevState, rewards: rewardsTasks }));
     } else {
-      del("tasksReq", undefined);
-      setList((prevState) => ({ ...prevState, tasks: [] }));
+      del("rewardsReq", undefined);
+      setList((prevState) => ({ ...prevState, rewards: [] }));
     }
   };
 
-  const approveTaskReq = async (task) => {
-    console.log(`task`, task);
-    setLoading(true)
-    try {
-      await actor.approveTask(task.childId, task.taskId, Date.now())
-      console.log(`try block`);
-      toast({
-        title: `Approved`,
-        status: "success",
-        duration: 4000,
-        isClosable: true,
-      });
-      getAlerts({ callService: true })
-    } catch (error) {
-      toast({
-        title: "An error occurred.",
-        description: `Apologies, please try again later.`,
-        status: "error",
-        duration: 4000,
-        isClosable: true,
-      })
-      setLoading(false)
-      console.log(`error block`, error);
+  const approveRequest = async ({ task, reward }) => {
+    setLoading(true);
+    let dateNum = Math.floor(Date.now() / 1000);
+    let date = dateNum.toString();
+
+    if (task) {
+      try {
+        await actor.approveTask(task.childId, parseInt(task.taskId), date);
+        toast({
+          title: `Approved`,
+          status: "success",
+          duration: 4000,
+          isClosable: true,
+        });
+        getAlerts({ callService: true });
+      } catch (error) {
+        toast({
+          title: "An error occurred.",
+          description: `Apologies, please try again later.`,
+          status: "error",
+          duration: 4000,
+          isClosable: true,
+        });
+        setLoading(false);
+        console.log(`error block`, error);
+      }
+    } else if (reward) {
+      try {
+        await actor.claimGoal(child.id, parseInt(reward.id), date);
+        toast({
+          title: `Approved`,
+          status: "success",
+          duration: 4000,
+          isClosable: true,
+        });
+        getAlerts({ callService: true });
+      } catch (error) {
+        toast({
+          title: "An error occurred.",
+          description: `Apologies, please try again later.`,
+          status: "error",
+          duration: 4000,
+          isClosable: true,
+        });
+        setLoading(false);
+        console.log(`error block`, error);
+      }
     }
-  }
-  const rejectTaskReq = async (task) => {
-    console.log(`task`, task);
-    setLoading(true)
-    try {
-      await actor.removeTaskReq(task.childId, task.id)
-      console.log(`try block`);
-      getAlerts({ callService: true })
-    } catch (error) {
-      toast({
-        title: "An error occurred.",
-        description: `Apologies, please try again later.`,
-        status: "error",
-        duration: 4000,
-        isClosable: true,
-      })
-      setLoading(false)
-      console.log(`error block`, error);
+  };
+  const rejectRequest = async ({ task, reward }) => {
+    setLoading(true);
+    if (task) {
+      try {
+        await actor.removeTaskReq(child.id, task.id);
+        getAlerts({ callService: true });
+      } catch (error) {
+        toast({
+          title: "An error occurred.",
+          description: `Apologies, please try again later.`,
+          status: "error",
+          duration: 4000,
+          isClosable: true,
+        });
+        setLoading(false);
+        console.log(`error block`, error);
+      }
+    } else if (reward) {
+      try {
+        await actor.removeRewardReq(child.id, reward.id);
+        getAlerts({ callService: true });
+      } catch (error) {
+        toast({
+          title: "An error occurred.",
+          description: `Apologies, please try again later.`,
+          status: "error",
+          duration: 4000,
+          isClosable: true,
+        });
+        setLoading(false);
+        console.log(`error block`, error);
+      }
     }
-  }
+  };
 
   const trailingActions = React.useCallback(
-    ({ task }) => (
+    ({ task, reward }) => (
       <TrailingActions>
         <SwipeAction
-          onClick={() => approveTaskReq(task)}
+          onClick={() => approveRequest({ task, reward })}
           className="approve"
         >
           <div className="action-btn ">
@@ -217,7 +251,7 @@ const Alerts = () => {
         </SwipeAction>
         <SwipeAction
           className="delete"
-          onClick={() => rejectTaskReq(task)}
+          onClick={() => rejectRequest({ task, reward })}
         >
           <div className="action-btn ">
             <div className="ItemColumnCentered">
@@ -236,8 +270,7 @@ const Alerts = () => {
   const onSwipeStart = () => {
     setStartSwiping(true);
   };
-  console.log(`list.tasks`, list.tasks);
-  
+
   const AlertsList = React.useMemo(() => {
     return (
       <>
@@ -249,6 +282,16 @@ const Alerts = () => {
                 type={ListType.IOS}
                 fullSwipe={false}
               >
+                {list.rewards.map((reward, idx) => (
+                  <SwipeableListItem
+                    leadingActions={null}
+                    trailingActions={trailingActions({ reward })}
+                    key={idx}
+                    onSwipeStart={onSwipeStart}
+                  >
+                    <RequestAlert key={reward.id} req={reward} />
+                  </SwipeableListItem>
+                ))}
                 {list.tasks.map((task, idx) => (
                   <SwipeableListItem
                     leadingActions={null}
@@ -265,7 +308,7 @@ const Alerts = () => {
         ) : null}
       </>
     );
-  }, [list.tasks]);
+  }, [list.tasks, list.rewards]);
 
   if (loading) {
     return <LoadingSpinner />;

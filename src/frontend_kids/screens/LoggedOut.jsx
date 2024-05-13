@@ -77,7 +77,7 @@ function LoggedOut() {
     console.log(`name`, name);
     set("selectedChildName", name, store)
 
-    handleUpdateChild({ id: data, name: 'Test', balance: parseInt(balance) })
+    handleUpdateChild({ id: data, name: name, balance: parseInt(balance) })
   };
 
   if (!isLoading && isAuthenticated) {

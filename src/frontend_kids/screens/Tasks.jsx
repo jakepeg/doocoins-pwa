@@ -63,7 +63,7 @@ const Tasks = () => {
 
   React.useEffect(() => {
     if (!blockingChildUpdate) {
-      // getChildren({ revokeStateUpdate: false });
+      getChildren({ revokeStateUpdate: false });
     }
   }, []);
 
@@ -93,13 +93,14 @@ const Tasks = () => {
   }, []);
 
   const getChildren = async ({ revokeStateUpdate = false }) => {
-    await get("selectedChild").then(async (data) => {
+    await get("selectedChild", store).then(async (data) => {
       const [balance, name] = await Promise.all([
-        get(`balance-${data}`),
-        get(`selectedChildName`),
+        get(`balance-${data}`, store),
+        get(`selectedChildName`, store),
       ]);
       if (data) {
         if (!revokeStateUpdate) {
+          console.log(`data`, data);
           setChild({
             id: data,
             balance: parseInt(balance),
@@ -478,7 +479,7 @@ const Tasks = () => {
 
   const handleReq = async (selectedTask) => {
     try {
-      await actor.requestTaskComplete(child.id, selectedTask.id)
+      await actor.requestTaskComplete(child.id, selectedTask.id, selectedTask.name, selectedTask.value)
       toast({
         title: `well done ${child.name}, the task is pending`,
         status: "success",
@@ -487,6 +488,7 @@ const Tasks = () => {
       });
 
     } catch (error) {
+      console.log(`the error`, error);
       toast({
         title: "An error occurred.",
         description: `Apologies, please try again later.`,

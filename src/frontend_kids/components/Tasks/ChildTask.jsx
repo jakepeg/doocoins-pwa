@@ -11,11 +11,11 @@ const ChildTask = ({ task, handleReq }) => {
   const handleClick = (task) => {
     handleReq(task);
     setShowEmoji(true);
-    onToggle(); // trigger animation
+    onToggle();
     setTimeout(() => {
       setShowEmoji(false);
-      onToggle(); // end animation
-    }, 2000); // display for 2 second
+      onToggle();
+    }, 2000);
   };
 
   return (
