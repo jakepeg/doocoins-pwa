@@ -31,7 +31,7 @@ function NavDrawer() {
         flexDirection={"row"}
         justifyContent={"space-between"}
         style={{ zIndex: 9, position: "relative" }}
-        px={showMobileLayout && 4}
+        px={showMobileLayout && 3.5}
         pt={showMobileLayout && 5}
       >
         <NavLink to="/">
@@ -40,7 +40,7 @@ function NavDrawer() {
             aria-label="doocoins"
             src={LogoIcon}
             style={{
-              height: "28px",
+              height: "32px",
               marginLeft: showMobileLayout ? 0 : "10px",
               marginTop: "10px",
             }}
@@ -53,7 +53,7 @@ function NavDrawer() {
           aria-label="open menu"
           src={ProfileIcon}
           style={{
-            height: "28px",
+            height: "32px",
             marginRight: showMobileLayout ? "5px" : "15px",
             marginTop: "10px",
           }}

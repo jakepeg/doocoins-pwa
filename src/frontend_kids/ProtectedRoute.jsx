@@ -30,6 +30,7 @@ function ProtectedRoute({ children }) {
             flexDirection: "column",
           }
         }
+        px={'5px'}
       >
         <NavDrawer />
         {showMobileLayout && (

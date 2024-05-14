@@ -72,7 +72,7 @@ function CustomTabs() {
     return (
       <Link to={props.href}>
         <Button
-          style={{ border: "none" }}
+          style={{ border: "none", paddingTop: '18px' }}
           display="flex"
           flex="0 0 25em"
           flexDirection="column"
@@ -82,7 +82,7 @@ function CustomTabs() {
           // {...tabProps}
         >
           <Box as="span" style={{ transform: "translateX(1px)" }}>
-            <props.icon activeColor={isSelected && "#00A4D7"} width="25px" />
+            <props.icon activeColor={isSelected && "#00A4D7"} width="40px" height="50px" />
           </Box>
           <Box color={isSelected ? "#00A4D7" : "#fff"} fontSize={14} mt={1}>
             {tabProps.children}
@@ -107,7 +107,7 @@ function CustomTabs() {
           alignItems: "center",
           border: "none",
           width: "100%",
-          maxWidth: "768px",
+          maxWidth: "544px",
           minWidth: "320px",
           margin: "0 auto",
           backgroundColor: "#0B334D",
