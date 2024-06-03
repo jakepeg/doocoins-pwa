@@ -315,9 +315,9 @@ actor {
     let callerId = msg.caller;
     let unArchivedChildsTasks : Buffer.Buffer<Types.Task> = Buffer.Buffer<Types.Task>(0);
 
-    if (Principal.toText(callerId) == anonIdNew) {
-      return #err(#NotAuthorized);
-    };
+    // if (Principal.toText(callerId) == anonIdNew) {
+    //   return #err(#NotAuthorized);
+    // };
 
     let myChildTasks = Trie.find(
       childToTasks,
@@ -784,7 +784,7 @@ actor {
 
   };
 
-  public shared (msg) func requestClaimReward(childId : Text, rewardId : Nat, value : Nat,name:Text) : async Text {
+  public shared (msg) func requestClaimReward(childId : Text, rewardId : Nat, value : Nat, name : Text) : async Text {
     let randomPin = await _randomPin();
     let requestId = childId # "-" #Nat.toText(rewardId) #Nat.toText(randomPin);
     let task : Types.RewardRequest = {
