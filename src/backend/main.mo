@@ -38,9 +38,11 @@ actor {
   //for setting up child's current goal
   stable var childToCurrentGoal : Trie.Trie<Text, Nat> = Trie.empty();
 
+  // MILESTONE #1
   //for mapping child's doocoins balance to child
   stable var childToBalance : Trie.Trie<Text, Nat> = Trie.empty();
 
+  // MILESTONE #1
   //for magicCode child app onboarding OTP
   stable var childPins : Trie.Trie<Text, Nat> = Trie.empty();
   stable var childIdsFromPin : Trie.Trie<Nat, Text> = Trie.empty();
@@ -56,6 +58,7 @@ actor {
     msg.caller;
   };
 
+  // MILESTONE #1 METHODS
   //magicCode child app onboarding OTP
   //----------------------------------------------------------------------------------------------------
 
@@ -141,6 +144,8 @@ actor {
     let burnt = await burnCode(nullToNat(childPinStore));
     return childPinStore;
   };
+
+  // END MILESTONE #1 TASKS
 
   //count users
   //----------------------------------------------------------------------------------------------------
@@ -312,12 +317,7 @@ actor {
   //----------------------------------------------------------------------------------------------------
 
   public shared (msg) func getTasks(childId : Text) : async Result.Result<[Types.Task], Types.Error> {
-    let callerId = msg.caller;
     let unArchivedChildsTasks : Buffer.Buffer<Types.Task> = Buffer.Buffer<Types.Task>(0);
-
-    // if (Principal.toText(callerId) == anonIdNew) {
-    //   return #err(#NotAuthorized);
-    // };
 
     let myChildTasks = Trie.find(
       childToTasks,
@@ -734,6 +734,7 @@ actor {
     return currentBalanceFormatted;
   };
 
+  // MILESTONE #2 WIP
   //Request rewards and task complete
   //Parametes needed: childId and updated child object.
   //   //----------------------------------------------------------------------------------------------------
