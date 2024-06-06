@@ -49,9 +49,9 @@ const ChildTask = ({ task, handleReq }) => {
               </span>
             </ScaleFade>
           ) : (
-            <Box
+            {/* <Box
               p={1}
-              background="#129FAA"
+              background="#00A4D7"
               ml={4}
               cursor="pointer"
               borderRadius={100}
@@ -61,7 +61,7 @@ const ChildTask = ({ task, handleReq }) => {
                 width="20px"
                 height="20px"
               />
-            </Box>
+            </Box> */}
           )}
         </div>
       </Box>

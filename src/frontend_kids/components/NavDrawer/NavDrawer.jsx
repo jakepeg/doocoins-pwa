@@ -40,7 +40,7 @@ function NavDrawer() {
             aria-label="doocoins"
             src={LogoIcon}
             style={{
-              height: "32px",
+              height: "34px",
               marginLeft: showMobileLayout ? 0 : "10px",
               marginTop: "10px",
             }}
@@ -53,7 +53,7 @@ function NavDrawer() {
           aria-label="open menu"
           src={ProfileIcon}
           style={{
-            height: "32px",
+            height: "34px",
             marginRight: showMobileLayout ? "5px" : "15px",
             marginTop: "10px",
           }}
