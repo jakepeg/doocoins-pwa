@@ -45,7 +45,56 @@ const ChildReward = ({
         </Text>
         <div className="child-balance">
           <DCIcon className="balance-dc-icon" width="24px" height="24px" />
-
+          <Box fontSize={"24px"}>{parseInt(reward.value)}</Box>
+          {showEmoji ? (
+            <ScaleFade initialScale={0.9} in={isOpen}>
+              <span
+                role="img"
+                aria-label="fireworks"
+                style={{ marginLeft: "4px", fontSize: "24px" }}
+              >
+                🎆
+              </span>
+            </ScaleFade>
+          ) : (
+            <>
+              {child.balance >= reward.value ? (
+                <Box
+                  ml={1}
+                  p={1}
+                  background="#129FAA"
+                  cursor="pointer"
+                  borderRadius={100}
+                  onClick={() => handleClick(reward, "req")}
+                >
+                  <TickIcon width="20px" height="20px" />
+                </Box>
+              ) : reward.active ? (
+                <Box
+                  ml={1}
+                  p={1}
+                  background="red"
+                  cursor="pointer"
+                  borderRadius={100}
+                  onClick={() => handleClick(reward, "close")}
+                >
+                  <CloseIcon stroke="#fff" width="20px" height="20px" />
+                </Box>
+              ) : (
+                <Box
+                  ml={1}
+                  p={1}
+                  cursor="pointer"
+                  borderRadius={100}
+                  onClick={() => handleClick(reward, "set")}
+                >
+                  <GoalIcon fill="#129FAA" width="20px" height="20px" />
+                </Box>
+              )}
+            </>
+          )}
+        </div>
+      </Box>
     </>
   );
 };
