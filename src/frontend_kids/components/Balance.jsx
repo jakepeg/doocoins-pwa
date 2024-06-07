@@ -276,7 +276,7 @@ const Balance = () => {
                   alignItems={"center"}
                   sx={{
                     width: { base: 100, sm: 200, md: 280 },
-                    height: { base: 160, sm: 200, md: 280 },
+                    height: { base: 160, sm: 200, md: 250 },
                     maxHeight: "320px",
                   }}
                 >
@@ -286,12 +286,12 @@ const Balance = () => {
                     text={`${percentage}%`}
                     background
                     backgroundPadding={6}
-                    strokeWidth={5}
+                    strokeWidth={4}
                     styles={buildStyles({
                       strokeLinecap: "butt",
                       backgroundColor: "#0B334D",
                       textColor: "#fff",
-                      pathColor: "#fff",
+                      pathColor: "#00A4D7",
                       trailColor: "transparent",
                       textSize: "1.2em",
                     })}
@@ -301,8 +301,9 @@ const Balance = () => {
                       color: "#fff",
                       marginTop: "0px",
                       textAlign: "center",
-                      fontSize: "1em",
-                      lineHeight: "1em",
+                      fontSize: "25px",
+                      fontWeight: "300",
+                      lineHeight: "1.5em",
                     }}
                   >
                     {goal.name}

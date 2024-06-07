@@ -7,7 +7,7 @@
   /* width: 100%; */
   background-position: center center;
   position: relative;
-  min-height: 35vh;
+  min-height: 32vh; /*  was 35vh */
   border-radius: 12px 12px 12px 12px;
   max-width: 544px;
   width: 100%;
