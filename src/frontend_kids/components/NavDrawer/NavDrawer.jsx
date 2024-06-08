@@ -12,7 +12,7 @@ import {
 import { Link as NavLink } from "react-router-dom";
 import React from "react";
 import ProfileIcon from "../../assets/images/profile-icon.svg";
-import LogoIcon from "../../assets/images/logo.svg";
+import LogoIcon from "../../assets/images/logo-dark.svg";
 import { useAuth } from "../../use-auth-client";
 import useIsMobileLayout from "../../hooks/useIsMobileLayout";
 import useClearContextState from "../../hooks/useClearContextState";
