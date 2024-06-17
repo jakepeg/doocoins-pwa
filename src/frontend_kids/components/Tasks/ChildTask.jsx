@@ -59,8 +59,8 @@ const ChildTask = ({ task, handleReq }) => {
               <TickIcon
                 onClick={() => handleClick(task)}
                 // width and height should be 22px
-                width="0px"
-                height="0px"
+                width="18px"
+                height="18px"
               />
             </Box>
           )}

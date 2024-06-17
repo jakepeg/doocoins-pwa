@@ -69,8 +69,8 @@ const ChildReward = ({
                 >
                   <TickIcon 
                     // width and height should be 20px
-                    width="0px" 
-                    height="0px"
+                    width="20px" 
+                    height="20px"
                    />
                 </Box>
               ) : reward.active ? (
@@ -85,8 +85,8 @@ const ChildReward = ({
                   <CloseIcon 
                     stroke="#fff" 
                     // width and height should be 20px
-                    width="0px" 
-                    height="0px" 
+                    width="20px" 
+                    height="20px" 
                   />
                 </Box>
               ) : (
@@ -97,7 +97,10 @@ const ChildReward = ({
                   borderRadius={100}
                   onClick={() => handleClick(reward, "set")}
                 >
-                  <GoalIcon fill="#129FAA" width="20px" height="20px" />
+                  <GoalIcon 
+                    fill="#129FAA" 
+                    width="24px" 
+                    height="24px" />
                 </Box>
               )}
             </>

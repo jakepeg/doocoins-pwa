@@ -83,7 +83,7 @@ actor {
     };
     Debug.print("Setting timers!" #debug_show (Int.abs(now - oneMinute)));
     ignore setTimer<system>(
-      #seconds(60 * 10), // 10 mins
+      #seconds(60 * 60), // 60 mins
       func() : async () {
 
         await burnCodeAsync();

@@ -61,16 +61,16 @@ const InviteChild = () => {
           flexDirection="column"
           justifyContent={"center"}
         >
-          <Text fontSize="xl" color="#fff">
+          <Text fontSize="3xl" color="#fff">
             Invite {child.name}
           </Text>
           <Text fontSize="xl" color="#fff">
-            Get your child on board with DooCoins Kids!
+            Get {child.name} on board with DooCoins Kids!
           </Text>
 
           <Box as="ol" ml="20px" color="#fff">
             <Box as="li" fontSize="xl">
-              Install the Kids App:
+              Install the Kids App: <a class="blue-ul" href="https://www.doo.co/install-kids" target="_blank">doo.co/install-kids</a>
             </Box>
             <Box as="li" fontSize="xl">
               Enter the magic code:

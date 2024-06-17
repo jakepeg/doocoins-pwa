@@ -63,7 +63,7 @@ function LoggedOut() {
     setCheckingCode(false)
 
     if (!data) {
-      setError("Incorrect magic code.");
+      setError("Incorrect or expired magic code.");
       return;
     }
     if (data?.error) {
