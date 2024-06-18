@@ -470,88 +470,6 @@ const Rewards = () => {
     if (child) getRewards({ callService: true });
   }, [actor, child]);
 
-  const trailingActions = React.useCallback(
-    ({ reward }) => (
-      <TrailingActions>
-        {child.balance >= reward.value ? (
-          <SwipeAction
-            onClick={() => handleTogglePopup(true, reward, "claim")}
-            className="approve"
-          >
-            <div className="action-btn ">
-              <div className="ItemColumnCentered">
-                <ApproveIcon width="22px" height="22px" />
-                <Text fontSize={"xs"} color={"#fff"}>
-                  Claim
-                </Text>
-              </div>
-            </div>
-          </SwipeAction>
-        ) : (
-          <>
-            {reward.active ? (
-              <SwipeAction
-                onClick={() => handleTogglePopup(true, reward, "remove_goal")}
-                className="claim-option"
-              >
-                <div className="action-btn ">
-                  <div className="ItemColumnCentered">
-                    <GoalIcon width="22px" height="22px" />
-                    <Text fontSize={"xs"} color={"#fff"}>
-                      Remove
-                    </Text>
-                  </div>
-                </div>
-              </SwipeAction>
-            ) : (
-              <SwipeAction
-                onClick={() => handleTogglePopup(true, reward, "goal")}
-                className="claim-option"
-              >
-                <div className="action-btn ">
-                  <div className="ItemColumnCentered">
-                    <GoalIcon width="22px" height="22px" />
-                    <Text fontSize={"xs"} color={"#fff"}>
-                      Goal
-                    </Text>
-                  </div>
-                </div>
-              </SwipeAction>
-            )}
-          </>
-        )}
-
-        <SwipeAction
-          className="edit"
-          onClick={() => handleTogglePopup(true, reward, "edit")}
-        >
-          <div className="action-btn ">
-            <div className="ItemColumnCentered">
-              <EditIcon width="22px" height="22px" />
-              <Text fontSize={"xs"} color={"#fff"}>
-                Edit
-              </Text>
-            </div>
-          </div>
-        </SwipeAction>
-        <SwipeAction
-          className="delete"
-          onClick={() => handleTogglePopup(true, reward, "delete")}
-        >
-          <div className="action-btn ">
-            <div className="ItemColumnCentered">
-              <DeleteIcon width="22px" height="22px" />
-              <Text fontSize={"xs"} color={"#fff"}>
-                Delete
-              </Text>
-            </div>
-          </div>
-        </SwipeAction>
-      </TrailingActions>
-    ),
-    [child]
-  );
-
   const handleCloseDeletePopup = () => {
     setShowPopup((prevState) => ({ ...prevState, ["delete"]: false }));
   };
@@ -587,41 +505,6 @@ const Rewards = () => {
       ...prevState,
       ["goal"]: !prevState.goal,
     }));
-  };
-
-  const handleSubmitReward = (rewardName, value) => {
-    if (rewardName) {
-      const reward = {
-        name: rewardName,
-        value: parseInt(value),
-        active: false,
-        archived: false,
-        id: rewards?.[0]?.id + 1 || 1,
-        isLocal: true,
-      };
-      setRewards((prevState) => {
-        set("rewardList", [reward, ...prevState], store);
-        return [reward, ...prevState];
-      });
-      // setLoader((prevState) => ({ ...prevState, singles: true }));
-      handleToggleAddRewardPopup();
-      actor
-        .addGoal(reward, child.id)
-        .then((response) => {
-          if ("ok" in response) {
-            getRewards({
-              disableFullLoader: true,
-              callService: true,
-              revokeStateUpdate: true,
-            });
-          } else {
-            removeErrorItem();
-          }
-        })
-        .catch((error) => {
-          removeErrorItem();
-        });
-    }
   };
 
   const handleReq = async (selectedReward) => {
