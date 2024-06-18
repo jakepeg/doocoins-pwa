@@ -16,7 +16,9 @@ import RewardsIcon from "./RewardsIcon2";
 import strings from "../../utils/constants";
 import BottomNavCallout from "../Callouts/BottomNavCallout";
 import { ReactComponent as NotificationIcon } from "../../assets/images/notification-icon.svg";
+import { ReactComponent as ZeroNotificationIcon } from "../../assets/images/zero-notification-icon.svg";
 import { ChildContext } from "../../contexts/ChildContext";
+import useHasRewards from "../../hooks/useHasRewards";
 
 function BottomTabNav() {
   const { pathname } = useLocation();
@@ -53,8 +55,10 @@ export default BottomTabNav;
 
 function CustomTabs() {
   const { pathname } = useLocation();
-  const { isNewToSystem, handleUpdateCalloutState } =
+  const { isNewToSystem, handleUpdateCalloutState, child } =
     React.useContext(ChildContext);
+    console.log(`;lmao`, child);
+    const count = useHasRewards(child.id)
 
   const CustomTab = React.forwardRef((props, ref) => {
     // 1. Reuse the `useTab` hook
@@ -119,7 +123,7 @@ function CustomTabs() {
         <CustomTab icon={WalletIcon} href="/wallet" />
         <CustomTab icon={TasksIcon} href="/tasks" />
         <CustomTab icon={RewardsIcon} href="/rewards" />
-        <CustomTab icon={NotificationIcon} href="/alerts" />
+        <CustomTab icon={!count ? ZeroNotificationIcon : NotificationIcon} href="/alerts" />
       </TabList>
     </Tabs>
   );
