@@ -70,8 +70,13 @@ const InviteChild = () => {
 
           <Box as="ol" ml="20px" color="#fff">
             <Box as="li" fontSize="xl">
-              Install the Kids App: <a class="blue-ul" href="https://www.doo.co/install-kids" target="_blank">doo.co/install-kids</a>
+            On {child.name}'s device, in a web browser go to www.doo.kids 
             </Box>
+
+            <Box as="li" fontSize="xl">
+            Follow the instructions to install the app 
+            </Box>
+
             <Box as="li" fontSize="xl">
               Enter the magic code:
             </Box>
