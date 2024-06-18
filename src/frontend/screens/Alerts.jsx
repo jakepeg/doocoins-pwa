@@ -18,9 +18,16 @@ import RequestAlert from "../../frontend_kids/components/Tasks/RequestAlert";
 const Alerts = () => {
   const [loading, setLoading] = useState(true);
   const [list, setList] = useState({ tasks: [], rewards: [] });
-  const [startSwiping, setStartSwiping] = React.useState(false);
+
   const toast = useToast();
-  const { child } = React.useContext(ChildContext);
+  const {
+    child,
+    setChild,
+    getBalance,
+    transactions,
+    setTransactions,
+    setBlockingChildUpdate,
+  } = React.useContext(ChildContext);
   const { actor } = useAuth();
 
   React.useEffect(() => {
@@ -82,7 +89,6 @@ const Alerts = () => {
           if (val === undefined || callService) {
             actor?.getRewardReqs(child.id).then(async (returnedRewardsReq) => {
               set("rewardsReq", returnedRewardsReq);
-
               setList((prevState) => ({
                 ...prevState,
                 rewards: returnedRewardsReq,
@@ -149,14 +155,109 @@ const Alerts = () => {
     }
   };
 
+  const getChildren = async ({ revokeStateUpdate = false }) => {
+    await get("selectedChild").then(async (data) => {
+      const [balance, name] = await Promise.all([
+        get(`balance-${data}`),
+        get(`selectedChildName`),
+      ]);
+      if (data) {
+        if (!revokeStateUpdate) {
+          setChild({
+            id: data,
+            balance: parseInt(balance),
+            name,
+          });
+        }
+      } else {
+        navigate("/");
+      }
+    });
+  };
+
+  const handleUpdateTransactions = (transactions) => {
+    setTransactions(transactions);
+    set("transactionList", transactions);
+  };
+
   const approveRequest = async ({ task, reward }) => {
     setLoading(true);
     let dateNum = Math.floor(Date.now() / 1000);
     let date = dateNum.toString();
 
     if (task) {
+      let maxIdObject = null;
+
+      // Iterate through the data array to find the object with the highest "id"
+      for (const item of transactions) {
+        if (!maxIdObject || Number(item.id) > Number(maxIdObject.id)) {
+          maxIdObject = item;
+        }
+      }
+
+      const new_transactions = {
+        completedDate: date,
+        id: maxIdObject?.id ? parseInt(maxIdObject?.id) + 1 : 1,
+        value: task.value,
+        name: task.name,
+        transactionType: "TASK_CREDIT",
+      };
+      setChild((prevState) => ({
+        ...prevState,
+        balance: prevState.balance + task.value,
+      }));
+      set("transactionList", [new_transactions, ...transactions]);
+      setTransactions([new_transactions, ...transactions]);
+      // API call approveTask
+      setBlockingChildUpdate(true);
+
       try {
-        await actor.approveTask(task.childId, parseInt(task.taskId), date);
+        await actor
+          .approveTask(task.childId, parseInt(task.taskId), date)
+          .then((returnedApproveTask) => {
+            if ("ok" in returnedApproveTask) {
+              actor?.getChildren().then(async (returnedChilren) => {
+                if ("ok" in returnedChilren) {
+                  toast({
+                    title: `Keep up the good work, ${child.name}.`,
+                    status: "success",
+                    duration: 4000,
+                    isClosable: true,
+                  });
+                  const children = Object.values(returnedChilren);
+                  const updatedChildrenData = await Promise.all(
+                    children[0].map(async (child) => {
+                      const balance = await getBalance(child.id);
+                      return {
+                        ...child,
+                        balance: parseInt(balance),
+                      };
+                    })
+                  );
+                  set("childList", updatedChildrenData);
+                  await getChildren({ revokeStateUpdate: true });
+                  // setLoader((prevState) => ({ ...prevState, init: false }));
+                  setBlockingChildUpdate(false);
+                } else {
+                  // setLoader((prevState) => ({ ...prevState, init: false }));
+                  console.error(returnedChilren.err);
+                }
+              });
+            } else {
+              // setLoader((prevState) => ({ ...prevState, init: false }));
+              const filteredTransactions = transactions.filter(
+                (transaction) => transaction.id !== new_transactions.id
+              );
+              setTransactions(filteredTransactions);
+              setChild((prevState) => ({
+                ...prevState,
+                balance: prevState.balance - task.value,
+              }));
+              set("transactionList", filteredTransactions);
+              console.error(returnedApproveTask.err);
+              setBlockingChildUpdate(false);
+            }
+          });
         toast({
           title: `Approved`,
           status: "success",
@@ -176,8 +277,62 @@ const Alerts = () => {
         console.log(`error block`, error);
       }
     } else if (reward) {
+      const new_transactions = {
+        completedDate: date,
+        id: transactions?.[0]?.id ? parseInt(transactions?.[0]?.id) + 1 : 1,
+        value: reward.value,
+        name: reward.name,
+        transactionType: "GOAL_DEBIT",
+      };
+      handleUpdateTransactions([new_transactions, ...transactions]);
+
+      setChild((prevState) => ({
+        ...prevState,
+        balance: prevState.balance - reward.value,
+      }));
+
       try {
-        await actor.claimGoal(child.id, parseInt(reward.id), date);
+        await actor
+          .claimGoal(child.id, parseInt(reward.id), date)
+          .then(async (returnedClaimReward) => {
+            if ("ok" in returnedClaimReward) {
+              toast({
+                title: `Yay - well deserved, ${child.name}.`,
+                status: "success",
+                duration: 4000,
+                isClosable: true,
+              });
+              // getReward({ rewardId: reward_id, revokeStateUpdate: true });
+              actor?.getChildren().then(async (returnedChilren) => {
+                const children = Object.values(returnedChilren);
+                const updatedChildrenData = await Promise.all(
+                  children[0].map(async (child) => {
+                    const balance = await getBalance(child.id);
+
+                    return {
+                      ...child,
+                      balance: parseInt(balance),
+                    };
+                  })
+                );
+                set("childList", updatedChildrenData);
+                await getChildren({ revokeStateUpdate: true });
+                // setIsLoading(false);
+                setBlockingChildUpdate(false);
+              });
+            } else {
+              console.error(returnedClaimReward.err);
+              handleUpdateTransactions(
+                transactions.filter(
+                  (transaction) => transaction.id !== new_transactions.id
+                )
+              );
+              setBlockingChildUpdate(false);
+            }
+          })
+          .finally(() => {
+            // setIsLoading(false);
+          });
         toast({
           title: `Approved`,
           status: "success",
@@ -217,7 +372,7 @@ const Alerts = () => {
       }
     } else if (reward) {
       try {
-        await actor.removeRewardReq(child.id, reward.id);
+        await actor.removeRewardReq(child.id, reward.strId);
         getAlerts({ callService: true });
       } catch (error) {
         toast({
@@ -267,14 +422,12 @@ const Alerts = () => {
     []
   );
 
-  const onSwipeStart = () => {
-    setStartSwiping(true);
-  };
+  const onSwipeStart = () => {};
 
   const AlertsList = React.useMemo(() => {
     return (
       <>
-        {list.tasks?.length ? (
+        {(list.tasks?.length || list.rewards?.length) ? (
           <div className="example">
             <ul className="child-list" style={{ position: "relative" }}>
               <SwipeableList
@@ -285,7 +438,7 @@ const Alerts = () => {
                 {list.rewards.map((reward, idx) => (
                   <SwipeableListItem
                     leadingActions={null}
-                    trailingActions={trailingActions({ reward })}
+                    trailingActions={trailingActions({ reward: { ...reward, value: parseInt(reward.value), id: parseInt(reward.reward || reward.id), strId: reward.id }, })}
                     key={idx}
                     onSwipeStart={onSwipeStart}
                   >
@@ -295,7 +448,9 @@ const Alerts = () => {
                 {list.tasks.map((task, idx) => (
                   <SwipeableListItem
                     leadingActions={null}
-                    trailingActions={trailingActions({ task })}
+                    trailingActions={trailingActions({
+                      task: { ...task, value: parseInt(task.value) },
+                    })}
                     key={idx}
                     onSwipeStart={onSwipeStart}
                   >

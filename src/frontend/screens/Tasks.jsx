@@ -37,7 +37,6 @@ const Tasks = () => {
   const navigate = useNavigate();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [tasks, setTasks] = React.useState([]);
-  const [taskComplete, setTaskComplete] = React.useState(null);
   const {
     child,
     setChild,
@@ -383,7 +382,6 @@ const Tasks = () => {
     // setLoader((prevState) => ({ ...prevState, init: true }));
     actor?.approveTask(child.id, task_id, date).then((returnedApproveTask) => {
       if ("ok" in returnedApproveTask) {
-        setTaskComplete(parseInt(task_id));
         actor?.getChildren().then(async (returnedChilren) => {
           if ("ok" in returnedChilren) {
             toast({
