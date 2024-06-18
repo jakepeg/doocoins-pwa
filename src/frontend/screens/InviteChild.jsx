@@ -67,21 +67,20 @@ const InviteChild = () => {
           <Text fontSize="xl" color="#fff">
             Get {child.name} on board with DooCoins Kids!
           </Text>
-
           <Box as="ol" ml="20px" color="#fff">
             <Box as="li" fontSize="xl">
-            On {child.name}'s device, in a web browser go to www.doo.kids 
+            On {child.name}'s device, in Safari (iOS) or Chrome (Android) go to www.doo.kids 
             </Box>
-
             <Box as="li" fontSize="xl">
             Follow the instructions to install the app 
             </Box>
-
+            <Box as="li" fontSize="xl">
+            Launch the app by clicking the DooCoins icon on the home screen.
+            </Box>
             <Box as="li" fontSize="xl">
               Enter the magic code:
             </Box>
           </Box>
-
           <Box
             display="flex"
             alignItems="center"
