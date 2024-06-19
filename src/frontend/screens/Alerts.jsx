@@ -14,10 +14,10 @@ import {
 import { ReactComponent as ApproveIcon } from "../assets/images/tick.svg";
 import { ReactComponent as DeleteIcon } from "../assets/images/delete.svg";
 import RequestAlert from "../../frontend_kids/components/Tasks/RequestAlert";
+import useHasRewards from "../hooks/useHasRewards";
 
 const Alerts = () => {
   const [loading, setLoading] = useState(true);
-  const [list, setList] = useState({ tasks: [], rewards: [] });
 
   const toast = useToast();
   const {
@@ -27,8 +27,11 @@ const Alerts = () => {
     transactions,
     setTransactions,
     setBlockingChildUpdate,
+    list, 
+    setList
   } = React.useContext(ChildContext);
   const { actor } = useAuth();
+  const { hasNewData } = useHasRewards(child?.id, false)
 
   React.useEffect(() => {
     if (!child) {
@@ -37,10 +40,10 @@ const Alerts = () => {
   }, [child]);
 
   React.useEffect(() => {
-    if (child) {
+    if (child && hasNewData) {
       getAlerts({ callService: true });
     }
-  }, [actor, child]);
+  }, [actor, child, hasNewData]);
 
   function getAlerts({
     disableFullLoader = false,

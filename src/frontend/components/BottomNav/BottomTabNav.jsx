@@ -55,10 +55,9 @@ export default BottomTabNav;
 
 function CustomTabs() {
   const { pathname } = useLocation();
-  const { isNewToSystem, handleUpdateCalloutState, child } =
+  const { isNewToSystem, handleUpdateCalloutState, child, list } =
     React.useContext(ChildContext);
-    console.log(`;lmao`, child);
-    const count = useHasRewards(child.id)
+  const { count } = useHasRewards(child?.id, pathname === '/alerts')
 
   const CustomTab = React.forwardRef((props, ref) => {
     // 1. Reuse the `useTab` hook
@@ -123,7 +122,7 @@ function CustomTabs() {
         <CustomTab icon={WalletIcon} href="/wallet" />
         <CustomTab icon={TasksIcon} href="/tasks" />
         <CustomTab icon={RewardsIcon} href="/rewards" />
-        <CustomTab icon={!count ? ZeroNotificationIcon : NotificationIcon} href="/alerts" />
+        <CustomTab icon={!count && (!list.tasks.length && !list.rewards.length) ? ZeroNotificationIcon : NotificationIcon} href="/alerts" />
       </TabList>
     </Tabs>
   );

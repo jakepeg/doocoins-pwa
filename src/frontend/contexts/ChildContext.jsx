@@ -12,6 +12,7 @@ export const ChildContext = createContext();
 export default function ChildProvider({ children }) {
   const { actor } = useAuth();
   const [child, setChild] = React.useState(null);
+  const [list, setList] = React.useState({ tasks: [], rewards: [] });
   const [goal, setGoal] = React.useState(null);
   const [blockingChildUpdate, setBlockingChildUpdate] = React.useState(false);
   const [transactions, setTransactions] = React.useState([]);
@@ -69,7 +70,9 @@ export default function ChildProvider({ children }) {
       setBlockingChildUpdate,
       blockingChildUpdate,
       setTransactions,
-      transactions
+      transactions,
+      setList,
+      list
     };
   }, [
     child,
@@ -83,7 +86,9 @@ export default function ChildProvider({ children }) {
     blockingChildUpdate,
     setBlockingChildUpdate,
     setTransactions,
-    transactions
+    transactions,
+    setList,
+    list
   ]);
 
   return (
