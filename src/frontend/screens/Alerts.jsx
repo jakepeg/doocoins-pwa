@@ -221,6 +221,7 @@ const Alerts = () => {
             if ("ok" in returnedApproveTask) {
               actor?.getChildren().then(async (returnedChilren) => {
                 if ("ok" in returnedChilren) {
+                  rejectRequest({ task })
                   toast({
                     title: `Keep up the good work, ${child.name}.`,
                     status: "success",
@@ -259,15 +260,21 @@ const Alerts = () => {
               set("transactionList", filteredTransactions);
               console.error(returnedApproveTask.err);
               setBlockingChildUpdate(false);
+              toast({
+                title: `Oops, sorry something went wrong.`,
+                status: "error",
+                duration: 4000,
+                isClosable: true,
+              })
             }
           });
-        toast({
-          title: `Approved`,
-          status: "success",
-          duration: 4000,
-          isClosable: true,
-        });
-        getAlerts({ callService: true });
+        // toast({
+        //   title: `Approved`,
+        //   status: "success",
+        //   duration: 4000,
+        //   isClosable: true,
+        // });
+        // getAlerts({ callService: true });
       } catch (error) {
         toast({
           title: "An error occurred.",
@@ -299,6 +306,7 @@ const Alerts = () => {
           .claimGoal(child.id, parseInt(reward.id), date)
           .then(async (returnedClaimReward) => {
             if ("ok" in returnedClaimReward) {
+              rejectRequest({ reward })
               toast({
                 title: `Yay - well deserved, ${child.name}.`,
                 status: "success",
@@ -336,13 +344,13 @@ const Alerts = () => {
           .finally(() => {
             // setIsLoading(false);
           });
-        toast({
-          title: `Approved`,
-          status: "success",
-          duration: 4000,
-          isClosable: true,
-        });
-        getAlerts({ callService: true });
+        // toast({
+        //   title: `Approved`,
+        //   status: "success",
+        //   duration: 4000,
+        //   isClosable: true,
+        // });
+        // getAlerts({ callService: true });
       } catch (error) {
         toast({
           title: "An error occurred.",
