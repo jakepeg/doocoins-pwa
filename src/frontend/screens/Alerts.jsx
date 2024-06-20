@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { ChildContext } from "../contexts/ChildContext";
 import { del, get, set } from "idb-keyval";
-import { useToast, Text } from "@chakra-ui/react";
+import { useToast, Text, Skeleton, Stack, Box } from "@chakra-ui/react";
 import { useAuth } from "../use-auth-client";
 import {
   SwipeableList,
@@ -27,11 +27,11 @@ const Alerts = () => {
     transactions,
     setTransactions,
     setBlockingChildUpdate,
-    list, 
-    setList
+    list,
+    setList,
   } = React.useContext(ChildContext);
   const { actor } = useAuth();
-  const { hasNewData } = useHasRewards(child?.id, false)
+  const { hasNewData } = useHasRewards(child?.id, false);
 
   React.useEffect(() => {
     if (!child) {
@@ -44,6 +44,12 @@ const Alerts = () => {
       getAlerts({ callService: true });
     }
   }, [actor, child, hasNewData]);
+
+  React.useEffect(() => {
+    if (child) {
+      getAlerts({ callService: true });
+    }
+  }, [actor, child]);
 
   function getAlerts({
     disableFullLoader = false,
@@ -221,6 +227,7 @@ const Alerts = () => {
             if ("ok" in returnedApproveTask) {
               actor?.getChildren().then(async (returnedChilren) => {
                 if ("ok" in returnedChilren) {
+                  rejectRequest({ task });
                   toast({
                     title: `Keep up the good work, ${child.name}.`,
                     status: "success",
@@ -259,15 +266,21 @@ const Alerts = () => {
               set("transactionList", filteredTransactions);
               console.error(returnedApproveTask.err);
               setBlockingChildUpdate(false);
+              toast({
+                title: `Oops, sorry something went wrong.`,
+                status: "error",
+                duration: 4000,
+                isClosable: true,
+              });
             }
           });
-        toast({
-          title: `Approved`,
-          status: "success",
-          duration: 4000,
-          isClosable: true,
-        });
-        getAlerts({ callService: true });
+        // toast({
+        //   title: `Approved`,
+        //   status: "success",
+        //   duration: 4000,
+        //   isClosable: true,
+        // });
+        // getAlerts({ callService: true });
       } catch (error) {
         toast({
           title: "An error occurred.",
@@ -299,6 +312,7 @@ const Alerts = () => {
           .claimGoal(child.id, parseInt(reward.id), date)
           .then(async (returnedClaimReward) => {
             if ("ok" in returnedClaimReward) {
+              rejectRequest({ reward });
               toast({
                 title: `Yay - well deserved, ${child.name}.`,
                 status: "success",
@@ -336,13 +350,13 @@ const Alerts = () => {
           .finally(() => {
             // setIsLoading(false);
           });
-        toast({
-          title: `Approved`,
-          status: "success",
-          duration: 4000,
-          isClosable: true,
-        });
-        getAlerts({ callService: true });
+        // toast({
+        //   title: `Approved`,
+        //   status: "success",
+        //   duration: 4000,
+        //   isClosable: true,
+        // });
+        // getAlerts({ callService: true });
       } catch (error) {
         toast({
           title: "An error occurred.",
@@ -430,7 +444,7 @@ const Alerts = () => {
   const AlertsList = React.useMemo(() => {
     return (
       <>
-        {(list.tasks?.length || list.rewards?.length) ? (
+        {list.tasks?.length || list.rewards?.length ? (
           <div className="example">
             <ul className="child-list" style={{ position: "relative" }}>
               <SwipeableList
@@ -441,7 +455,14 @@ const Alerts = () => {
                 {list.rewards.map((reward, idx) => (
                   <SwipeableListItem
                     leadingActions={null}
-                    trailingActions={trailingActions({ reward: { ...reward, value: parseInt(reward.value), id: parseInt(reward.reward || reward.id), strId: reward.id }, })}
+                    trailingActions={trailingActions({
+                      reward: {
+                        ...reward,
+                        value: parseInt(reward.value),
+                        id: parseInt(reward.reward || reward.id),
+                        strId: reward.id,
+                      },
+                    })}
                     key={idx}
                     onSwipeStart={onSwipeStart}
                   >
@@ -464,13 +485,19 @@ const Alerts = () => {
             </ul>
           </div>
         ) : null}
+
+        {!list.tasks?.length && !list.rewards?.length && (
+          <Text color="gray.800" align="left" pl={5} fontSize="sm">
+            There are no pending requests.
+          </Text>
+        )}
       </>
     );
   }, [list.tasks, list.rewards]);
 
-  if (loading) {
-    return <LoadingSpinner />;
-  }
+  // if (loading) {
+  //   return <LoadingSpinner />;
+  // }
 
   if (!child) {
     return (
@@ -495,7 +522,15 @@ const Alerts = () => {
         </h2>
       </div>
 
-      <>{AlertsList}</>
+      {loading ? (
+        <Stack margin={"0 20px 20px 20px"}>
+          <Skeleton height="20px" />
+          <Skeleton height="20px" mt={"12px"} />
+          <Skeleton height="20px" mt={"12px"} />
+        </Stack>
+      ) : (
+        <>{AlertsList}</>
+      )}
     </div>
   );
 };

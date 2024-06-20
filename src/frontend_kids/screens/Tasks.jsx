@@ -83,7 +83,7 @@ const Tasks = () => {
   }, [child]);
 
   function getTransactions() {
-    get("transactionList").then(async (val) => {
+    get("transactionList", store).then(async (val) => {
       setTransactions(val || []);
     });
   }

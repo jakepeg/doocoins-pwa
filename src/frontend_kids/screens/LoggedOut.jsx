@@ -74,7 +74,6 @@ function LoggedOut() {
     set("selectedChild", data, store)
     const balance = await getBalance(data);
     const name = await actor.getChild(data);
-    console.log(`name`, name);
     set("selectedChildName", name, store)
 
     handleUpdateChild({ id: data, name: name, balance: parseInt(balance) })

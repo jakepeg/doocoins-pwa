@@ -41,7 +41,7 @@ export const useAuthClient = () => {
       if (data?.[0]) {
         setIsAuthenticated(true);
       } else {
-        del("selectedChild");
+        del("selectedChild", store);
         setIsAuthenticated(false);
       }
       return data?.[0];
