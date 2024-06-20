@@ -311,7 +311,6 @@ const Rewards = () => {
   };
 
   function handleSetGoal({ reward_id, isForSet, disableFullLoader, selectedReward }) {
-    console.log(`selectedReward`, selectedReward);
     if (isForSet) {
       // handleToggleGoalPopup();
       const returnedGoal = {

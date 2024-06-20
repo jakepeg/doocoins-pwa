@@ -1,15 +1,17 @@
 import { get } from "idb-keyval";
 import React from "react";
 import strings from "../utils/constants";
+import { useAuth } from "../use-auth-client";
 
 const useCheckIsUserNewToSwipeActions = ({ handleUpdateCalloutState }) => {
   const [isUserNew, setIsUserNew] = React.useState();
+  const { store } = useAuth();
   const checkIsUserNew = async () => {
     const [rewardCallout, rewards, taskListCallout, tasks] = await Promise.all([
-      get(`${strings.CALLOUT_REWARDS_LIST}Callout`),
-      get("rewardList"),
-      get(`${strings.CALLOUT_TASKS_LIST}Callout`),
-      get("taskList"),
+      get(`${strings.CALLOUT_REWARDS_LIST}Callout`, store),
+      get("rewardList", store),
+      get(`${strings.CALLOUT_TASKS_LIST}Callout`, store),
+      get("taskList", store),
     ]);
 
     if (rewardCallout === undefined || rewardCallout === true) {
