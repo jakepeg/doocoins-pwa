@@ -38,6 +38,30 @@ const Balance = () => {
     }
   }, []);
 
+  React.useEffect(() => {
+    if (!blockingChildUpdate) {
+      get("selectedChild")
+        .then(async (data) => {
+          const [balance, name] = await Promise.all([
+            get(`balance-${data}`),
+            get(`selectedChildName`),
+          ]);
+          if (data) {
+            setChild({
+              id: data,
+              balance: parseInt(balance),
+              name,
+            });
+          } else {
+            navigate("/");
+          }
+        })
+        .finally(() =>
+          setIsLoading((prevState) => ({ ...prevState, child: false }))
+        );
+    }
+  }, []);
+
   const getChildGoal = () => {
     get("childGoal").then(async (data) => {
       if (data) {
