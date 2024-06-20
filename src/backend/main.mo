@@ -60,27 +60,38 @@ actor {
 
   // MILESTONE #1 METHODS
   //magicCode child app onboarding OTP
+  // This section contains functions related to managing one-time passwords (OTPs)
+  // used for onboarding child apps within the magicCode system.
   //----------------------------------------------------------------------------------------------------
 
+  // burnCode function initiates the burning process for a provided OTP (pin).
+  // Burning essentially removes the pin from the system after a specific time.
   public shared (msg) func burnCode<system>(pin : Nat) : async Nat {
     Debug.print "in burn function!";
     let now = Time.now();
     let oneMinute = 1_000_000_000 * 60 * 1;
+
+    // Find the child app ID associated with the provided pin using a Trie data structure
     let childId = Trie.find(
       childIdsFromPin,
       keyNat(pin),
       Nat.equal,
     );
     Debug.print "before setting timers after childID!";
+
+    // Define an async function to perform the actual burning process
     func burnCodeAsync() : async () {
       Debug.print "Starting the burn function!";
-      Debug.print(debug_show (pin) # "     " #debug_show (childId)); // Often used with `debug_show` to convert values to Text
-
+      // Print debug information about the pin and child ID (Often used with `debug_show` to convert values to Text)
+      Debug.print(debug_show (pin) # "     " #debug_show (childId));
+      // Remove the pin and child ID association from their respective Trie structures
       let (newChildPins, oldPin) = Trie.remove(childPins, keyText(nullToText(childId)), Text.equal);
       let (newChildIdsFromPin, oldIds) = Trie.remove(childIdsFromPin, keyNat(pin), Nat.equal);
+      // Update the in-memory state of the Trie structures
       childPins := newChildPins;
       childIdsFromPin := newChildIdsFromPin;
     };
+    // Schedule a timer to call the burnCodeAsync function after the timeout duration
     Debug.print("Setting timers!" #debug_show (Int.abs(now - oneMinute)));
     ignore setTimer<system>(
       #seconds(60 * 60), // 60 mins
@@ -89,38 +100,48 @@ actor {
         await burnCodeAsync();
       },
     );
+    // Return the provided pin (possibly for reference)
     return pin;
   };
-
+  // _randomPin function generates a random 4-digit integer to be used as an OTP.
   func _randomPin() : async Nat {
     let fuzz = Fuzz.Fuzz();
     let randInt16 = fuzz.nat.randomRange(1111, 9999);
     return randInt16;
   };
-
+  // checkMagiCode function checks if a provided OTP (pin) exists in the system and returns the associated child app ID if found.
   public shared (msg) func checkMagiCode(pin : Nat) : async ?Text {
     Debug.print("checking at the magic code");
+    // Find the child app ID associated with the provided pin using a Trie data structure
     let childId = Trie.find(
       childIdsFromPin,
       keyNat(pin),
       Nat.equal,
     );
+    // If the pin is found, return the child ID
     if (childId != null) {
       return childId;
     };
+    // If the pin is not found, return null
     return ?"";
   };
 
+  // magicCode function creates a new OTP (pin) and associates it with a provided child app ID.
+  // It also initiates the burning process for the pin after a specific time.
   public shared (msg) func magicCode(childId : Text) : async ?Nat {
+    // Check if a pin already exists for the provided child ID
     let pinExists = Trie.find(
       childPins,
       keyText(childId),
       Text.equal,
     );
+    // If a pin already exists, return it (no need to create a new one)
     if (pinExists != null) {
       return pinExists;
     };
+    // If no pin exists, generate a new random 4-digit integer
     let pin : Nat = await _randomPin();
+    // Add the association between the child ID and the new pin to the childPins Trie
     let (newChildPins, oldPins) = Trie.put(
       childPins,
       keyText(childId),
@@ -128,20 +149,24 @@ actor {
       pin,
     );
     childPins := newChildPins;
+    // Retrieve the newly added pin from the childPins Trie for verification
     let childPinStore = Trie.find(
       childPins,
       keyText(childId),
       Text.equal,
     );
+    // Add the association between the new pin and the child ID to the childIdsFromPin Trie
     let (childPinToId, childPinToOld) = Trie.put(
       childIdsFromPin,
       keyNat(pin),
       Nat.equal,
       childId,
     );
-
+    // Update the childIdsFromPin Trie
     childIdsFromPin := childPinToId;
+    // Initiate the burning process for the newly created pin with a timeout
     let burnt = await burnCode(nullToNat(childPinStore));
+    // Return the newly created pin
     return childPinStore;
   };
 
@@ -173,7 +198,6 @@ actor {
     };
 
     //Initializing task number to this child
-
     let (newChildToTaskNumber, existingTask) = Trie.put(
       childToTaskNumber,
       keyText(childId),
@@ -191,7 +215,6 @@ actor {
     childToBalance := childtobalancemap;
 
     //Initializing goal (reward) number to this child
-
     let (newChildToGoalNumber, existingGoal) = Trie.put(
       childToGoalNumber,
       keyText(childId),
@@ -734,21 +757,25 @@ actor {
     return currentBalanceFormatted;
   };
 
-  // MILESTONE #2 WIP
+  // MILESTONE #2
   //Request rewards and task complete
-  //Parametes needed: childId and updated child object.
-  //   //----------------------------------------------------------------------------------------------------
-  //   requestTaskComplete(childID, taskID)
 
-  // On the kids app, the child can say they completed a task, it will get added to a task_requests data store e.g.
-  // req_id = iterate an id?
-  // childID
-  // taskID
+  // This section contains functions related to managing task and reward requests
+  // submitted by child apps.
+
+  // **public shared (msg) func requestTaskComplete(childId : Text, taskId : Nat, name : Text, value : Nat) : async Text**
+  // This function allows a child app to submit a request indicating that a task has been completed.
+  // It creates a new "TaskRequest" object with details about the child, task, and reward value.
+  // The request ID is a combination of child ID, task ID, and a random pin.
+  // The function then stores the request in a Trie data structure identified by the child ID.
+  // It returns the request ID as a reference.
 
   public shared (msg) func requestTaskComplete(childId : Text, taskId : Nat, name : Text, value : Nat) : async Text {
-
+    // Generate a random 4-digit pin
     let randomPin = await _randomPin();
+    // Construct the request ID by combining child ID, task ID, and random pin
     let requestId = childId # "-" #Nat.toText(taskId) #Nat.toText(randomPin);
+    // Create a new "TaskRequest" object with details about the request
     let task : Types.TaskRequest = {
       childId;
       taskId;
@@ -756,35 +783,37 @@ actor {
       name = name;
       value = value;
     };
-
+    // Find the existing task requests for the child (initially empty Trie)
     let allChildTasks = Trie.find(
       childRequestsTasks,
       keyText(childId),
       Text.equal,
     );
-
+    // Get the existing task requests as an Option type (may be null)
     let allChildrenTaskormatted = Option.get(allChildTasks, Trie.empty());
-
+    // Add the new task request to the child's existing requests (or create a new map if none exist)
     let (allChildTasksLV2, oldLV2) = Trie.put(
       allChildrenTaskormatted,
       keyText(requestId),
       Text.equal,
       task,
     );
-
+    // Update the child's task requests in the main Trie data structure
     let (allChildTasksUpdate, oldLV1) = Trie.put(
       childRequestsTasks,
       keyText(childId),
       Text.equal,
       allChildTasksLV2,
     );
-
+    // Update the in-memory state of the childRequestsTasks Trie
     childRequestsTasks := allChildTasksUpdate;
-
+    // Return the generated request ID
     return requestId;
 
   };
 
+  // requestClaimReward function is similar to requestTaskComplete, but for claiming rewards.
+  // It creates a "RewardRequest" object and stores it in the childRequestsRewards Trie.
   public shared (msg) func requestClaimReward(childId : Text, rewardId : Nat, value : Nat, name : Text) : async Text {
     let randomPin = await _randomPin();
     let requestId = childId # "-" #Nat.toText(rewardId) #Nat.toText(randomPin);
@@ -824,26 +853,33 @@ actor {
 
   };
 
+  // getRewardReqs function retrieves all reward requests associated with a given child ID.
+  // It uses Trie operations to find the child's requests, converts them to a list of "RewardRequest" objects,
+  // and returns the list.
   public shared (msg) func getRewardReqs(childId : Text) : async [Types.RewardRequest] {
+    // Create an empty buffer to store the reward requests
     let rewardsRequestBuffer : Buffer.Buffer<Types.RewardRequest> = Buffer.Buffer<Types.RewardRequest>(0);
-
+    // Find the child's reward requests in the Trie
     let allChildRewards = Trie.find(
       childRequestsRewards,
       keyText(childId),
       Text.equal,
     );
-
+    // Get the child's requests as an Option type (may be null)
     let allChildrenRewardsFormatted = Option.get(allChildRewards, Trie.empty());
-
+    // Convert the child's requests (potentially empty Trie) to a list of "RewardRequest" objects
     let agnosticArchivedRewardslist = Trie.toArray(allChildrenRewardsFormatted, extractReReq);
-
+    // Iterate through the list of requests and add them to the buffer
     for (reward in agnosticArchivedRewardslist.vals()) {
       rewardsRequestBuffer.add(reward);
     };
-
+    // Convert the buffer containing requests to a Motoko array and return it
     return Buffer.toArray(rewardsRequestBuffer);
   };
 
+  // hasRewards function checks if a child has any reward requests.
+  // It follows a similar approach to getRewardReqs, but instead of returning the list,
+  // it returns the number of requests found (buffer size).
   public shared (msg) func hasRewards(childId : Text) : async Nat {
     let rewardsRequestBuffer : Buffer.Buffer<Types.RewardRequest> = Buffer.Buffer<Types.RewardRequest>(0);
 
@@ -864,6 +900,7 @@ actor {
     return rewardsRequestBuffer.size();
   };
 
+  // hasTasks function is similar to hasRewards but for task requests.
   public shared (msg) func hasTasks(childId : Text) : async Nat {
     let tasksRequestBuffer : Buffer.Buffer<Types.TaskRequest> = Buffer.Buffer<Types.TaskRequest>(0);
 
@@ -884,6 +921,8 @@ actor {
     return tasksRequestBuffer.size();
   };
 
+  // getTaskReqs function retrieves all task requests associated with a given child ID.
+  // It's similar to getRewardReqs but operates on task requests.
   public shared (msg) func getTaskReqs(childId : Text) : async [Types.TaskRequest] {
     let tasksRequestBuffer : Buffer.Buffer<Types.TaskRequest> = Buffer.Buffer<Types.TaskRequest>(0);
 
@@ -904,34 +943,38 @@ actor {
     return Buffer.toArray(tasksRequestBuffer);
   };
 
+  // This function allows a child app to remove a specific task request.
+  // It finds the child's task requests (Trie), removes the request identified by the ID,
+  // and updates the child's Trie entry with the modified list. It then returns the request ID.
   public shared (msg) func removeTaskReq(childId : Text, id : Text) : async Text {
-
+    // Find the child's task requests in the Trie
     let allChildTasks = Trie.find(
       childRequestsTasks,
       keyText(childId),
       Text.equal,
     );
-
+    // Get the child's requests as an Option type (may be null)
     let allChildrenTaskormatted = Option.get(allChildTasks, Trie.empty());
-
+    // Attempt to remove the task request identified by ID from the child's Trie
     let (allChildTasksLV2, oldLV2) = Trie.remove(
       allChildrenTaskormatted,
       keyText(id),
       Text.equal,
     );
-
+    // Update the child's task requests in the main Trie with the modified list (or empty Trie if removed)
     let (allChildTasksUpdate, oldLV1) = Trie.put(
       childRequestsTasks,
       keyText(childId),
       Text.equal,
       allChildTasksLV2,
     );
-
+    // Update the in-memory state of the childRequestsTasks Trie
     childRequestsTasks := allChildTasksUpdate;
-
+    // Return the ID of the removed request
     return id;
   };
 
+  // removeRewardReq function is similar to removeTaskReq but for reward requests.
   public shared (msg) func removeRewardReq(childId : Text, id : Text) : async Text {
 
     let allChildRewards = Trie.find(
@@ -960,24 +1003,36 @@ actor {
     return id;
   };
 
+  // extractCallerFromId private function extracts the principal (caller ID) from a child ID string.
+  // The child ID format is assumed to be "<principal ID>-<random string>".
+  // It splits the string by "-", extracts the first part, and returns it.
   private func extractCallerFromId(childId : Text) : Text {
+    // Split the child ID string by "-" delimiter
     let words = Text.split(childId, #char '-');
+    // Convert the split parts to a Motoko array
     let wordsArray = Iter.toArray(words);
+    // Extract a slice of the array containing all elements except the last one (random string)
     let wordsSlices = Array.slice<Text>(wordsArray, 0, wordsArray.size() -1);
+    // Initialize an empty string to store the extracted principal ID
     var fromIter : Text = "";
+    // Iterate through the sliced array (without the random string)
     var counter = 0;
     for (word in wordsSlices) {
+      // If it's the first iteration, append the word (principal ID) to the empty string
       if (counter == 0) {
         fromIter := fromIter #word;
         counter := counter +1;
+        // If it's not the first iteration, append "-" and the word (principal ID) to the string
       } else {
         fromIter := fromIter # "-" #word;
         counter := counter +1;
       };
     };
+    // Return the extracted principal ID
     return fromIter;
   };
 
+  // getChild function retrieves the name
   public shared (msg) func getChild(childId : Text) : async Text {
     let fromIter = extractCallerFromId(childId);
     let callerId = Principal.fromText(nullToText(?fromIter));
