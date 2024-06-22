@@ -1,33 +1,15 @@
 import * as React from "react";
 import { get, set } from "idb-keyval";
-import Balance from "../components/Balance";
-import dc from "../assets/images/dc.svg";
-import { ReactComponent as DotArrow } from "../assets/images/dotarrow.svg";
 import { useAuth } from "../use-auth-client";
 import modelStyles from "../components/popup/confirmation_popup.module.css";
 import {
-  SwipeableList,
-  Type as ListType,
-  SwipeAction,
-  TrailingActions,
-  SwipeableListItem,
-} from "react-swipeable-list";
-import { ReactComponent as ApproveIcon } from "../assets/images/tick.svg";
-import { ReactComponent as GoalIcon } from "../assets/images/goal.svg";
-import { ReactComponent as EditIcon } from "../assets/images/pencil.svg";
-import { ReactComponent as DeleteIcon } from "../assets/images/delete.svg";
-import { ReactComponent as TickIcon } from "../assets/images/tick.svg";
-import {
-  Box,
   Skeleton,
   Stack,
-  Text,
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
 import DeleteDialog from "../components/Dialogs/DeleteDialog";
 import EditDialog from "../components/Dialogs/EditDialog";
-import AddActionDialog from "../components/Tasks/AddActionDialog";
 import { default as GoalDialog } from "../components/Dialogs/ApproveDialog";
 import { default as ClaimDialog } from "../components/Dialogs/ApproveDialog";
 import { useNavigate } from "react-router-dom";
@@ -35,8 +17,6 @@ import RemoveGoalDialog from "../components/Dialogs/RemoveGoalDialog";
 import strings, { noGoalEntity } from "../utils/constants";
 import { ChildContext } from "../contexts/ChildContext";
 import LoadingSpinner from "../components/LoadingSpinner";
-import SwipeListCallout from "../components/Callouts/SwipeListCallout";
-import AddRewardCalloutWrapper from "../components/Rewards/AddRewardCalloutWrapper";
 import ChildReward from "../components/Rewards/ChildReward";
 
 const Rewards = () => {
@@ -44,14 +24,12 @@ const Rewards = () => {
   const toast = useToast();
   const navigate = useNavigate();
   const [rewards, setRewards] = React.useState([]);
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const [currentGoal, setCurrentGoal] = React.useState(null);
+  const { isOpen, onOpen } = useDisclosure();
   const {
     child,
     setChild,
     setGoal,
     isNewToSystem,
-    handleUpdateCalloutState,
     blockingChildUpdate,
     setBlockingChildUpdate,
   } = React.useContext(ChildContext);
@@ -62,7 +40,6 @@ const Rewards = () => {
     singles: false,
     child: !child ? true : false,
   });
-  const [addClicked, setAddClicked] = React.useState(false);
   const [selectedReward, setSelectedReward] = React.useState(null);
   const [showPopup, setShowPopup] = React.useState({
     delete: false,
@@ -305,11 +282,6 @@ const Rewards = () => {
     });
   }
 
-  const handleTogglePopup = (isOpen, reward, popup) => {
-    setSelectedReward(reward);
-    setShowPopup((prevState) => ({ ...prevState, [popup]: isOpen }));
-  };
-
   function handleSetGoal({ reward_id, isForSet, disableFullLoader, selectedReward }) {
     if (isForSet) {
       // handleToggleGoalPopup();
@@ -352,7 +324,6 @@ const Rewards = () => {
       ?.currentGoal(child.id, reward_id)
       .then(async (returnedCurrentGoal) => {
         if ("ok" in returnedCurrentGoal) {
-          setCurrentGoal(reward_id);
           if (isForSet) {
             toast({
               title: `Good luck achieving your goal, ${child.name}.`,
@@ -475,14 +446,6 @@ const Rewards = () => {
 
   const handleCloseEditPopup = () => {
     setShowPopup((prevState) => ({ ...prevState, ["edit"]: false }));
-  };
-
-  const handleToggleAddRewardPopup = () => {
-    setAddClicked(true);
-    setShowPopup((prevState) => ({
-      ...prevState,
-      ["add_reward"]: !prevState.add_reward,
-    }));
   };
 
   const handleToggleClaimPopup = () => {

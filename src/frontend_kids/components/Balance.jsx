@@ -19,11 +19,7 @@ const Balance = () => {
     setChild,
     goal,
     setGoal,
-    getBalance,
-    handleUnsetGoal,
-    setBlockingChildUpdate,
     blockingChildUpdate,
-    transactions,
     setTransactions,
   } = React.useContext(ChildContext);
   const { actor, store } = useAuth();
@@ -72,69 +68,6 @@ const Balance = () => {
     setTransactions(transactions);
     set("transactionList", transactions, store);
   };
-
-  function handleClaimGoal() {
-    const reward_id = goal.id;
-    let dateNum = Math.floor(Date.now() / 1000);
-    let date = dateNum.toString();
-    setIsLoading(true);
-    const new_transactions = {
-      completedDate: date,
-      id: transactions?.[0]?.id ? parseInt(transactions?.[0]?.id) + 1 : 1,
-      value: goal.value,
-      name: goal.name,
-      transactionType: "GOAL_DEBIT",
-    };
-    handleUpdateTransactions([new_transactions, ...transactions]);
-
-    setChild((prevState) => ({
-      ...prevState,
-      balance: prevState.balance - goal.value,
-    }));
-    setBlockingChildUpdate(true);
-    handleUnsetGoal();
-    actor
-      ?.claimGoal(child.id, reward_id, date)
-      .then(async (returnedClaimReward) => {
-        if ("ok" in returnedClaimReward) {
-          toast({
-            title: `Yay - well deserved, ${child.name}.`,
-            status: "success",
-            duration: 4000,
-            isClosable: true,
-          });
-          getReward({ rewardId: reward_id, revokeStateUpdate: true });
-          actor?.getChildren().then(async (returnedChilren) => {
-            const children = Object.values(returnedChilren);
-            const updatedChildrenData = await Promise.all(
-              children[0].map(async (child) => {
-                const balance = await getBalance(child.id);
-
-                return {
-                  ...child,
-                  balance: parseInt(balance),
-                };
-              })
-            );
-            set("childList", updatedChildrenData, store);
-            await getChildren({ revokeStateUpdate: true });
-            setIsLoading(false);
-            setBlockingChildUpdate(false);
-          });
-        } else {
-          console.error(returnedClaimReward.err);
-          handleUpdateTransactions(
-            transactions.filter(
-              (transaction) => transaction.id !== new_transactions.id
-            )
-          );
-          setBlockingChildUpdate(false);
-        }
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }
 
   const getChildren = async ({ revokeStateUpdate = false }) => {
     await get("selectedChild", store).then(async (data) => {
@@ -217,9 +150,38 @@ const Balance = () => {
   ).toFixed(0);
   const isAbleToClaim = balance >= goal?.value && goal?.value > 0;
 
+  const handleReq = async (selectedReward) => {
+    try {
+      setIsLoading(true)
+      await actor.requestClaimReward(
+        child.id,
+        parseInt(selectedReward.id),
+        parseInt(selectedReward.value),
+        selectedReward.name
+      );
+      toast({
+        title: `well done ${child.name}, the reward is pending`,
+        status: "success",
+        duration: 4000,
+        isClosable: true,
+      });
+    } catch (error) {
+      console.log(`the error`, error);
+      toast({
+        title: "An error occurred.",
+        description: `Apologies, please try again later.`,
+        status: "error",
+        duration: 4000,
+        isClosable: true,
+      });
+    } finally {
+      setIsLoading(false)
+    }
+  };
+
   const handleGoalClick = () => {
-    if (isAbleToClaim) {
-      handleClaimGoal();
+    if (isAbleToClaim && !isLoading) {
+      handleReq(goal);
     }
   };
 
