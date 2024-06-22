@@ -36,7 +36,7 @@ const useHasRewards = (childId, revokeCalls = false) => {
     fetchData();
 
     // Set up the interval to call fetchData every 1 minute
-    const intervalId = setInterval(fetchData, 10000);
+    const intervalId = setInterval(fetchData, 60000);
 
     // Cleanup function to clear the interval when the component unmounts
     return () => clearInterval(intervalId);

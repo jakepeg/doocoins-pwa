@@ -1,6 +1,7 @@
 import * as React from "react";
 import dc from "../assets/images/dc-thin-white.svg";
 import GoalIcon from "../assets/images/card-header/cc-claim.svg";
+import ReqClaimIcon from "../assets/images/card-header/req_claim.svg";
 import NoGoalIcon from "../assets/images/card-header/cc-nogoal.svg";
 import PlainGoalBackground from "../assets/images/card-header/cc.svg";
 import styles from "../assets/css/golabal.module.css";
@@ -193,7 +194,7 @@ const Balance = () => {
             !goal?.hasGoal
               ? NoGoalIcon
               : isAbleToClaim
-              ? GoalIcon
+              ? ReqClaimIcon
               : goal?.hasGoal
               ? PlainGoalBackground
               : null
