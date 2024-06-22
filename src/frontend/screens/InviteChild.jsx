@@ -10,7 +10,7 @@ const InviteChild = () => {
   const [hasNFT] = useState(true);
   const [loading, setLoading] = useState(true);
   const [magicCode, setMagicCode] = useState([]);
-  console.log(`child`, child);
+
   const navigate = useNavigate();
 
   async function generateOtp() {

@@ -1,4 +1,4 @@
-import React, { createContext } from "react";
+import React, { createContext, useEffect } from "react";
 import { useAuth } from "../use-auth-client";
 import { get, set } from "idb-keyval";
 import strings, { noGoalEntity } from "../utils/constants";
@@ -12,6 +12,7 @@ export const ChildContext = createContext();
 export default function ChildProvider({ children }) {
   const { actor, store } = useAuth();
   const [child, setChild] = React.useState(null);
+  const [tasks, setTasks] = React.useState([]);
   const [goal, setGoal] = React.useState(null);
   const [blockingChildUpdate, setBlockingChildUpdate] = React.useState(false);
   const [transactions, setTransactions] = React.useState([]);
@@ -36,15 +37,28 @@ export default function ChildProvider({ children }) {
   useCheckIsUserNewToSwipeActions({ handleUpdateCalloutState });
 
   const handleUpdateChild = (...args) => {
-    setChild((prevState) => ({ ...prevState, ...args?.[0] }))
-  }
+    setChild((prevState) => ({ ...prevState, ...args?.[0] }));
+  };
 
   async function getBalance(childID) {
     return new Promise((resolve, reject) => {
       get("balance-" + childID, store)
         .then((val) => {
-          actor?.getBalance(childID).then((returnedBalance) => {
+          actor?.getBalance(childID).then(async (returnedBalance) => {
             set("balance-" + childID, parseInt(returnedBalance), store);
+
+            const [balance, name] = await Promise.all([
+              get(`balance-${childID}`, store),
+              get(`selectedChildName`, store),
+            ]);
+
+            setChild({
+              id: childID,
+              balance: parseInt(balance),
+              name,
+            });
+            console.log(`balance`, balance, name);
+
             resolve(returnedBalance);
           });
         })
@@ -60,6 +74,47 @@ export default function ChildProvider({ children }) {
     set("childGoal", noGoalEntity, store);
   };
 
+  useEffect(() => {
+    // call all the apis and update memory on mount
+    console.log(`renders`);
+    if (actor) {
+      // Get transactions
+      child?.id && actor?.getTransactions(child?.id).then((returnedTransactions) => {
+        if ("ok" in returnedTransactions) {
+          const transactions = Object.values(returnedTransactions);
+          if (transactions.length) {
+            set("transactionList", transactions[0], store);
+            setTransactions(transactions?.[0]);
+          }
+        } else {
+          console.error(returnedTransactions.err);
+          set("transactionList", undefined, store);
+        }
+      });
+
+      // Update child balance
+      child?.id && getBalance(child?.id);
+
+      // Get Tasks
+      child?.id && actor?.getTasks(child?.id).then((returnedTasks) => {
+        if ("ok" in returnedTasks) {
+          const tasks = Object.values(returnedTasks);
+          const filteredTasks = tasks?.[0]?.map((task) => {
+            return {
+              ...task,
+              id: parseInt(task.id),
+              value: parseInt(task.value),
+            };
+          });
+          set("taskList", filteredTasks, store);
+          setTasks(filteredTasks || []);
+        } else {
+          console.error(returnedTasks.err);
+        }
+      });
+    }
+  }, [actor, child?.id]);
+
   const values = React.useCallback(() => {
     return {
       child,
@@ -74,7 +129,9 @@ export default function ChildProvider({ children }) {
       blockingChildUpdate,
       setTransactions,
       transactions,
-      handleUpdateChild
+      handleUpdateChild,
+      setTasks,
+      tasks,
     };
   }, [
     child,
@@ -89,7 +146,9 @@ export default function ChildProvider({ children }) {
     setBlockingChildUpdate,
     setTransactions,
     transactions,
-    handleUpdateChild
+    handleUpdateChild,
+    setTasks,
+    tasks,
   ]);
 
   return (

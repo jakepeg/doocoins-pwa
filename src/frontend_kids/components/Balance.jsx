@@ -1,6 +1,5 @@
 import * as React from "react";
 import dc from "../assets/images/dc-thin-white.svg";
-import GoalIcon from "../assets/images/card-header/cc-claim.svg";
 import ReqClaimIcon from "../assets/images/card-header/req_claim.svg";
 import NoGoalIcon from "../assets/images/card-header/cc-nogoal.svg";
 import PlainGoalBackground from "../assets/images/card-header/cc.svg";
@@ -9,7 +8,6 @@ import { Box, useToast } from "@chakra-ui/react";
 import { get, set } from "idb-keyval";
 import { ChildContext } from "../contexts/ChildContext";
 import { useAuth } from "../use-auth-client";
-import { useNavigate } from "react-router-dom";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 import { noGoalEntity } from "../utils/constants";
@@ -17,7 +15,6 @@ import { noGoalEntity } from "../utils/constants";
 const Balance = () => {
   const {
     child,
-    setChild,
     goal,
     setGoal,
     blockingChildUpdate,
@@ -26,7 +23,6 @@ const Balance = () => {
   const { actor, store } = useAuth();
   const [isLoading, setIsLoading] = React.useState(false);
   const balance = child?.balance || 0;
-  const navigate = useNavigate();
   const toast = useToast();
 
   React.useEffect(() => {
@@ -64,31 +60,6 @@ const Balance = () => {
       getReward({});
     }
   }, [child?.id]);
-
-  const handleUpdateTransactions = (transactions) => {
-    setTransactions(transactions);
-    set("transactionList", transactions, store);
-  };
-
-  const getChildren = async ({ revokeStateUpdate = false }) => {
-    await get("selectedChild", store).then(async (data) => {
-      const [balance, name] = await Promise.all([
-        get(`balance-${data}`, store),
-        get(`selectedChildName`, store),
-      ]);
-      if (data) {
-        if (!revokeStateUpdate) {
-          setChild({
-            id: data,
-            balance: parseInt(balance),
-            name,
-          });
-        }
-      } else {
-        navigate("/");
-      }
-    });
-  };
 
   const getReward = ({ rewardId, revokeStateUpdate = false }) => {
     actor

@@ -52,9 +52,11 @@ export const useAuthClient = () => {
   };
 
   async function logout() {
+    const childId = await get("selectedChild", store)
     del("childList", store)
     del("childGoal", store)
     del("rewardList", store)
+    del("balance-" + childId, store)
     del("selectedChild", store)
     del("selectedChildName", store)
     del("taskList", store)
