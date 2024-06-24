@@ -62,15 +62,18 @@ export const useAuthClient = (options = defaultOptions) => {
 
   useEffect(() => {
     // Initialize AuthClient
-    setIsLoading(true)
-    AuthClient.create(options.createOptions).then(async (client) => {
-      updateClient(client);
-    }).finally(() => {
-      setIsLoading(false)
-    });
+    if (authClient == null) {
+      setIsLoading(true)
+      AuthClient.create().then(async (client) => {
+        updateClient(client);
+      }).finally(() => {
+        setIsLoading(false)
+      });
+    }
   }, []);
 
   const login = () => {
+    console.log(`authClient`, authClient);
     authClient.login({
       ...options.loginOptions,
       onSuccess: () => {
@@ -84,6 +87,7 @@ export const useAuthClient = (options = defaultOptions) => {
     setIsAuthenticated(isAuthenticated);
 
     const identity = client.getIdentity();
+    console.log(`identity`, identity);
     setIdentity(identity);
 
     const principal = identity.getPrincipal();
@@ -96,6 +100,8 @@ export const useAuthClient = (options = defaultOptions) => {
         identity,
       },
     });
+
+    console.log(`actor`, actor);
 
     setActor(actor);
   }
