@@ -1,19 +1,8 @@
 import * as React from "react";
 import { get, set } from "idb-keyval";
 import { useAuth } from "../use-auth-client";
-import modelStyles from "../components/popup/confirmation_popup.module.css";
-import {
-  Skeleton,
-  Stack,
-  useDisclosure,
-  useToast,
-} from "@chakra-ui/react";
-import DeleteDialog from "../components/Dialogs/DeleteDialog";
-import EditDialog from "../components/Dialogs/EditDialog";
-import { default as GoalDialog } from "../components/Dialogs/ApproveDialog";
-import { default as ClaimDialog } from "../components/Dialogs/ApproveDialog";
+import { Skeleton, Stack, useDisclosure, useToast } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
-import RemoveGoalDialog from "../components/Dialogs/RemoveGoalDialog";
 import strings, { noGoalEntity } from "../utils/constants";
 import { ChildContext } from "../contexts/ChildContext";
 import LoadingSpinner from "../components/LoadingSpinner";
@@ -23,7 +12,6 @@ const Rewards = () => {
   const { actor, store } = useAuth();
   const toast = useToast();
   const navigate = useNavigate();
-  const [rewards, setRewards] = React.useState([]);
   const { isOpen, onOpen } = useDisclosure();
   const {
     child,
@@ -31,23 +19,14 @@ const Rewards = () => {
     setGoal,
     isNewToSystem,
     blockingChildUpdate,
-    setBlockingChildUpdate,
+    setRewards,
+    rewards,
   } = React.useContext(ChildContext);
-  const [transactions, setTransactions] = React.useState([]);
 
   const [loader, setLoader] = React.useState({
     init: true,
     singles: false,
     child: !child ? true : false,
-  });
-  const [selectedReward, setSelectedReward] = React.useState(null);
-  const [showPopup, setShowPopup] = React.useState({
-    delete: false,
-    edit: false,
-    claim: false,
-    goal: false,
-    add_reward: false,
-    remove_goal: false,
   });
 
   React.useEffect(() => {
@@ -91,21 +70,6 @@ const Rewards = () => {
     });
   };
 
-  async function getBalance(childID) {
-    return new Promise((resolve, reject) => {
-      get("balance-" + childID, store)
-        .then((val) => {
-          actor?.getBalance(childID).then((returnedBalance) => {
-            set("balance-" + childID, parseInt(returnedBalance), store);
-            resolve(returnedBalance);
-          });
-        })
-        .catch((error) => {
-          reject(error);
-        });
-    });
-  }
-
   function getRewards({
     disableFullLoader,
     callService = false,
@@ -133,8 +97,7 @@ const Rewards = () => {
                     ...reward,
                     value: parseInt(reward.value),
                     id: parseInt(reward.id),
-                    active:
-                      currentGoalId === parseInt(reward.id) ? true : false,
+                    active: currentGoalId === parseInt(reward.id),
                   };
                 });
                 set("rewardList", filteredRewards, store);
@@ -195,94 +158,12 @@ const Rewards = () => {
     }
   };
 
-  function updateReward(rewardID, rewardName, rewardValue) {
-    const reward_object = {
-      ...selectedReward,
-      name: rewardName,
-      value: rewardValue,
-      id: rewardID,
-      archived: false,
-    };
-
-    if (reward_object.active) {
-      const returnedGoal = {
-        hasGoal: true,
-        value: parseInt(rewardValue),
-        name: rewardName,
-        id: parseInt(rewardID),
-      };
-      set("childGoal", returnedGoal, store);
-      setGoal(returnedGoal);
-    }
-    handleCloseEditPopup();
-    let prevReward;
-    // setLoader((prevState) => ({ ...prevState, init: true }));
-    const updatedList = rewards.map((reward) => {
-      if (reward.id === reward_object.id) {
-        prevReward = reward;
-        return reward_object;
-      } else {
-        return reward;
-      }
-    });
-    setRewards(updatedList);
-    set("rewardList", updatedList, store);
-    actor?.updateGoal(child.id, rewardID, reward_object).then((response) => {
-      if ("ok" in response) {
-        getRewards({
-          disableFullLoader: true,
-          callService: true,
-          revokeStateUpdate: true,
-        });
-      } else {
-        const updatedList = rewards.map((reward) => {
-          const updatedReward =
-            reward.id === reward_object.id ? prevReward : reward;
-          return updatedReward;
-        });
-        setRewards(updatedList);
-        set("rewardList", updatedList, store);
-      }
-    });
-  }
-
-  function deleteReward(rewardID, rewardName, rewardValue) {
-    const reward_object = {
-      ...selectedReward,
-      name: rewardName,
-      value: rewardValue,
-      id: rewardID,
-      archived: true,
-    };
-    const finalRewards = rewards.filter((reward) => reward.id !== rewardID);
-    setRewards(finalRewards);
-    set("rewardList", finalRewards, store);
-    handleCloseDeletePopup();
-    // setLoader((prevState) => ({ ...prevState, init: true }));
-    actor?.updateGoal(child.id, rewardID, reward_object).then((response) => {
-      if ("ok" in response) {
-        getRewards({
-          disableFullLoader: true,
-          callService: true,
-          revokeStateUpdate: true,
-        });
-      } else {
-        setRewards((prevState) => {
-          set("rewardList", [...prevState, reward_object], store);
-          return [...prevState, reward_object];
-        });
-        toast({
-          title: "An error occurred.",
-          description: `Can't perform delete, please try again later.`,
-          status: "error",
-          duration: 4000,
-          isClosable: true,
-        });
-      }
-    });
-  }
-
-  function handleSetGoal({ reward_id, isForSet, disableFullLoader, selectedReward }) {
+  function handleSetGoal({
+    reward_id,
+    isForSet,
+    disableFullLoader,
+    selectedReward,
+  }) {
     if (isForSet) {
       // handleToggleGoalPopup();
       const returnedGoal = {
@@ -360,114 +241,9 @@ const Rewards = () => {
       });
   }
 
-  function getTransactions() {
-    get("transactionList", store).then(async (val) => {
-      setTransactions(val || []);
-    });
-  }
-
   React.useEffect(() => {
-    getTransactions();
-  }, []);
-
-  function handleClaimReward(reward_id) {
-    handleToggleClaimPopup();
-    let dateNum = Math.floor(Date.now() / 1000);
-    let date = dateNum.toString();
-
-    let maxIdObject = null;
-
-    // Iterate through the data array to find the object with the highest "id"
-    for (const item of transactions) {
-      if (!maxIdObject || Number(item.id) > Number(maxIdObject.id)) {
-        maxIdObject = item;
-      }
-    }
-
-    const new_transactions = {
-      completedDate: date,
-      id: maxIdObject?.id ? parseInt(maxIdObject?.id) + 1 : 1,
-      value: selectedReward.value,
-      name: selectedReward.name,
-      transactionType: "GOAL_DEBIT",
-    };
-    set("transactionList", [new_transactions, ...transactions], store);
-    setTransactions([new_transactions, ...transactions]);
-    setChild((prevState) => ({
-      ...prevState,
-      balance: prevState.balance - selectedReward.value,
-    }));
-    setBlockingChildUpdate(true);
-    actor
-      ?.claimGoal(child.id, reward_id, date)
-      .then(async (returnedClaimReward) => {
-        if ("ok" in returnedClaimReward) {
-          toast({
-            title: `Yay - well deserved, ${child.name}.`,
-            status: "success",
-            duration: 4000,
-            isClosable: true,
-          });
-          actor?.getChildren().then(async (returnedChilren) => {
-            const children = Object.values(returnedChilren);
-            const updatedChildrenData = await Promise.all(
-              children[0].map(async (child) => {
-                const balance = await getBalance(child.id);
-                return {
-                  ...child,
-                  balance: parseInt(balance),
-                };
-              })
-            );
-            set("childList", updatedChildrenData, store);
-            await getChildren({ revokeStateUpdate: true });
-            setBlockingChildUpdate(false);
-            setLoader((prevState) => ({ ...prevState, init: false }));
-          });
-        } else {
-          const filteredTransactions = transactions.filter(
-            (transaction) => transaction.id !== new_transactions.id
-          );
-          setTransactions(filteredTransactions);
-          set("transactionList", filteredTransactions, store);
-          setLoader((prevState) => ({ ...prevState, init: false }));
-          setBlockingChildUpdate(false);
-        }
-      });
-  }
-
-  React.useEffect(() => {
-    if (child) getRewards({ callService: true });
+    if (child) getRewards({ callService: false });
   }, [actor, child]);
-
-  const handleCloseDeletePopup = () => {
-    setShowPopup((prevState) => ({ ...prevState, ["delete"]: false }));
-  };
-
-  const handleCloseEditPopup = () => {
-    setShowPopup((prevState) => ({ ...prevState, ["edit"]: false }));
-  };
-
-  const handleToggleClaimPopup = () => {
-    setShowPopup((prevState) => ({
-      ...prevState,
-      ["claim"]: !prevState.claim,
-    }));
-  };
-
-  const handleCloseRemoveGoalPopup = () => {
-    setShowPopup((prevState) => ({
-      ...prevState,
-      ["remove_goal"]: !prevState.remove_goal,
-    }));
-  };
-
-  const handleToggleGoalPopup = () => {
-    setShowPopup((prevState) => ({
-      ...prevState,
-      ["goal"]: !prevState.goal,
-    }));
-  };
 
   const handleReq = async (selectedReward) => {
     try {
@@ -509,7 +285,7 @@ const Rewards = () => {
                         reward_id: 0,
                         isForSet: false,
                         disableFullLoader: false,
-                        selectedReward
+                        selectedReward,
                       });
                     }}
                     handleSetGoal={(selectedReward) => {
@@ -517,13 +293,12 @@ const Rewards = () => {
                         reward_id: parseInt(selectedReward.id),
                         isForSet: true,
                         disableFullLoader: false,
-                        selectedReward
+                        selectedReward,
                       });
                     }}
                     reward={reward}
                     child={child}
                     handleReq={(reward) => {
-                      setSelectedReward(reward);
                       handleReq(reward);
                     }}
                     key={reward.id}
@@ -537,114 +312,34 @@ const Rewards = () => {
     );
   }, [rewards, isOpen]);
 
-  const isModalOpen =
-    showPopup.delete ||
-    showPopup.edit ||
-    showPopup.claim ||
-    showPopup.goal ||
-    showPopup.add_reward ||
-    showPopup.remove_goal;
-
   if (loader.child) {
     return <LoadingSpinner />;
   }
 
   return (
-    <>
-      {showPopup.delete && (
-        <DeleteDialog
-          selectedItem={selectedReward}
-          handleCloseDeletePopup={handleCloseDeletePopup}
-          handleDelete={(childId) =>
-            deleteReward(
-              parseInt(selectedReward.id),
-              selectedReward.name,
-              parseInt(selectedReward.value)
-            )
-          }
-        />
-      )}
-      {showPopup.remove_goal && (
-        <RemoveGoalDialog
-          selectedItem={selectedReward}
-          handleClosePopup={handleCloseRemoveGoalPopup}
-          handleRemove={() =>
-            handleSetGoal({
-              reward_id: 0,
-              isForSet: false,
-              disableFullLoader: false,
-            })
-          }
-        />
-      )}
-      {showPopup.edit && (
-        <EditDialog
-          handleCloseEditPopup={handleCloseEditPopup}
-          selectedItem={selectedReward}
-          handleSubmitForm={(rewardId, rewardName, rewardValue) =>
-            updateReward(
-              parseInt(selectedReward.id),
-              rewardName,
-              parseInt(rewardValue)
-            )
-          }
-        />
-      )}
-      {showPopup.claim && (
-        <ClaimDialog
-          handleClosePopup={handleToggleClaimPopup}
-          selectedItem={selectedReward}
-          handleApprove={() => handleClaimReward(parseInt(selectedReward.id))}
-          submitBtnLabel="Claim Reward"
-        />
-      )}
-      {showPopup.goal && (
-        <GoalDialog
-          handleClosePopup={handleToggleGoalPopup}
-          selectedItem={selectedReward}
-          title={selectedReward.name}
-          handleApprove={() =>
-            handleSetGoal({
-              reward_id: parseInt(selectedReward.id),
-              isForSet: true,
-              disableFullLoader: false,
-            })
-          }
-          submitBtnLabel="Set Goal"
-        />
-      )}
-
-      <div
-        className={`${
-          isModalOpen ? modelStyles.blur_background : undefined
-        } light-panel max-w-screen`}
-      >
-        <div
-          className={`panel-header-wrapper`}
-          style={{ position: "relative" }}
-        >
-          <h2 className="title-button dark">
-            <span>Rewards</span>{" "}
-          </h2>
-        </div>
-        {loader.init ? (
-          <Stack margin={"0 20px 20px 20px"}>
-            <Skeleton height="20px" />
-            <Skeleton height="20px" mt={"12px"} />
-            <Skeleton height="20px" mt={"12px"} />
-          </Stack>
-        ) : (
-          <>{RewardList}</>
-        )}
-        {loader.singles ? (
-          <Stack margin={"0 20px 20px 20px"}>
-            <Skeleton height="20px" mt={"12px"} />
-          </Stack>
-        ) : (
-          <div></div>
-        )}
+    <div className={`light-panel max-w-screen`}>
+      <div className={`panel-header-wrapper`} style={{ position: "relative" }}>
+        <h2 className="title-button dark">
+          <span>Rewards</span>{" "}
+        </h2>
       </div>
-    </>
+      {loader.init ? (
+        <Stack margin={"0 20px 20px 20px"}>
+          <Skeleton height="20px" />
+          <Skeleton height="20px" mt={"12px"} />
+          <Skeleton height="20px" mt={"12px"} />
+        </Stack>
+      ) : (
+        <>{RewardList}</>
+      )}
+      {loader.singles ? (
+        <Stack margin={"0 20px 20px 20px"}>
+          <Skeleton height="20px" mt={"12px"} />
+        </Stack>
+      ) : (
+        <div></div>
+      )}
+    </div>
   );
 };
 

@@ -10,9 +10,11 @@ import useCheckIsUserNewToSwipeActions from "../hooks/useCheckIsUserNewToSwipeAc
 export const ChildContext = createContext();
 
 export default function ChildProvider({ children }) {
+  const [init, setInit] = React.useState(true);
   const { actor, store } = useAuth();
   const [child, setChild] = React.useState(null);
   const [tasks, setTasks] = React.useState([]);
+  const [rewards, setRewards] = React.useState([]);
   const [goal, setGoal] = React.useState(null);
   const [blockingChildUpdate, setBlockingChildUpdate] = React.useState(false);
   const [transactions, setTransactions] = React.useState([]);
@@ -76,42 +78,69 @@ export default function ChildProvider({ children }) {
 
   useEffect(() => {
     // call all the apis and update memory on mount
-    console.log(`renders`);
     if (actor) {
       // Get transactions
-      child?.id && actor?.getTransactions(child?.id).then((returnedTransactions) => {
-        if ("ok" in returnedTransactions) {
-          const transactions = Object.values(returnedTransactions);
-          if (transactions.length) {
-            set("transactionList", transactions[0], store);
-            setTransactions(transactions?.[0]);
+      child?.id &&
+        actor?.getTransactions(child?.id).then((returnedTransactions) => {
+          if ("ok" in returnedTransactions) {
+            const transactions = Object.values(returnedTransactions);
+            if (transactions.length) {
+              set("transactionList", transactions[0], store);
+              setTransactions(transactions?.[0]);
+            }
+          } else {
+            console.error(returnedTransactions.err);
+            set("transactionList", undefined, store);
           }
-        } else {
-          console.error(returnedTransactions.err);
-          set("transactionList", undefined, store);
-        }
-      });
+        });
 
       // Update child balance
       child?.id && getBalance(child?.id);
 
       // Get Tasks
-      child?.id && actor?.getTasks(child?.id).then((returnedTasks) => {
-        if ("ok" in returnedTasks) {
-          const tasks = Object.values(returnedTasks);
-          const filteredTasks = tasks?.[0]?.map((task) => {
-            return {
-              ...task,
-              id: parseInt(task.id),
-              value: parseInt(task.value),
-            };
-          });
-          set("taskList", filteredTasks, store);
-          setTasks(filteredTasks || []);
-        } else {
-          console.error(returnedTasks.err);
-        }
-      });
+      child?.id &&
+        actor?.getTasks(child?.id).then((returnedTasks) => {
+          if ("ok" in returnedTasks) {
+            const tasks = Object.values(returnedTasks);
+            const filteredTasks = tasks?.[0]?.map((task) => {
+              return {
+                ...task,
+                id: parseInt(task.id),
+                value: parseInt(task.value),
+              };
+            });
+            set("taskList", filteredTasks, store);
+            setTasks(filteredTasks || []);
+          } else {
+            console.error(returnedTasks.err);
+          }
+        });
+
+      // Get Rewards
+      child?.id &&
+        actor?.getGoals(child.id).then(async (returnedRewards) => {
+          if ("ok" in returnedRewards) {
+            const rewards = Object.values(returnedRewards);
+            let currentGoalId;
+            await actor?.getCurrentGoal(child.id).then((returnedGoal) => {
+              currentGoalId = parseInt(returnedGoal);
+
+              return currentGoalId;
+            });
+            const filteredRewards = rewards?.[0].map((reward) => {
+              return {
+                ...reward,
+                value: parseInt(reward.value),
+                id: parseInt(reward.id),
+                active: currentGoalId === parseInt(reward.id),
+              };
+            });
+            set("rewardList", filteredRewards, store);
+            setRewards(filteredRewards);
+          } else {
+            console.error(returnedRewards.err);
+          }
+        });
     }
   }, [actor, child?.id]);
 
@@ -132,6 +161,8 @@ export default function ChildProvider({ children }) {
       handleUpdateChild,
       setTasks,
       tasks,
+      setRewards,
+      rewards,
     };
   }, [
     child,
@@ -149,11 +180,11 @@ export default function ChildProvider({ children }) {
     handleUpdateChild,
     setTasks,
     tasks,
+    setRewards,
+    rewards,
   ]);
 
   return (
-    <>
-      <ChildContext.Provider value={values()}>{children}</ChildContext.Provider>
-    </>
+    <ChildContext.Provider value={values()}>{children}</ChildContext.Provider>
   );
 }
