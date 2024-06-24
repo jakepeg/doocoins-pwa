@@ -79,7 +79,6 @@ const Tasks = () => {
       }
 
       get("taskList", store).then(async (val) => {
-        console.log(`called`, val);
         if (val === undefined || callService) {
           actor
             ?.getTasks(child.id)

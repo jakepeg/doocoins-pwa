@@ -8,9 +8,6 @@ const store = createStore('db', 'kids');
 
 export const useAuthClient = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [authClient, setAuthClient] = useState(null);
-  const [identity, setIdentity] = useState(null);
-  const [principal, setPrincipal] = useState(null);
   const [actor, setActor] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -69,9 +66,6 @@ export const useAuthClient = () => {
     isAuthenticated,
     login,
     logout,
-    authClient,
-    identity,
-    principal,
     actor,
     isLoading,
     store

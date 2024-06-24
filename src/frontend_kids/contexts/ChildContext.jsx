@@ -6,13 +6,17 @@ import useCheckIsUserNewToChildList from "../hooks/useCheckIsUserNewToChildList"
 import useCheckIsUserNewToTasks from "../hooks/useCheckIsUserNewToTasks";
 import useCheckIsUserNewToTransactions from "../hooks/useCheckIsUserNewToTransactions";
 import useCheckIsUserNewToSwipeActions from "../hooks/useCheckIsUserNewToSwipeActions";
+import { Box } from "@chakra-ui/react";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 export const ChildContext = createContext();
 
 export default function ChildProvider({ children }) {
+  const [init, setInit] = React.useState(true);
   const { actor, store } = useAuth();
   const [child, setChild] = React.useState(null);
   const [tasks, setTasks] = React.useState([]);
+  const [rewards, setRewards] = React.useState([]);
   const [goal, setGoal] = React.useState(null);
   const [blockingChildUpdate, setBlockingChildUpdate] = React.useState(false);
   const [transactions, setTransactions] = React.useState([]);
@@ -75,45 +79,92 @@ export default function ChildProvider({ children }) {
   };
 
   useEffect(() => {
-    // call all the apis and update memory on mount
-    console.log(`renders`);
-    if (actor) {
-      // Get transactions
-      child?.id && actor?.getTransactions(child?.id).then((returnedTransactions) => {
-        if ("ok" in returnedTransactions) {
-          const transactions = Object.values(returnedTransactions);
-          if (transactions.length) {
-            set("transactionList", transactions[0], store);
-            setTransactions(transactions?.[0]);
-          }
-        } else {
-          console.error(returnedTransactions.err);
-          set("transactionList", undefined, store);
-        }
-      });
+    if (actor && child?.id) {
+      const promises = [];
 
-      // Update child balance
-      child?.id && getBalance(child?.id);
+      // Get transactions
+      const transactionsPromise = actor
+        .getTransactions(child.id)
+        .then((returnedTransactions) => {
+          if ("ok" in returnedTransactions) {
+            const transactions = Object.values(returnedTransactions)[0];
+            set("transactionList", transactions, store);
+            setTransactions(transactions);
+          } else {
+            console.error(returnedTransactions.err);
+            set("transactionList", undefined, store);
+          }
+        });
+
+      promises.push(transactionsPromise);
 
       // Get Tasks
-      child?.id && actor?.getTasks(child?.id).then((returnedTasks) => {
+      const tasksPromise = actor.getTasks(child.id).then((returnedTasks) => {
         if ("ok" in returnedTasks) {
-          const tasks = Object.values(returnedTasks);
-          const filteredTasks = tasks?.[0]?.map((task) => {
-            return {
-              ...task,
-              id: parseInt(task.id),
-              value: parseInt(task.value),
-            };
-          });
+          const tasks = Object.values(returnedTasks)[0];
+          const filteredTasks = tasks.map((task) => ({
+            ...task,
+            id: parseInt(task.id),
+            value: parseInt(task.value),
+          }));
           set("taskList", filteredTasks, store);
-          setTasks(filteredTasks || []);
+          setTasks(filteredTasks);
         } else {
           console.error(returnedTasks.err);
         }
       });
+
+      promises.push(tasksPromise);
+
+      // Get Rewards
+      const rewardsPromise = actor
+        .getGoals(child.id)
+        .then(async (returnedRewards) => {
+          if ("ok" in returnedRewards) {
+            const rewards = Object.values(returnedRewards)[0];
+            let currentGoalId = await actor
+              .getCurrentGoal(child.id)
+              .then((returnedGoal) => parseInt(returnedGoal));
+
+            const filteredRewards = rewards.map((reward) => ({
+              ...reward,
+              value: parseInt(reward.value),
+              id: parseInt(reward.id),
+              active: currentGoalId === parseInt(reward.id),
+            }));
+            set("rewardList", filteredRewards, store);
+            setRewards(filteredRewards);
+          } else {
+            console.error(returnedRewards.err);
+          }
+        });
+
+      promises.push(rewardsPromise);
+
+      Promise.all(promises)
+        .then(() => {
+          setInit(false);
+        })
+        .catch((error) => {
+          console.error("Error in one of the promises:", error);
+        });
     }
   }, [actor, child?.id]);
+
+  const getChildId = async () => {
+    const childId = await get("selectedChild", store);
+
+    return childId;
+  };
+
+  useEffect(() => {
+    setChildData();
+  }, [actor]);
+
+  async function setChildData() {
+    const childId = await getChildId();
+    actor && childId && getBalance(childId).catch(console.error);
+  }
 
   const values = React.useCallback(() => {
     return {
@@ -132,6 +183,8 @@ export default function ChildProvider({ children }) {
       handleUpdateChild,
       setTasks,
       tasks,
+      setRewards,
+      rewards,
     };
   }, [
     child,
@@ -149,11 +202,24 @@ export default function ChildProvider({ children }) {
     handleUpdateChild,
     setTasks,
     tasks,
+    setRewards,
+    rewards,
   ]);
 
+  if (init) {
+    return (
+      <Box
+        minHeight={"100vh"}
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+      >
+        <LoadingSpinner />
+      </Box>
+    );
+  }
+
   return (
-    <>
-      <ChildContext.Provider value={values()}>{children}</ChildContext.Provider>
-    </>
+    <ChildContext.Provider value={values()}>{children}</ChildContext.Provider>
   );
 }
