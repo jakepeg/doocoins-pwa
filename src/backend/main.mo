@@ -16,37 +16,30 @@ import Debug "mo:base/Debug";
 import Array "mo:base/Array";
 
 actor {
-
   type TimerId = Nat;
-
-  stable var anonIdNew : Text = "2vxsx-fae"; // Reject AnonymousIdentity
-
+  // Reject AnonymousIdentity
+  stable var anonIdNew : Text = "2vxsx-fae";
   stable var profiles : Types.Profile = Trie.empty();
   stable var childNumber : Nat = 1;
   //for keeping the child to tasks mapping
   stable var childToTasks : Types.TaskMap = Trie.empty();
   stable var childToTaskNumber : Trie.Trie<Text, Nat> = Trie.empty();
-
   //for keeping the child to transactions mapping
   stable var childToTransactions : Types.TransactionMap = Trie.empty();
   stable var childToTransactionNumber : Trie.Trie<Text, Nat> = Trie.empty();
-
   //for keeping the child to goals mapping
   stable var childToGoals : Types.GoalMap = Trie.empty();
   stable var childToGoalNumber : Trie.Trie<Text, Nat> = Trie.empty();
-
   //for setting up child's current goal
   stable var childToCurrentGoal : Trie.Trie<Text, Nat> = Trie.empty();
 
   // MILESTONE #1
   //for mapping child's doocoins balance to child
   stable var childToBalance : Trie.Trie<Text, Nat> = Trie.empty();
-
-  // MILESTONE #1
   //for magicCode child app onboarding OTP
   stable var childPins : Trie.Trie<Text, Nat> = Trie.empty();
   stable var childIdsFromPin : Trie.Trie<Nat, Text> = Trie.empty();
-
+  // MILESTONE #2
   //for child to request task complete and request claim reward
   stable var childRequestsTasks : Trie.Trie<Text, Types.TaskReqMap> = Trie.empty();
   stable var childRequestsRewards : Trie.Trie<Text, Types.RewardReqMap> = Trie.empty();
@@ -59,7 +52,6 @@ actor {
   };
 
   // MILESTONE #1 METHODS
-  //magicCode child app onboarding OTP
   // This section contains functions related to managing one-time passwords (OTPs)
   // used for onboarding child apps within the magicCode system.
   //----------------------------------------------------------------------------------------------------
@@ -70,7 +62,6 @@ actor {
     Debug.print "in burn function!";
     let now = Time.now();
     let oneMinute = 1_000_000_000 * 60 * 1;
-
     // Find the child app ID associated with the provided pin using a Trie data structure
     let childId = Trie.find(
       childIdsFromPin,
@@ -78,7 +69,6 @@ actor {
       Nat.equal,
     );
     Debug.print "before setting timers after childID!";
-
     // Define an async function to perform the actual burning process
     func burnCodeAsync() : async () {
       Debug.print "Starting the burn function!";
@@ -174,14 +164,12 @@ actor {
 
   //count users
   //----------------------------------------------------------------------------------------------------
-
   public shared query func numberOfProfiles() : async Nat {
     return childNumber;
   };
 
   //creating a new child record
   //----------------------------------------------------------------------------------------------------
-
   public shared (msg) func addChild(child : Types.ChildCall) : async Result.Result<Types.Child, Types.Error> {
     let callerId = msg.caller;
 
@@ -247,7 +235,6 @@ actor {
   //Add a task
   //Parametes needed: childId and Task (name and value)
   //----------------------------------------------------------------------------------------------------
-
   public shared (msg) func addTask(task : Types.TaskCall, childId : Text) : async Result.Result<[Types.Task], Types.Error> {
     let callerId = msg.caller;
 
@@ -763,8 +750,7 @@ actor {
   // This section contains functions related to managing task and reward requests
   // submitted by child apps.
 
-  // **public shared (msg) func requestTaskComplete(childId : Text, taskId : Nat, name : Text, value : Nat) : async Text**
-  // This function allows a child app to submit a request indicating that a task has been completed.
+  // requestTaskComplete function allows a child app to submit a request indicating that a task has been completed.
   // It creates a new "TaskRequest" object with details about the child, task, and reward value.
   // The request ID is a combination of child ID, task ID, and a random pin.
   // The function then stores the request in a Trie data structure identified by the child ID.
