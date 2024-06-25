@@ -58,7 +58,8 @@ actor {
 
   // burnCode function initiates the burning process for a provided OTP (pin).
   // Burning essentially removes the pin from the system after a specific time.
-  public shared (msg) func burnCode<system>(pin : Nat) : async Nat {
+  // public shared (msg) func burnCode<system>(pin : Nat) : async Nat {
+  public shared func burnCode<system>(pin : Nat) : async Nat {
     Debug.print "in burn function!";
     let now = Time.now();
     let oneMinute = 1_000_000_000 * 60 * 1;
@@ -100,7 +101,8 @@ actor {
     return randInt16;
   };
   // checkMagiCode function checks if a provided OTP (pin) exists in the system and returns the associated child app ID if found.
-  public shared (msg) func checkMagiCode(pin : Nat) : async ?Text {
+  // public shared (msg) func checkMagiCode(pin : Nat) : async ?Text {
+  public shared func checkMagiCode(pin : Nat) : async ?Text {
     Debug.print("checking at the magic code");
     // Find the child app ID associated with the provided pin using a Trie data structure
     let childId = Trie.find(
@@ -118,7 +120,8 @@ actor {
 
   // magicCode function creates a new OTP (pin) and associates it with a provided child app ID.
   // It also initiates the burning process for the pin after a specific time.
-  public shared (msg) func magicCode(childId : Text) : async ?Nat {
+  // public shared (msg) func magicCode(childId : Text) : async ?Nat {
+  public shared func magicCode(childId : Text) : async ?Nat {
     // Check if a pin already exists for the provided child ID
     let pinExists = Trie.find(
       childPins,
@@ -326,7 +329,8 @@ actor {
   //Parametes needed: childId
   //----------------------------------------------------------------------------------------------------
 
-  public shared (msg) func getTasks(childId : Text) : async Result.Result<[Types.Task], Types.Error> {
+  // public shared (msg) func getTasks(childId : Text) : async Result.Result<[Types.Task], Types.Error> {
+  public shared func getTasks(childId : Text) : async Result.Result<[Types.Task], Types.Error> {
     let unArchivedChildsTasks : Buffer.Buffer<Types.Task> = Buffer.Buffer<Types.Task>(0);
 
     let myChildTasks = Trie.find(
@@ -411,7 +415,8 @@ actor {
   //Parametes needed: childId and goalId
   //----------------------------------------------------------------------------------------------------
 
-  public shared (msg) func currentGoal(childId : Text, goalId : Nat) : async Result.Result<(), Types.Error> {
+  // public shared (msg) func currentGoal(childId : Text, goalId : Nat) : async Result.Result<(), Types.Error> {
+  public shared func currentGoal(childId : Text, goalId : Nat) : async Result.Result<(), Types.Error> {
     let (updateChildToGoalNumber, existing) = Trie.put(
       childToCurrentGoal,
       keyText(childId),
@@ -602,9 +607,7 @@ actor {
   //Parametes needed: childId, taskNumber and updated task object
   //----------------------------------------------------------------------------------------------------
   public shared (msg) func updateTask(childId : Text, taskNumber : Nat, updatedTask : Types.Task) : async Result.Result<(), Types.Error> {
-
     let callerId = msg.caller;
-
     if (Principal.toText(callerId) == anonIdNew) {
       return #err(#NotAuthorized);
     };
@@ -626,7 +629,6 @@ actor {
   //----------------------------------------------------------------------------------------------------
   public shared (msg) func updateChild(childId : Text, child : Types.Child) : async Result.Result<(), Types.Error> {
     let callerId = msg.caller;
-
     if (Principal.toText(callerId) == anonIdNew) {
       return #err(#NotAuthorized);
     };
@@ -644,9 +646,7 @@ actor {
   };
 
   public shared (msg) func updateGoal(childId : Text, goalId : Nat, updatedGoal : Types.Goal) : async Result.Result<(), Types.Error> {
-
     let callerId = msg.caller;
-
     if (Principal.toText(callerId) == anonIdNew) {
       return #err(#NotAuthorized);
     };
@@ -756,7 +756,8 @@ actor {
   // The function then stores the request in a Trie data structure identified by the child ID.
   // It returns the request ID as a reference.
 
-  public shared (msg) func requestTaskComplete(childId : Text, taskId : Nat, name : Text, value : Nat) : async Text {
+  // public shared (msg) func requestTaskComplete(childId : Text, taskId : Nat, name : Text, value : Nat) : async Text {
+  public shared func requestTaskComplete(childId : Text, taskId : Nat, name : Text, value : Nat) : async Text {
     // Generate a random 4-digit pin
     let randomPin = await _randomPin();
     // Construct the request ID by combining child ID, task ID, and random pin
@@ -800,7 +801,8 @@ actor {
 
   // requestClaimReward function is similar to requestTaskComplete, but for claiming rewards.
   // It creates a "RewardRequest" object and stores it in the childRequestsRewards Trie.
-  public shared (msg) func requestClaimReward(childId : Text, rewardId : Nat, value : Nat, name : Text) : async Text {
+  // public shared (msg) func requestClaimReward(childId : Text, rewardId : Nat, value : Nat, name : Text) : async Text {
+  public shared func requestClaimReward(childId : Text, rewardId : Nat, value : Nat, name : Text) : async Text {
     let randomPin = await _randomPin();
     let requestId = childId # "-" #Nat.toText(rewardId) #Nat.toText(randomPin);
     let task : Types.RewardRequest = {
@@ -842,7 +844,8 @@ actor {
   // getRewardReqs function retrieves all reward requests associated with a given child ID.
   // It uses Trie operations to find the child's requests, converts them to a list of "RewardRequest" objects,
   // and returns the list.
-  public shared (msg) func getRewardReqs(childId : Text) : async [Types.RewardRequest] {
+  // public shared (msg) func getRewardReqs(childId : Text) : async [Types.RewardRequest] {
+  public shared func getRewardReqs(childId : Text) : async [Types.RewardRequest] {
     // Create an empty buffer to store the reward requests
     let rewardsRequestBuffer : Buffer.Buffer<Types.RewardRequest> = Buffer.Buffer<Types.RewardRequest>(0);
     // Find the child's reward requests in the Trie
@@ -866,7 +869,8 @@ actor {
   // hasRewards function checks if a child has any reward requests.
   // It follows a similar approach to getRewardReqs, but instead of returning the list,
   // it returns the number of requests found (buffer size).
-  public shared (msg) func hasRewards(childId : Text) : async Nat {
+  //  public shared (msg) func hasRewards(childId : Text) : async Nat {
+  public shared func hasRewards(childId : Text) : async Nat {
     let rewardsRequestBuffer : Buffer.Buffer<Types.RewardRequest> = Buffer.Buffer<Types.RewardRequest>(0);
 
     let allChildRewards = Trie.find(
@@ -887,7 +891,8 @@ actor {
   };
 
   // hasTasks function is similar to hasRewards but for task requests.
-  public shared (msg) func hasTasks(childId : Text) : async Nat {
+  // public shared (msg) func hasTasks(childId : Text) : async Nat {
+  public shared func hasTasks(childId : Text) : async Nat {
     let tasksRequestBuffer : Buffer.Buffer<Types.TaskRequest> = Buffer.Buffer<Types.TaskRequest>(0);
 
     let allChildTasks = Trie.find(
@@ -909,7 +914,8 @@ actor {
 
   // getTaskReqs function retrieves all task requests associated with a given child ID.
   // It's similar to getRewardReqs but operates on task requests.
-  public shared (msg) func getTaskReqs(childId : Text) : async [Types.TaskRequest] {
+  //  public shared (msg) func getTaskReqs(childId : Text) : async [Types.TaskRequest] {
+  public shared func getTaskReqs(childId : Text) : async [Types.TaskRequest] {
     let tasksRequestBuffer : Buffer.Buffer<Types.TaskRequest> = Buffer.Buffer<Types.TaskRequest>(0);
 
     let allChildTasks = Trie.find(
@@ -932,7 +938,8 @@ actor {
   // This function allows a child app to remove a specific task request.
   // It finds the child's task requests (Trie), removes the request identified by the ID,
   // and updates the child's Trie entry with the modified list. It then returns the request ID.
-  public shared (msg) func removeTaskReq(childId : Text, id : Text) : async Text {
+  // public shared (msg) func removeTaskReq(childId : Text, id : Text) : async Text {
+  public shared func removeTaskReq(childId : Text, id : Text) : async Text {
     // Find the child's task requests in the Trie
     let allChildTasks = Trie.find(
       childRequestsTasks,
@@ -961,8 +968,8 @@ actor {
   };
 
   // removeRewardReq function is similar to removeTaskReq but for reward requests.
-  public shared (msg) func removeRewardReq(childId : Text, id : Text) : async Text {
-
+  // public shared (msg) func removeRewardReq(childId : Text, id : Text) : async Text {
+  public shared func removeRewardReq(childId : Text, id : Text) : async Text {
     let allChildRewards = Trie.find(
       childRequestsRewards,
       keyText(childId),
@@ -1019,7 +1026,8 @@ actor {
   };
 
   // getChild function retrieves the name
-  public shared (msg) func getChild(childId : Text) : async Text {
+  // public shared (msg) func getChild(childId : Text) : async Text {
+  public shared func getChild(childId : Text) : async Text {
     let fromIter = extractCallerFromId(childId);
     let callerId = Principal.fromText(nullToText(?fromIter));
     let allChildren = Trie.find(
