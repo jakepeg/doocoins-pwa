@@ -13,7 +13,7 @@ export const ChildContext = createContext();
 
 export default function ChildProvider({ children }) {
   const [init, setInit] = React.useState(true);
-  const { actor, store } = useAuth();
+  const { actor, store, isAuthenticated } = useAuth();
   const [child, setChild] = React.useState(null);
   const [tasks, setTasks] = React.useState([]);
   const [rewards, setRewards] = React.useState([]);
@@ -153,13 +153,14 @@ export default function ChildProvider({ children }) {
 
   const getChildId = async () => {
     const childId = await get("selectedChild", store);
+    if (!childId) setInit(false)
 
     return childId;
   };
 
   useEffect(() => {
     setChildData();
-  }, [actor]);
+  }, [actor, isAuthenticated]);
 
   async function setChildData() {
     const childId = await getChildId();
