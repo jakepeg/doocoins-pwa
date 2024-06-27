@@ -15,10 +15,10 @@ import TasksIcon from "./TasksIcon2";
 import RewardsIcon from "./RewardsIcon2";
 import strings from "../../utils/constants";
 import BottomNavCallout from "../Callouts/BottomNavCallout";
-import { ReactComponent as NotificationIcon } from "../../assets/images/notification-icon.svg";
-import { ReactComponent as ZeroNotificationIcon } from "../../assets/images/zero-notification-icon.svg";
 import { ChildContext } from "../../contexts/ChildContext";
 import useHasRewards from "../../hooks/useHasRewards";
+import ZeroNotificationIcon from "./ZeroNotificationIcon";
+import NotificationIcon from "./NotificationIcon";
 
 function BottomTabNav() {
   const { pathname } = useLocation();
