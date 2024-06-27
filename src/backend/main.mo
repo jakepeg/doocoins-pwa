@@ -10,6 +10,7 @@ import Types "./Types";
 import Buffer "mo:base/Buffer";
 import Time "mo:base/Time";
 import Fuzz "mo:fuzz";
+// WARNING REMOVE? unused field "recurringTimer"
 import { setTimer; recurringTimer } = "mo:base/Timer";
 import Int "mo:base/Int";
 import Debug "mo:base/Debug";
@@ -76,7 +77,9 @@ actor {
       // Print debug information about the pin and child ID (Often used with `debug_show` to convert values to Text)
       Debug.print(debug_show (pin) # "     " #debug_show (childId));
       // Remove the pin and child ID association from their respective Trie structures
+      // WARNING REMOVE? unused identifier "oldPin"
       let (newChildPins, oldPin) = Trie.remove(childPins, keyText(nullToText(childId)), Text.equal);
+      // WARNING REMOVE? unused identifier "oldIds"
       let (newChildIdsFromPin, oldIds) = Trie.remove(childIdsFromPin, keyNat(pin), Nat.equal);
       // Update the in-memory state of the Trie structures
       childPins := newChildPins;
@@ -135,6 +138,7 @@ actor {
     // If no pin exists, generate a new random 4-digit integer
     let pin : Nat = await _randomPin();
     // Add the association between the child ID and the new pin to the childPins Trie
+    // WARNING REMOVE? unused identifier "oldPins"
     let (newChildPins, oldPins) = Trie.put(
       childPins,
       keyText(childId),
@@ -149,6 +153,7 @@ actor {
       Text.equal,
     );
     // Add the association between the new pin and the child ID to the childIdsFromPin Trie
+    // WARNING REMOVE? unused identifier "childPinToOld"
     let (childPinToId, childPinToOld) = Trie.put(
       childIdsFromPin,
       keyNat(pin),
@@ -158,6 +163,7 @@ actor {
     // Update the childIdsFromPin Trie
     childIdsFromPin := childPinToId;
     // Initiate the burning process for the newly created pin with a timeout
+    // WARNING REMOVE? unused identifier "burnt"
     let burnt = await burnCode(nullToNat(childPinStore));
     // Return the newly created pin
     return childPinStore;
@@ -189,6 +195,7 @@ actor {
     };
 
     //Initializing task number to this child
+    // WARNING REMOVE? unused identifier "existingTask"
     let (newChildToTaskNumber, existingTask) = Trie.put(
       childToTaskNumber,
       keyText(childId),
@@ -197,6 +204,7 @@ actor {
     );
     childToTaskNumber := newChildToTaskNumber;
 
+    // WARNING REMOVE? unused identifier "existing"
     let (childtobalancemap, existing) = Trie.put(
       childToBalance,
       keyText(childId),
@@ -206,6 +214,7 @@ actor {
     childToBalance := childtobalancemap;
 
     //Initializing goal (reward) number to this child
+    // WARNING REMOVE? unused identifier "existingGoal"
     let (newChildToGoalNumber, existingGoal) = Trie.put(
       childToGoalNumber,
       keyText(childId),
@@ -215,6 +224,7 @@ actor {
     childToGoalNumber := newChildToGoalNumber;
 
     //Initializing transaction number to this child
+    // WARNING REMOVE? unused identifier "existingTransaction"
     let (newChildToTransactionNumber, existingTransaction) = Trie.put(
       childToTransactionNumber,
       keyText(childId),
@@ -266,6 +276,7 @@ actor {
         #err(#NotFound);
       };
       case (v) {
+        // WARNING REMOVE? unused identifier "existing"
         let (newMap, existing) = Trie.put(
           childToTaskNumber,
           keyText(childId),
@@ -381,6 +392,7 @@ actor {
         #err(#NotFound);
       };
       case (v) {
+        // WARNING REMOVE? unused identifier "existing"
         let (newMap, existing) = Trie.put(
           childToGoalNumber,
           keyText(childId),
@@ -417,6 +429,7 @@ actor {
 
   // public shared (msg) func currentGoal(childId : Text, goalId : Nat) : async Result.Result<(), Types.Error> {
   public shared func currentGoal(childId : Text, goalId : Nat) : async Result.Result<(), Types.Error> {
+    // WARNING REMOVE? unused identifier "existing"
     let (updateChildToGoalNumber, existing) = Trie.put(
       childToCurrentGoal,
       keyText(childId),
@@ -492,7 +505,7 @@ actor {
       };
       case (?v) {
         let value : Nat = v.value;
-
+        // WARNING REMOVE? unused identifier "allTransactions"
         let (allTransactions, currentPointer) = returnTransactionDetails(childId);
         let transactionObject : Types.Transaction = {
           name = v.name;
@@ -512,6 +525,7 @@ actor {
         childToTransactions := newChildToTransactionMap;
         let myBalance = await getBalance(childId);
         let currentBalanceFormatted = Nat.add(myBalance, value);
+        // WARNING REMOVE? unused identifier "existing"
         let (updatedBalanceMap, existing) = Trie.put(
           childToBalance,
           keyText(childId),
@@ -558,6 +572,7 @@ actor {
         if (value > myBalance) {
           return #err(#BalanceNotEnough);
         };
+        // WARNING REMOVE? unused identifier "allTransactions"
         let (allTransactions, currentPointer) = returnTransactionDetails(childId);
         let transactionObject : Types.Transaction = {
           name = v.name;
@@ -578,6 +593,7 @@ actor {
         childToTransactions := newChildToTransactionMap;
 
         let currentBalanceFormatted = Nat.sub(myBalance, value);
+        // WARNING REMOVE? unused identifier "existing"
         let (updatedBalanceMap, existing) = Trie.put(
           childToBalance,
           keyText(childId),
@@ -670,31 +686,38 @@ actor {
   private func keyText(x : Text) : Trie.Key<Text> {
     return { key = x; hash = Text.hash(x) };
   };
+  // WARNING REMOVE? unused identifier "keyTextNull"
   private func keyTextNull(x : Text) : Trie.Key<Text> {
     return { key = x; hash = Text.hash(x) };
   };
 
   private func keyNat(x : Nat) : Trie.Key<Nat> {
+    // WARNING field hash is deprecated: For large `Nat` values consider using a bespoke hash function that considers all of the argument's bits.
     return { key = x; hash = Hash.hash(x) };
   };
 
+  // WARNING REMOVE? unused identifier "k"
   private func extractChildren(k : Text, v : Types.Child) : Types.Child {
     return v;
   };
 
+  // WARNING REMOVE? unused identifier "k"
   private func extractTasks(k : Nat, v : Types.Task) : Types.Task {
     return v;
   };
+  // WARNING REMOVE? unused identifier "k"
   private func extractTasksReq(k : Text, v : Types.TaskRequest) : Types.TaskRequest {
     return v;
   };
-
+  // WARNING REMOVE? unused identifier "k"
   private func extractReReq(k : Text, v : Types.RewardRequest) : Types.RewardRequest {
     return v;
   };
+  // WARNING REMOVE? unused identifier "k"
   private func extractTransactions(k : Nat, v : Types.Transaction) : Types.Transaction {
     return v;
   };
+  // WARNING REMOVE? unused identifier "k"
   private func extractGoals(k : Nat, v : Types.Goal) : Types.Goal {
     return v;
   };
@@ -779,6 +802,7 @@ actor {
     // Get the existing task requests as an Option type (may be null)
     let allChildrenTaskormatted = Option.get(allChildTasks, Trie.empty());
     // Add the new task request to the child's existing requests (or create a new map if none exist)
+    // WARNING REMOVE? unused identifier "oldLV2"
     let (allChildTasksLV2, oldLV2) = Trie.put(
       allChildrenTaskormatted,
       keyText(requestId),
@@ -786,6 +810,7 @@ actor {
       task,
     );
     // Update the child's task requests in the main Trie data structure
+    // WARNING REMOVE? unused identifier "oldLV1"
     let (allChildTasksUpdate, oldLV1) = Trie.put(
       childRequestsTasks,
       keyText(childId),
@@ -820,14 +845,14 @@ actor {
     );
 
     let allChildrenRewardsFormatted = Option.get(allChildRewards, Trie.empty());
-
+    // WARNING REMOVE? unused identifier "oldLV2"
     let (allChildRewardssLV2, oldLV2) = Trie.put(
       allChildrenRewardsFormatted,
       keyText(requestId),
       Text.equal,
       task,
     );
-
+    // WARNING REMOVE? unused identifier "oldLV1"
     let (allChildRewardsUpdate, oldLV1) = Trie.put(
       childRequestsRewards,
       keyText(childId),
@@ -949,12 +974,14 @@ actor {
     // Get the child's requests as an Option type (may be null)
     let allChildrenTaskormatted = Option.get(allChildTasks, Trie.empty());
     // Attempt to remove the task request identified by ID from the child's Trie
+    // WARNING REMOVE? unused identifier "oldLV2"
     let (allChildTasksLV2, oldLV2) = Trie.remove(
       allChildrenTaskormatted,
       keyText(id),
       Text.equal,
     );
     // Update the child's task requests in the main Trie with the modified list (or empty Trie if removed)
+    // WARNING REMOVE? unused identifier "oldLV1"
     let (allChildTasksUpdate, oldLV1) = Trie.put(
       childRequestsTasks,
       keyText(childId),
@@ -977,13 +1004,13 @@ actor {
     );
 
     let allChildrenRewardsFormatted = Option.get(allChildRewards, Trie.empty());
-
+    // WARNING REMOVE? unused identifier "oldLV2"
     let (allChildRewardssLV2, oldLV2) = Trie.remove(
       allChildrenRewardsFormatted,
       keyText(id),
       Text.equal,
     );
-
+    // WARNING REMOVE? unused identifier "oldLV1"
     let (allChildRewardsUpdate, oldLV1) = Trie.put(
       childRequestsRewards,
       keyText(childId),
