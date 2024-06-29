@@ -40,16 +40,16 @@ const Alerts = () => {
   }, [child]);
 
   React.useEffect(() => {
-    if (child && hasNewData) {
+    if (child?.id && hasNewData) {
       getAlerts({ callService: true });
     }
-  }, [actor, child, hasNewData]);
+  }, [actor, child.id, hasNewData]);
 
   React.useEffect(() => {
-    if (child) {
+    if (child?.id) {
       getAlerts({ callService: true });
     }
-  }, [actor, child]);
+  }, [actor, child.id]);
 
   function getAlerts({
     disableFullLoader = false,
@@ -371,7 +371,6 @@ const Alerts = () => {
     }
   };
   const rejectRequest = async ({ task, reward }) => {
-    setLoading(true);
     if (task) {
       try {
         await actor.removeTaskReq(child.id, task.id);
