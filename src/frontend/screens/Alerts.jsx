@@ -43,13 +43,13 @@ const Alerts = () => {
     if (child?.id && hasNewData) {
       getAlerts({ callService: true });
     }
-  }, [actor, child.id, hasNewData]);
+  }, [actor, child?.id, hasNewData]);
 
   React.useEffect(() => {
     if (child?.id) {
       getAlerts({ callService: true });
     }
-  }, [actor, child.id]);
+  }, [actor, child?.id]);
 
   function getAlerts({
     disableFullLoader = false,
