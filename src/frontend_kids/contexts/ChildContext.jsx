@@ -79,7 +79,8 @@ export default function ChildProvider({ children }) {
     set("childGoal", noGoalEntity, store);
   };
 
-  const refetchContent = ({ refetch, init }) => {
+  const refetchContent = async ({ refetch, init }) => {
+    let response;
     if (init) {
       setInit(true);
     }
@@ -147,7 +148,7 @@ export default function ChildProvider({ children }) {
 
     promises.push(rewardsPromise);
 
-    Promise.all(promises)
+    await Promise.all(promises)
       .then(() => {
         if (init) {
           setInit(false);
@@ -170,7 +171,11 @@ export default function ChildProvider({ children }) {
         if (refetch) {
           setRefetching(false);
         }
+      }).finally(() => {
+        response = {};
       });
+
+      return response
   };
 
   useEffect(() => {

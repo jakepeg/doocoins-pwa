@@ -7,7 +7,8 @@ import Balance from "./components/Balance";
 import React from "react";
 import { ChildContext } from "./contexts/ChildContext";
 import useIsMobileLayout from "./hooks/useIsMobileLayout";
-import ReactPullToRefresh from "react-pull-to-refresh";
+import PullToRefresh from "react-simple-pull-to-refresh";
+import ReloadIcon from "./components/icons/ReloadIcon";
 
 function ProtectedRoute({ children }) {
   const { isAuthenticated, isLoading } = useAuth();
@@ -23,11 +24,12 @@ function ProtectedRoute({ children }) {
       backgroundColor={!showMobileLayout && "#0B334D"}
       gap={0}
     >
-      <ReactPullToRefresh
-        onRefresh={() => {
-          refetchContent({ init: true });
+      <PullToRefresh
+        onRefresh={async () => {
+          const data = await refetchContent({ refetch: true });
+          return data
         }}
-        style={{ textAlign: "center" }}
+        className="text-center"
       >
         <Box
           sx={
@@ -45,7 +47,7 @@ function ProtectedRoute({ children }) {
           )}
         </Box>
         {children}
-      </ReactPullToRefresh>
+      </PullToRefresh>
       {showMobileLayout && <BottomTabNav />}
     </Box>
   );

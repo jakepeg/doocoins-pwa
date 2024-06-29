@@ -462,3 +462,7 @@ input:-ms-input-placeholder {/* IE 10+ */
 .rotate {
   animation: rotate 2s linear infinite;
 }
+
+.text-center {
+  text-align: center;
+}
