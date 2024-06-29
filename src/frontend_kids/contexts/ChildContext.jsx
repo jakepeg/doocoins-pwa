@@ -53,14 +53,13 @@ export default function ChildProvider({ children }) {
           actor?.getBalance(childID).then(async (returnedBalance) => {
             set("balance-" + childID, parseInt(returnedBalance), store);
 
-            const [balance, name] = await Promise.all([
-              get(`balance-${childID}`, store),
+            const [name] = await Promise.all([
               get(`selectedChildName`, store),
             ]);
 
             setChild({
               id: childID,
-              balance: parseInt(balance),
+              balance: parseInt(returnedBalance),
               name,
             });
 
@@ -145,8 +144,19 @@ export default function ChildProvider({ children }) {
           console.error(returnedRewards.err);
         }
       });
-
     promises.push(rewardsPromise);
+
+    const balance = actor
+      ?.getBalance(child.id)
+      .then(async (returnedBalance) => {
+        setChild({
+          id: child.id,
+          balance: parseInt(returnedBalance),
+          name: child.name,
+        });
+      });
+
+    promises.push(balance);
 
     await Promise.all(promises)
       .then(() => {
@@ -171,11 +181,12 @@ export default function ChildProvider({ children }) {
         if (refetch) {
           setRefetching(false);
         }
-      }).finally(() => {
+      })
+      .finally(() => {
         response = {};
       });
 
-      return response
+    return response;
   };
 
   useEffect(() => {
