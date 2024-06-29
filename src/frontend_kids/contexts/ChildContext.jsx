@@ -1,4 +1,4 @@
-import React, { createContext, useEffect } from "react";
+import React, { createContext, useEffect, useState } from "react";
 import { useAuth } from "../use-auth-client";
 import { get, set } from "idb-keyval";
 import strings, { noGoalEntity } from "../utils/constants";
@@ -6,7 +6,7 @@ import useCheckIsUserNewToChildList from "../hooks/useCheckIsUserNewToChildList"
 import useCheckIsUserNewToTasks from "../hooks/useCheckIsUserNewToTasks";
 import useCheckIsUserNewToTransactions from "../hooks/useCheckIsUserNewToTransactions";
 import useCheckIsUserNewToSwipeActions from "../hooks/useCheckIsUserNewToSwipeActions";
-import { Box } from "@chakra-ui/react";
+import { Box, useToast } from "@chakra-ui/react";
 import LoadingSpinner from "../components/LoadingSpinner";
 
 export const ChildContext = createContext();
@@ -14,6 +14,8 @@ export const ChildContext = createContext();
 export default function ChildProvider({ children }) {
   const [init, setInit] = React.useState(true);
   const { actor, store, isAuthenticated } = useAuth();
+  const [refetching, setRefetching] = useState(false);
+  const toast = useToast();
   const [child, setChild] = React.useState(null);
   const [tasks, setTasks] = React.useState([]);
   const [rewards, setRewards] = React.useState([]);
@@ -61,7 +63,6 @@ export default function ChildProvider({ children }) {
               balance: parseInt(balance),
               name,
             });
-            console.log(`balance`, balance, name);
 
             resolve(returnedBalance);
           });
@@ -78,82 +79,114 @@ export default function ChildProvider({ children }) {
     set("childGoal", noGoalEntity, store);
   };
 
-  useEffect(() => {
-    if (actor && child?.id) {
-      const promises = [];
+  const refetchContent = async ({ refetch, init }) => {
+    let response;
+    if (init) {
+      setInit(true);
+    }
+    if (refetch) {
+      setRefetching(true);
+    }
+    const promises = [];
 
-      // Get transactions
-      const transactionsPromise = actor
-        .getTransactions(child.id)
-        .then((returnedTransactions) => {
-          if ("ok" in returnedTransactions) {
-            const transactions = Object.values(returnedTransactions)[0];
-            set("transactionList", transactions, store);
-            setTransactions(transactions);
-          } else {
-            console.error(returnedTransactions.err);
-            set("transactionList", undefined, store);
-          }
-        });
-
-      promises.push(transactionsPromise);
-
-      // Get Tasks
-      const tasksPromise = actor.getTasks(child.id).then((returnedTasks) => {
-        if ("ok" in returnedTasks) {
-          const tasks = Object.values(returnedTasks)[0];
-          const filteredTasks = tasks.map((task) => ({
-            ...task,
-            id: parseInt(task.id),
-            value: parseInt(task.value),
-          }));
-          set("taskList", filteredTasks, store);
-          setTasks(filteredTasks);
+    // Get transactions
+    const transactionsPromise = actor
+      .getTransactions(child.id)
+      .then((returnedTransactions) => {
+        if ("ok" in returnedTransactions) {
+          const transactions = Object.values(returnedTransactions)[0];
+          set("transactionList", transactions, store);
+          setTransactions(transactions);
         } else {
-          console.error(returnedTasks.err);
+          console.error(returnedTransactions.err);
+          set("transactionList", undefined, store);
         }
       });
 
-      promises.push(tasksPromise);
+    promises.push(transactionsPromise);
 
-      // Get Rewards
-      const rewardsPromise = actor
-        .getGoals(child.id)
-        .then(async (returnedRewards) => {
-          if ("ok" in returnedRewards) {
-            const rewards = Object.values(returnedRewards)[0];
-            let currentGoalId = await actor
-              .getCurrentGoal(child.id)
-              .then((returnedGoal) => parseInt(returnedGoal));
+    // Get Tasks
+    const tasksPromise = actor.getTasks(child.id).then((returnedTasks) => {
+      if ("ok" in returnedTasks) {
+        const tasks = Object.values(returnedTasks)[0];
+        const filteredTasks = tasks.map((task) => ({
+          ...task,
+          id: parseInt(task.id),
+          value: parseInt(task.value),
+        }));
+        set("taskList", filteredTasks, store);
+        setTasks(filteredTasks);
+      } else {
+        console.error(returnedTasks.err);
+      }
+    });
 
-            const filteredRewards = rewards.map((reward) => ({
-              ...reward,
-              value: parseInt(reward.value),
-              id: parseInt(reward.id),
-              active: currentGoalId === parseInt(reward.id),
-            }));
-            set("rewardList", filteredRewards, store);
-            setRewards(filteredRewards);
-          } else {
-            console.error(returnedRewards.err);
-          }
-        });
+    promises.push(tasksPromise);
 
-      promises.push(rewardsPromise);
+    // Get Rewards
+    const rewardsPromise = actor
+      .getGoals(child.id)
+      .then(async (returnedRewards) => {
+        if ("ok" in returnedRewards) {
+          const rewards = Object.values(returnedRewards)[0];
+          let currentGoalId = await actor
+            .getCurrentGoal(child.id)
+            .then((returnedGoal) => parseInt(returnedGoal));
 
-      Promise.all(promises)
-        .then(() => {
+          const filteredRewards = rewards.map((reward) => ({
+            ...reward,
+            value: parseInt(reward.value),
+            id: parseInt(reward.id),
+            active: currentGoalId === parseInt(reward.id),
+          }));
+          set("rewardList", filteredRewards, store);
+          setRewards(filteredRewards);
+        } else {
+          console.error(returnedRewards.err);
+        }
+      });
+
+    promises.push(rewardsPromise);
+
+    await Promise.all(promises)
+      .then(() => {
+        if (init) {
           setInit(false);
-        })
-        .catch((error) => {
-          console.error("Error in one of the promises:", error);
+        }
+        if (refetch) {
+          setRefetching(false);
+        }
+      })
+      .catch((error) => {
+        toast({
+          title: "An error occurred.",
+          description: `Could not fetch kids details.`,
+          status: "error",
+          duration: 4000,
+          isClosable: true,
         });
+        if (init) {
+          setInit(false);
+        }
+        if (refetch) {
+          setRefetching(false);
+        }
+      }).finally(() => {
+        response = {};
+      });
+
+      return response
+  };
+
+  useEffect(() => {
+    if (actor && child?.id) {
+      refetchContent({ init: true });
     }
   }, [actor, child?.id]);
 
   const getChildId = async () => {
     const childId = await get("selectedChild", store);
-    if (!childId) setInit(false)
+    if (!childId) setInit(false);
 
     return childId;
   };
@@ -186,6 +219,8 @@ export default function ChildProvider({ children }) {
       tasks,
       setRewards,
       rewards,
+      refetchContent,
+      refetching,
     };
   }, [
     child,
@@ -205,6 +240,8 @@ export default function ChildProvider({ children }) {
     tasks,
     setRewards,
     rewards,
+    refetchContent,
+    refetching,
   ]);
 
   if (init) {

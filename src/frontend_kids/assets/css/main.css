@@ -449,3 +449,20 @@ input:-ms-input-placeholder {/* IE 10+ */
   font-size: 14px;
   padding: 0 !important;
 }
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.rotate {
+  animation: rotate 2s linear infinite;
+}
+
+.text-center {
+  text-align: center;
+}

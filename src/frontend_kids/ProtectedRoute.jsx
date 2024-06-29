@@ -7,10 +7,12 @@ import Balance from "./components/Balance";
 import React from "react";
 import { ChildContext } from "./contexts/ChildContext";
 import useIsMobileLayout from "./hooks/useIsMobileLayout";
+import PullToRefresh from "react-simple-pull-to-refresh";
+import ReloadIcon from "./components/icons/ReloadIcon";
 
 function ProtectedRoute({ children }) {
   const { isAuthenticated, isLoading } = useAuth();
-  const { child } = React.useContext(ChildContext);
+  const { child, refetchContent } = React.useContext(ChildContext);
   const showMobileLayout = useIsMobileLayout();
   if (!isLoading && !isAuthenticated) {
     return <Navigate to="/login" replace />;
@@ -22,22 +24,30 @@ function ProtectedRoute({ children }) {
       backgroundColor={!showMobileLayout && "#0B334D"}
       gap={0}
     >
-      <Box
-        sx={
-          showMobileLayout && {
-            backgroundColor: "#F0F7FC",
-            display: "flex",
-            flexDirection: "column",
-          }
-        }
-        px={'5px'}
+      <PullToRefresh
+        onRefresh={async () => {
+          const data = await refetchContent({ refetch: true });
+          return data
+        }}
+        className="text-center"
       >
-        <NavDrawer />
-        {showMobileLayout && (
-          <Balance childName={child?.name} childBalance={child?.balance} />
-        )}
-      </Box>
-      {children}
+        <Box
+          sx={
+            showMobileLayout && {
+              backgroundColor: "#F0F7FC",
+              display: "flex",
+              flexDirection: "column",
+            }
+          }
+          px={"5px"}
+        >
+          <NavDrawer />
+          {showMobileLayout && (
+            <Balance childName={child?.name} childBalance={child?.balance} />
+          )}
+        </Box>
+        {children}
+      </PullToRefresh>
       {showMobileLayout && <BottomTabNav />}
     </Box>
   );
