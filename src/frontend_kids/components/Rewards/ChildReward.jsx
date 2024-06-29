@@ -35,8 +35,6 @@ const ChildReward = ({
     }, 2000); // display for 2 second
   };
 
-  console.log(`the reward`, reward);
-
   return (
     <>
       <Box px={5} as="li" className="list-item" key={parseInt(reward.id)}>

@@ -11,6 +11,7 @@ import { useAuth } from "../use-auth-client";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 import { noGoalEntity } from "../utils/constants";
+import ReloadIcon from "./icons/ReloadIcon";
 
 const Balance = () => {
   const {
@@ -19,6 +20,8 @@ const Balance = () => {
     setGoal,
     blockingChildUpdate,
     setTransactions,
+    refetchContent,
+    refetching,
   } = React.useContext(ChildContext);
   const { actor, store } = useAuth();
   const [isLoading, setIsLoading] = React.useState(false);
@@ -27,7 +30,7 @@ const Balance = () => {
 
   React.useEffect(() => {
     if (!blockingChildUpdate) {
-      getChildGoal()
+      getChildGoal();
     }
   }, []);
 
@@ -43,7 +46,7 @@ const Balance = () => {
         setIsLoading(false);
       }
     });
-  }
+  };
 
   function getTransactions() {
     get("transactionList", store).then(async (val) => {
@@ -124,7 +127,7 @@ const Balance = () => {
 
   const handleReq = async (selectedReward) => {
     try {
-      setIsLoading(true)
+      setIsLoading(true);
       await actor.requestClaimReward(
         child.id,
         parseInt(selectedReward.id),
@@ -147,7 +150,7 @@ const Balance = () => {
         isClosable: true,
       });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
   };
 
@@ -266,6 +269,17 @@ const Balance = () => {
             )}
           </Box>
         </Box>
+        <button
+          onClick={() => refetchContent({ refetch: true })}
+          style={{
+            position: "absolute",
+            bottom: 0,
+            left: "50%",
+            transform: `translateX(-50%) translateY(50%)`,
+          }}
+        >
+          <ReloadIcon className={refetching && "rotate"} />
+        </button>
       </header>
     </>
   );
