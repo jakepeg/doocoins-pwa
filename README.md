@@ -10,8 +10,9 @@ To get started, start a local dfx development environment in this directory with
 
 dfx start --background --clean
 dfx deploy
+npm run build
 npm start (to run the parents app)
 npm run buildkids
-npm run startkids (to run the parents app)
+npm run startkids (to run the kids app)
 
 # doocoins-pwa
