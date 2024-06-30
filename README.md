@@ -8,11 +8,11 @@ PWA frontend built with React, Motoko Internet Computer backend with auth by htt
 
 To get started, start a local dfx development environment in this directory with the following steps:
 
-dfx start --background --clean
-dfx deploy
-npm run build
-npm start (to run the parents app)
-npm run buildkids
-npm run startkids (to run the kids app)
+- dfx start --background --clean
+- dfx deploy
+- npm run build
+- npm start (to run the parents app)
+- npm run buildkids
+- npm run startkids (to run the kids app)
 
 # doocoins-pwa
