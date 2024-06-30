@@ -144,7 +144,7 @@ function LoggedOut() {
         </Button>
 
         <Text fontSize="lg" mt={2} fontWeight={"bold"} color={"#00A4D7"}>
-          <Link href="/" target="_blank">
+          <Link href="https://doo.co/faq-kids.html#invite" target="_blank">
             I don't have a code!
           </Link>
         </Text>
