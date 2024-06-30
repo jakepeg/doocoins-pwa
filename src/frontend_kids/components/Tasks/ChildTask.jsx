@@ -6,15 +6,16 @@ import { ScaleFade } from "@chakra-ui/react";
 
 const ChildTask = ({ task, handleReq }) => {
   const [showEmoji, setShowEmoji] = useState(false);
-  const { isOpen, onToggle } = useDisclosure();
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleClick = (task) => {
-    handleReq(task);
     setShowEmoji(true);
-    onToggle();
+    handleReq(task);
+    setIsOpen(true);
+
     setTimeout(() => {
       setShowEmoji(false);
-      onToggle();
+      setIsOpen(false);
     }, 2000);
   };
 

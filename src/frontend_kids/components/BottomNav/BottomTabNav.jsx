@@ -5,7 +5,6 @@ import {
   Flex,
   TabList,
   Tabs,
-  useDisclosure,
   useMultiStyleConfig,
   useTab,
 } from "@chakra-ui/react";

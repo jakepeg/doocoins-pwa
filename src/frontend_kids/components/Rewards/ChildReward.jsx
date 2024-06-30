@@ -13,7 +13,7 @@ const ChildReward = ({
   handleSetGoal,
 }) => {
   const [showEmoji, setShowEmoji] = useState(false);
-  const { isOpen, onToggle } = useDisclosure();
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleClick = (reward, state) => {
     switch (state) {
@@ -28,10 +28,10 @@ const ChildReward = ({
         break;
     }
     setShowEmoji(true);
-    onToggle(); // trigger animation
+    setIsOpen(true); // trigger animation
     setTimeout(() => {
       setShowEmoji(false);
-      onToggle(); // end animation
+      setIsOpen(false); // end animation
     }, 2000); // display for 2 second
   };
 
