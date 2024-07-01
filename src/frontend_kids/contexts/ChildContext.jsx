@@ -53,9 +53,7 @@ export default function ChildProvider({ children }) {
           actor?.getBalance(childID).then(async (returnedBalance) => {
             set("balance-" + childID, parseInt(returnedBalance), store);
 
-            const [name] = await Promise.all([
-              get(`selectedChildName`, store),
-            ]);
+            const [name] = await Promise.all([get(`selectedChildName`, store)]);
 
             setChild({
               id: childID,
@@ -157,6 +155,51 @@ export default function ChildProvider({ children }) {
       });
 
     promises.push(balance);
+
+    const goals = actor?.getGoals(child?.id).then(async (returnedRewards) => {
+      if ("ok" in returnedRewards) {
+        const rewards = Object.values(returnedRewards);
+        let currentGoalId;
+        await actor?.getCurrentGoal(child?.id).then((returnedGoal) => {
+          currentGoalId = parseInt(returnedGoal);
+
+          return currentGoalId;
+        });
+
+        if (rewards) {
+          const reward = rewards?.[0]?.find(
+            (reward) => currentGoalId === parseInt(reward.id)
+          );
+
+          if (reward) {
+            const { name, value, id } = reward;
+            const returnedGoal = {
+              name,
+              value: parseInt(value),
+              hasGoal: true,
+              id,
+            };
+            set("childGoal", returnedGoal, store);
+            setGoal(returnedGoal);
+          }
+        }
+        const filteredRewards = rewards?.[0].map((reward) => {
+          return {
+            ...reward,
+            value: parseInt(reward.value),
+            id: parseInt(reward.id),
+            active: currentGoalId === parseInt(reward.id) ? true : false,
+          };
+        });
+        set("rewardList", filteredRewards, store);
+      } else {
+        set("childGoal", noGoalEntity, store);
+        setGoal(noGoalEntity);
+        console.error(returnedRewards.err);
+      }
+    });
+
+    promises.push(goals);
 
     await Promise.all(promises)
       .then(() => {
