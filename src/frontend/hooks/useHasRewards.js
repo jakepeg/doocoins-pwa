@@ -42,7 +42,13 @@ const useHasRewards = (childId, revokeCalls = false) => {
     return () => clearInterval(intervalId);
   }, []);
 
-  return { count, prevCount, hasNewData: count !== prevCount };
+  return {
+    count,
+    prevCount,
+    hasNewData: count !== prevCount,
+    reqCount: count,
+    setReqCount: setCount,
+  };
 };
 
 export default useHasRewards;
