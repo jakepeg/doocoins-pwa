@@ -1,34 +1,38 @@
 import { AuthClient } from "@dfinity/auth-client";
+import { NFID } from "@nfid/embed"
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { canisterId, createActor } from "../declarations/backend";
 import { del } from "idb-keyval";
 
 const AuthContext = createContext();
 
-    const APPLICATION_NAME = "DooCoins";
-    const APPLICATION_LOGO_URL = "https://nfid.one/icons/favicon-96x96.png";
-    const AUTH_PATH = "/authenticate/?applicationName="+APPLICATION_NAME+"&applicationLogo="+APPLICATION_LOGO_URL+"#authorize";
-    const NFID_AUTH_URL = "https://nfid.one" + AUTH_PATH;
-
-const defaultOptions = {
-  /**
-   *  @type {import("@dfinity/auth-client").AuthClientCreateOptions}
-   */
-  createOptions: {
-    idleOptions: {
-      disableIdle: true,
-      disableDefaultIdleCallback: true,
-    },
-  },
-  /**
-   * @type {import("@dfinity/auth-client").AuthClientLoginOptions}
-   */
-
-  loginOptions: {
-    identityProvider: NFID_AUTH_URL,
-    maxTimeToLive: BigInt (30) * BigInt(24) * BigInt(3_600_000_000_000), // 30 days
-  },
+type IdleOptions = {
+  onIdle?: () => unknown; // callback after the user has gone idle
+  idleTimeout?: number; // timeout in ms, default is 600000 (10 minutes)
+  captureScroll?: boolean; // capture scroll events
+  scrollDebounce?: number; // scroll debounce time in ms, default is 100
+  disableIdle?: boolean; // disables idle functionality
+  disableDefaultIdleCallback?: boolean; // disables default idle behavior - call logout & reload window
+}
+ 
+type NFIDConfig = {
+  origin?: string; // default is "https://nfid.one"
+  application?: { // your application details to display in the NFID iframe
+    name?: DooCoins; // your app name user can recognize
+    logo?: string; // your app logo user can recognize
+  };
+  identity?: SignIdentity;
+  storage?: AuthClientStorage;
+  keyType?: "ECDSA" | "Ed25519" // default is "ECDSA"
+  idleOptions?: IdleOptions;
 };
+ 
+const nfid = await NFID.init({
+  application: {
+    name: "My Sweet App",
+    logo: "https://dev.nfid.one/static/media/id.300eb72f3335b50f5653a7d6ad5467b3.svg"
+  },
+}: NFIDConfig);
 
 /**
  *

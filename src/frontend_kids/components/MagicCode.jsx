@@ -59,6 +59,7 @@ const MagicCode = ({ updateCode }) => {
     <Box display='flex' gap='2' className='magic-code-input-container'>
       {inputs.map((input, index) => (
         <Input
+          type='number'
           key={index}
           ref={inputRefs.current[index]}
           value={input}

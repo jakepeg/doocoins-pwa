@@ -3,11 +3,10 @@
   background-image: url("../images/card-header/cc.svg");
   background-repeat: no-repeat;
   background-size: cover;
-  padding: 20px 20px 0 20px;
-  /* width: 100%; */
   background-position: center center;
+  padding: 20px 20px 0 20px;
   position: relative;
-  min-height: 32vh; /*  was 35vh */
+  height: 29vh;
   border-radius: 12px 12px 12px 12px;
   max-width: 544px;
   width: 100%;
@@ -21,20 +20,21 @@
   }
 }
 
-.name {
+/* .name {
   font-size: 30px;
   margin-top: 28px;
   font-weight: 300;
   color: #ffffff;
-}
+} */
 
-/* .name {
+.name {
   font-size: 37px;
   font-weight: 300;
   color: #ffffff;
-  left: 29px;
+  left: 60px;
   position: absolute;
-} */
+  top: 10px;
+}
 
 .balance {
   font-size: 68px;
@@ -43,9 +43,6 @@
   color: #ffffff;
   font-family: "Courier New", Courier, monospace;
   transform: translateY(-10px);
-  margin-top: 70px;
-  max-width: 300px;
-  display:inline-block;
 }
 
 @media only screen and (max-width: 720px) {
@@ -64,7 +61,7 @@
 
 @media only screen and (min-width: 420px) and (max-width: 800px) {
   .circular_progress {
-    margin-right: 5vw; 
+    /* margin-right: 5vw;  */
   }
 }
 

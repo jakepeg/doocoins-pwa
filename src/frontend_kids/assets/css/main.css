@@ -442,7 +442,7 @@ input:-ms-input-placeholder {/* IE 10+ */
 }
 
 .magic-code-input {
-  border: 2px solid var(--secondary-clr) !important;
+  border: 2px solid #00A4D7 !important;
   background: #00a5d739 !important;
   max-width: 38px;
   color: #fff;
