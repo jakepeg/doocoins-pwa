@@ -47,23 +47,34 @@ const ChildReward = ({
           <Box fontSize={"24px"}>{parseInt(reward.value)}</Box>
           {showEmoji ? (
             <ScaleFade initialScale={0.9} in={isOpen}>
+            <Box
+                p={1}
+                background="#FBB03B"
+                ml={4}
+                cursor="pointer"
+                borderRadius={100}
+              >
             <SmileyIcon 
-                    // width and height should be 20px
                     width="18px"
                     height="18px"
                    />
+                   </Box>
             </ScaleFade>
           ) : (
             <>
               {child.balance >= reward.value ? (
                 <Box
-                  ml={1}
+                  ml={4}
                   p={1}
                   background="#129FAA"
                   cursor="pointer"
                   borderRadius={100}
                   onClick={() => handleClick(reward, "req")}
                 >
+
+
+
+
                   <TickIcon 
                     // width and height should be 20px
                     width="18px"
@@ -72,7 +83,7 @@ const ChildReward = ({
                 </Box>
               ) : reward.active ? (
                 <Box
-                  ml={1}
+                  ml={4}
                   p={1}
                   background="red"
                   cursor="pointer"
@@ -88,7 +99,7 @@ const ChildReward = ({
                 </Box>
               ) : (
                 <Box
-                  ml={1}
+                  ml={4}
                   p={0}
                   cursor="pointer"
                   borderRadius={100}

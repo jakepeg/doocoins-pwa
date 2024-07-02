@@ -3,6 +3,7 @@ import { ReactComponent as DCIcon } from "../../assets/images/dc.svg";
 import { ReactComponent as TickIcon } from "../../assets/images/tick.svg";
 import { Box, Text, useDisclosure } from "@chakra-ui/react";
 import { ScaleFade } from "@chakra-ui/react";
+import { ReactComponent as SmileyIcon } from "../../assets/images/smiley.svg";
 
 const ChildTask = ({ task, handleReq }) => {
   const [showEmoji, setShowEmoji] = useState(false);
@@ -41,13 +42,18 @@ const ChildTask = ({ task, handleReq }) => {
           <Box fontSize={"24px"}>{parseInt(task.value)}</Box>
           {showEmoji ? (
             <ScaleFade initialScale={0.9} in={isOpen}>
-              <span
-                role="img"
-                aria-label="fireworks"
-                style={{ marginLeft: "10px", fontSize: "24px" }}
+              <Box
+                p={1}
+                background="#FBB03B"
+                ml={4}
+                cursor="pointer"
+                borderRadius={100}
               >
-                🎆
-              </span>
+                <SmileyIcon 
+                  width="18px"
+                  height="18px"
+                />
+              </Box>
             </ScaleFade>
           ) : (
             <Box
