@@ -54,9 +54,10 @@
   }
 }
 
-
 .circular_progress {
   margin-right: 0; 
+  width: 195px;
+  height: 250px;
 }
 
 @media only screen and (min-width: 420px) and (max-width: 800px) {

@@ -209,23 +209,22 @@ const Balance = () => {
                   display={"flex"}
                   className={styles.circular_progress}
                   flexDirection={"column"}
-                  alignItems={"center"}
+                  alignItems={"right"}
                   sx={{
-                    width: { base: 100, sm: 200, md: 280 },
+                    width: { base: 100, sm: 100, md: 195 },
                     height: { base: 160, sm: 200, md: 250 },
-                    maxHeight: "320px",
+                    maxHeight: "220px",
                   }}
                 >
                   <CircularProgressbar
                     value={percentage}
-                    // width= {"70%"}
                     text={`${percentage}%`}
                     background
                     backgroundPadding={6}
                     strokeWidth={4}
                     styles={buildStyles({
                       strokeLinecap: "butt",
-                      backgroundColor: "#0B334D",
+                      backgroundColor: "transparent",
                       textColor: "#fff",
                       pathColor: "#00A4D7",
                       trailColor: "transparent",

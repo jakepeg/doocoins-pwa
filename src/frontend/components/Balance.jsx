@@ -313,9 +313,10 @@ const Balance = () => {
                     strokeWidth={5}
                     styles={buildStyles({
                       strokeLinecap: "butt",
-                      backgroundColor: "#0B334D",
+                      // backgroundColor: "#0B334D",
+                      backgroundColor: "transparent",
                       textColor: "#fff",
-                      pathColor: "#fff",
+                      pathColor: "#00A4D7",
                       trailColor: "transparent",
                       textSize: "1.2em",
                     })}
