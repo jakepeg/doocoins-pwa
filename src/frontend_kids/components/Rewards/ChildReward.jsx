@@ -4,6 +4,7 @@ import { ReactComponent as DCIcon } from "../../assets/images/dc.svg";
 import { ReactComponent as TickIcon } from "../../assets/images/tick.svg";
 import { ReactComponent as CloseIcon } from "../../assets/images/close.svg";
 import { ReactComponent as GoalIcon } from "../../assets/images/goal.svg";
+import { ReactComponent as SmileyIcon } from "../../assets/images/smiley.svg";
 
 const ChildReward = ({
   reward,
@@ -46,13 +47,11 @@ const ChildReward = ({
           <Box fontSize={"24px"}>{parseInt(reward.value)}</Box>
           {showEmoji ? (
             <ScaleFade initialScale={0.9} in={isOpen}>
-              <span
-                role="img"
-                aria-label="fireworks"
-                style={{ marginLeft: "4px", fontSize: "24px" }}
-              >
-                🎆
-              </span>
+            <SmileyIcon 
+                    // width and height should be 20px
+                    width="18px"
+                    height="18px"
+                   />
             </ScaleFade>
           ) : (
             <>
@@ -67,8 +66,8 @@ const ChildReward = ({
                 >
                   <TickIcon 
                     // width and height should be 20px
-                    width="20px" 
-                    height="20px"
+                    width="18px"
+                    height="18px"
                    />
                 </Box>
               ) : reward.active ? (
@@ -90,15 +89,15 @@ const ChildReward = ({
               ) : (
                 <Box
                   ml={1}
-                  p={1}
+                  p={0}
                   cursor="pointer"
                   borderRadius={100}
                   onClick={() => handleClick(reward, "set")}
                 >
                   <GoalIcon 
                     fill="#129FAA" 
-                    width="24px" 
-                    height="24px" />
+                    width="26px" 
+                    height="26px" />
                 </Box>
               )}
             </>
