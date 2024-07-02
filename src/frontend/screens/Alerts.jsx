@@ -13,6 +13,7 @@ import {
 } from "react-swipeable-list";
 import { ReactComponent as ApproveIcon } from "../assets/images/tick.svg";
 import { ReactComponent as DeleteIcon } from "../assets/images/delete.svg";
+import { ReactComponent as CloseIcon } from "../assets/images/close.svg";
 import RequestAlert from "../../frontend_kids/components/Tasks/RequestAlert";
 import useHasRewards from "../hooks/useHasRewards";
 
@@ -490,9 +491,9 @@ const Alerts = () => {
         >
           <div className="action-btn ">
             <div className="ItemColumnCentered">
-              <DeleteIcon width="22px" height="22px" />
+              <CloseIcon width="22px" height="22px" />
               <Text fontSize={"xs"} color={"#fff"}>
-                Remove
+                Decline
               </Text>
             </div>
           </div>
