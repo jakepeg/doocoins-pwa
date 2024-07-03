@@ -37,7 +37,7 @@ function checkForIOS() {
 
 function LoggedOut() {
   const { login, isAuthenticated, isLoading, logout, store, actor } = useAuth();
-  const { getBalance, child, setChild } = React.useContext(ChildContext);
+  const { getBalance, child, setChild, refetchContent } = React.useContext(ChildContext);
   const [code, setCode] = useState(null);
   const [error, setError] = useState("");
   const clearContextState = useClearContextState();
@@ -76,9 +76,11 @@ function LoggedOut() {
     const balance = await getBalance(data);
     const name = await actor.getChild(data);
     set("selectedChildName", name, store)
+    set("balance-" + data, parseInt(balance), store);
     setChild({ name: name, id: data, balance: parseInt(balance) })
     setCheckingCode(false)
     setIsAuthenticatedWithChildData(true)
+    refetchContent({ init: true, childId: data })
   };
 
   if (!isLoading && isAuthenticatedWithChildData) {

@@ -42,7 +42,6 @@ export const useAuthClient = (options = defaultOptions) => {
   }, []);
 
   const login = () => {
-    console.log(`authClient`, authClient);
     authClient.login({
       ...options.loginOptions,
       onSuccess: () => {
