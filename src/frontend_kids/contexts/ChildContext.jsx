@@ -12,8 +12,8 @@ import LoadingSpinner from "../components/LoadingSpinner";
 export const ChildContext = createContext();
 
 export default function ChildProvider({ children }) {
-  const [init, setInit] = React.useState(true);
-  const { actor, store, isAuthenticated } = useAuth();
+  const [init, setInit] = React.useState(false);
+  const { actor, store, isAuthenticated, isLoading } = useAuth();
   const [refetching, setRefetching] = useState(false);
   const toast = useToast();
   const [child, setChild] = React.useState(null);
@@ -72,7 +72,8 @@ export default function ChildProvider({ children }) {
     set("childGoal", noGoalEntity, store);
   };
 
-  const refetchContent = async ({ refetch, init }) => {
+  const refetchContent = async ({ refetch, init, childId }) => {
+    const child_id = childId || child?.id
     let response;
     if (init) {
       setInit(true);
@@ -84,7 +85,7 @@ export default function ChildProvider({ children }) {
 
     // Get transactions
     const transactionsPromise = actor
-      .getTransactions(child.id)
+      .getTransactions(child_id)
       .then((returnedTransactions) => {
         if ("ok" in returnedTransactions) {
           const transactions = Object.values(returnedTransactions)[0];
@@ -99,7 +100,7 @@ export default function ChildProvider({ children }) {
     promises.push(transactionsPromise);
 
     // Get Tasks
-    const tasksPromise = actor.getTasks(child.id).then((returnedTasks) => {
+    const tasksPromise = actor.getTasks(child_id).then((returnedTasks) => {
       if ("ok" in returnedTasks) {
         const tasks = Object.values(returnedTasks)[0];
         const filteredTasks = tasks.map((task) => ({
@@ -118,12 +119,12 @@ export default function ChildProvider({ children }) {
 
     // Get Rewards
     const rewardsPromise = actor
-      .getGoals(child.id)
+      .getGoals(child_id)
       .then(async (returnedRewards) => {
         if ("ok" in returnedRewards) {
           const rewards = Object.values(returnedRewards)[0];
           let currentGoalId = await actor
-            .getCurrentGoal(child.id)
+            .getCurrentGoal(child_id)
             .then((returnedGoal) => parseInt(returnedGoal));
 
           const filteredRewards = rewards.map((reward) => ({
@@ -141,18 +142,18 @@ export default function ChildProvider({ children }) {
     promises.push(rewardsPromise);
 
     const balance = actor
-      ?.getBalance(child.id)
+      ?.getBalance(child_id)
       .then(async (returnedBalance) => {
         setChild((prevState) => ({ ...prevState, balance: parseInt(returnedBalance) }));
       });
 
     promises.push(balance);
 
-    const goals = actor?.getGoals(child?.id).then(async (returnedRewards) => {
+    const goals = actor?.getGoals(child_id).then(async (returnedRewards) => {
       if ("ok" in returnedRewards) {
         const rewards = Object.values(returnedRewards);
         let currentGoalId;
-        await actor?.getCurrentGoal(child?.id).then((returnedGoal) => {
+        await actor?.getCurrentGoal(child_id).then((returnedGoal) => {
           currentGoalId = parseInt(returnedGoal);
 
           return currentGoalId;
@@ -224,12 +225,6 @@ export default function ChildProvider({ children }) {
     return response;
   };
 
-  useEffect(() => {
-    if (actor && child?.id) {
-      refetchContent({ init: true });
-    }
-  }, [actor, child?.id]);
-
   const getChildId = async () => {
     const childId = await get("selectedChild", store);
     if (!childId) setInit(false);
@@ -237,14 +232,41 @@ export default function ChildProvider({ children }) {
     return childId;
   };
 
-  useEffect(() => {
-    setChildData();
-  }, [actor, isAuthenticated]);
-
-  async function setChildData() {
+  async function setChildDataFromLocalStorage() {
     const childId = await getChildId();
-    actor && childId && getBalance(childId).catch(console.error);
+
+    if (!childId) {
+      return;
+    }
+  
+    const [balance, childName] = await Promise.all([
+      get(`balance-${childId}`, store),
+      get("selectedChildName", store),
+    ]);
+
+    // Create a new state object to set all at once
+    const newState = {};
+  
+    if (balance !== undefined) {
+      newState.balance = parseInt(balance);
+    }
+    if (childName !== undefined) {
+      newState.name = childName;
+    }
+    newState.id = childId; // childId is always defined here
+  
+    // Update state once with the new state object
+    setChild((prevState) => ({
+      ...prevState,
+      ...newState,
+    }));
   }
+
+  useEffect(() => {
+    if (!isLoading && isAuthenticated) {
+      setChildDataFromLocalStorage()
+    }
+  }, [isLoading])
 
   const values = React.useCallback(() => {
     return {
