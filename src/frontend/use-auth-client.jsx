@@ -4,11 +4,6 @@ import { canisterId, createActor } from "../declarations/backend";
 import { del } from "idb-keyval";
 
 const AuthContext = createContext();
-const APPLICATION_NAME = "DooCoins";
-const APPLICATION_LOGO_URL = "https://nfid.one/icons/favicon-96x96.png";
-const AUTH_PATH = "/authenticate/?applicationName="+APPLICATION_NAME+"&applicationLogo="+APPLICATION_LOGO_URL+"#authorize";
-const NFID_AUTH_URL = "https://nfid.one" + AUTH_PATH;
-
 const defaultOptions = {
   createOptions: {
     idleOptions: {
@@ -17,8 +12,8 @@ const defaultOptions = {
     },
   },
   loginOptions: {
-    identityProvider: NFID_AUTH_URL,
-    maxTimeToLive: BigInt (30) * BigInt(24) * BigInt(3_600_000_000_000), // 30 days
+    identityProvider: "https://nfid.one/authenticate/?applicationName=DooCoins&applicationLogo=https://nfid.one/icons/favicon-96x96.png#authorize", 
+    maxTimeToLive: BigInt (30) * BigInt(24) * BigInt(3_600_000_000_000), // Sets login expiration to 30 days
   },
 };
 
