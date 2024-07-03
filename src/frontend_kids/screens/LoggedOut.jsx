@@ -37,11 +37,13 @@ function checkForIOS() {
 
 function LoggedOut() {
   const { login, isAuthenticated, isLoading, logout, store, actor } = useAuth();
-  const { getBalance, handleUpdateChild } = React.useContext(ChildContext);
+  const { getBalance, child, setChild } = React.useContext(ChildContext);
   const [code, setCode] = useState(null);
   const [error, setError] = useState("");
   const clearContextState = useClearContextState();
   const [checkingCode, setCheckingCode] = useState(false)
+
+  const [isAuthenticatedWithChildData, setIsAuthenticatedWithChildData] = useState(!!(isAuthenticated && child?.id))
 
   React.useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -60,7 +62,6 @@ function LoggedOut() {
     }
     setCheckingCode(true)
     const data = await login(code);
-    setCheckingCode(false)
 
     if (!data) {
       setError("Incorrect or expired magic code.");
@@ -75,11 +76,12 @@ function LoggedOut() {
     const balance = await getBalance(data);
     const name = await actor.getChild(data);
     set("selectedChildName", name, store)
-
-    handleUpdateChild({ id: data, name: name, balance: parseInt(balance) })
+    setChild({ name: name, id: data, balance: parseInt(balance) })
+    setCheckingCode(false)
+    setIsAuthenticatedWithChildData(true)
   };
 
-  if (!isLoading && isAuthenticated) {
+  if (!isLoading && isAuthenticatedWithChildData) {
     return <Navigate to="/" replace />;
   }
 

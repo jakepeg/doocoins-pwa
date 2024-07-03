@@ -42,10 +42,6 @@ export default function ChildProvider({ children }) {
   useCheckIsUserNewToTransactions({ handleUpdateCalloutState });
   useCheckIsUserNewToSwipeActions({ handleUpdateCalloutState });
 
-  const handleUpdateChild = (...args) => {
-    setChild((prevState) => ({ ...prevState, ...args?.[0] }));
-  };
-
   async function getBalance(childID) {
     return new Promise((resolve, reject) => {
       get("balance-" + childID, store)
@@ -147,11 +143,7 @@ export default function ChildProvider({ children }) {
     const balance = actor
       ?.getBalance(child.id)
       .then(async (returnedBalance) => {
-        setChild({
-          id: child.id,
-          balance: parseInt(returnedBalance),
-          name: child.name,
-        });
+        setChild((prevState) => ({ ...prevState, balance: parseInt(returnedBalance) }));
       });
 
     promises.push(balance);
@@ -268,7 +260,6 @@ export default function ChildProvider({ children }) {
       blockingChildUpdate,
       setTransactions,
       transactions,
-      handleUpdateChild,
       setTasks,
       tasks,
       setRewards,
@@ -289,7 +280,6 @@ export default function ChildProvider({ children }) {
     setBlockingChildUpdate,
     setTransactions,
     transactions,
-    handleUpdateChild,
     setTasks,
     tasks,
     setRewards,
