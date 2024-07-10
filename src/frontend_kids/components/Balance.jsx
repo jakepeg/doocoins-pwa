@@ -272,8 +272,6 @@ const Balance = () => {
           onClick={() => refetchContent({ refetch: true })}
           style={{
             position: "absolute",
-            // bottom: 0,
-            // left: "50%",
             top: "-2px",
             left: "32px",
             transform: `translateX(-50%) translateY(50%)`,

@@ -122,14 +122,14 @@ function NavDrawer() {
               >
                 Email <a href="mailto:hello@doo.co">hello@doo.co</a>
               </Text>
-              <Text
+              {/* <Text
                 onClick={onClose}
                 fontSize="xl"
                 color="#0B334D"
                 fontWeight={600}
               >
                 Discord <a href="https://discord.gg/UhzNDvbnPX">discord.gg/UhzNDvbnPX</a>
-              </Text>
+              </Text> */}
             </Stack>
           </DrawerBody>
         </DrawerContent>
