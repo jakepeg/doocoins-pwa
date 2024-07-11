@@ -57,6 +57,10 @@
   "output_env_file": ".env",
   "version": 1,
   "networks": {
+    "ic": {
+      "providers": ["https://icp0.io"],
+      "type": "persistent"
+    },
     "staging": {
       "providers": ["https://icp0.io"],
       "type": "persistent"
