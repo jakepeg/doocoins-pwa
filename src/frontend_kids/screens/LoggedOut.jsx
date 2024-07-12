@@ -42,6 +42,7 @@ function LoggedOut() {
   const [error, setError] = useState("");
   const clearContextState = useClearContextState();
   const [checkingCode, setCheckingCode] = useState(false)
+  const [loadingState, setLoadingState] = useState(null)
 
   const [isAuthenticatedWithChildData, setIsAuthenticatedWithChildData] = useState(!!(isAuthenticated && child?.id))
 
@@ -61,17 +62,21 @@ function LoggedOut() {
       return;
     }
     setCheckingCode(true)
+    setLoadingState('Verifying user...')
     const data = await login(code);
 
     if (!data) {
       setError("Incorrect or expired magic code.");
+      setLoadingState(null)
       return;
     }
     if (data?.error) {
       setError(data?.error);
+      setLoadingState(null)
       return;
     }
-
+    
+    setLoadingState('Loading data..')
     set("selectedChild", data, store)
     const balance = await getBalance(data);
     const name = await actor.getChild(data);
@@ -80,7 +85,8 @@ function LoggedOut() {
     setChild({ name: name, id: data, balance: parseInt(balance) })
     setCheckingCode(false)
     setIsAuthenticatedWithChildData(true)
-    refetchContent({ init: true, childId: data })
+    await refetchContent({ init: true, childId: data })
+    setLoadingState(null)
   };
 
   if (!isLoading && isAuthenticatedWithChildData) {
@@ -144,7 +150,7 @@ function LoggedOut() {
           _active={{}}
           disabled={checkingCode}
         >
-          {checkingCode ? 'Verifying...' : 'Connect'}
+          {loadingState ? loadingState : 'Connect'}
         </Button>
 
         <Text fontSize="lg" mt={2} fontWeight={"bold"} color={"#00A4D7"}>

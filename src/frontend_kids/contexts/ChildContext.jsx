@@ -141,13 +141,15 @@ export default function ChildProvider({ children }) {
       });
     promises.push(rewardsPromise);
 
+    if (refetch) {
     const balance = actor
       ?.getBalance(child_id)
       .then(async (returnedBalance) => {
         setChild((prevState) => ({ ...prevState, balance: parseInt(returnedBalance) }));
       });
 
-    promises.push(balance);
+      promises.push(balance);
+    }
 
     const goals = actor?.getGoals(child_id).then(async (returnedRewards) => {
       if ("ok" in returnedRewards) {
