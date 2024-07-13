@@ -47,6 +47,7 @@
     "@dfinity/principal": "^1.4.0",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
+    "@junobuild/analytics": "^0.0.24",
     "@nfid/embed": "^0.10.3",
     "framer-motion": "^10.12.16",
     "idb-keyval": "^6.2.1",
