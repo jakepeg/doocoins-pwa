@@ -1,5 +1,6 @@
 import React from "react";
 import { useAuth } from "../use-auth-client";
+import { ConnectWallet } from "@nfid/identitykit/react"
 import { Navigate } from "react-router-dom";
 import { Box, Button, Link, Text } from "@chakra-ui/react";
 import ICBadge from "../assets/images/ic-badge.svg";
@@ -75,7 +76,7 @@ function LoggedOut() {
           Kids Rewards dApp
         </Text>
         <Text fontSize="lg" mt={2} fontWeight={"bold"} color={"#00A4D7"}>
-          <Link href="https://www.doo.co" target="_blank">find out more</Link>
+          <Link href="https://www.doo.co" target="_blank">learn more</Link>
         </Text>
         <Button
           variant="ghost"
@@ -93,6 +94,8 @@ function LoggedOut() {
         >
           Connect
         </Button>
+
+        <ConnectWallet />
 
         <Box>
       {checkForIOS() ? <div className="install-prompt"><p className="light prompt-text">Install for a better experience</p><p className="light prompt-text">Tap <img src={ShareIcon} className="share-icon" alt="Install PWA" /> then "Add to Home Screen" </p>

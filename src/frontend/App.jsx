@@ -1,6 +1,10 @@
 import React from "react";
 import LoggedOut from "./screens/LoggedOut";
 import { AuthProvider } from "./use-auth-client";
+
+import "@nfid/identitykit/react/styles.css";
+import { IdentityKitProvider } from "@nfid/identitykit/react";
+
 import "./assets/css/main.css";
 import ChildList from "./screens/ChildList";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
@@ -20,6 +24,7 @@ import Alerts from "./screens/Alerts";
 
 function App() {
   return (
+    <IdentityKitProvider>
     <main id="pageContent">
     <ImageLoader />
       <ChildProvider>
@@ -103,6 +108,7 @@ function App() {
         </Router>
       </ChildProvider>
     </main>
+    </IdentityKitProvider>
   );
 }
 
