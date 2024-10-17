@@ -4,6 +4,7 @@ import { AuthProvider } from "./use-auth-client";
 
 import "@nfid/identitykit/react/styles.css";
 import { IdentityKitProvider } from "@nfid/identitykit/react";
+import { IdentityKitAuthType } from "@nfid/identitykit"
 
 import "./assets/css/main.css";
 import ChildList from "./screens/ChildList";
@@ -23,8 +24,14 @@ import InviteChild from "./screens/InviteChild";
 import Alerts from "./screens/Alerts";
 
 function App() {
+
   return (
-    <IdentityKitProvider>
+    <IdentityKitProvider 
+      onConnectSuccess={(res) => {
+        console.log('logged in successfully', res)
+      }} 
+      theme="light" 
+      authType={IdentityKitAuthType.Delegation}>
     <main id="pageContent">
     <ImageLoader />
       <ChildProvider>
