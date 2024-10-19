@@ -1,100 +1,130 @@
 import { AuthClient } from "@dfinity/auth-client";
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  useCallback,
+  useRef,
+} from "react";
 import { canisterId, createActor } from "../declarations/backend";
 import { del } from "idb-keyval";
+import { useIdentityKit } from "@nfid/identitykit/react";
+import { useCallbackRef } from "@chakra-ui/react";
+import { Actor } from "@dfinity/agent";
+import { idlFactory } from "../declarations/backend";
 
 const AuthContext = createContext();
-const APPLICATION_NAME = "DooCoins";
-const APPLICATION_LOGO_URL = "https://nfid.one/icons/favicon-96x96.png";
-const AUTH_PATH = "/authenticate/?applicationName="+APPLICATION_NAME+"&applicationLogo="+APPLICATION_LOGO_URL+"#authorize";
-const NFID_AUTH_URL = "https://nfid.one" + AUTH_PATH;
 
-const defaultOptions = {
-  createOptions: {
-    idleOptions: {
-      disableIdle: true,
-      disableDefaultIdleCallback: true,
-    },
-  },
-  loginOptions: {
-    identityProvider: NFID_AUTH_URL,
-    maxTimeToLive: BigInt (30) * BigInt(24) * BigInt(3_600_000_000_000), // 30 days
-  },
-};
-
-export const useAuthClient = (options = defaultOptions) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [authClient, setAuthClient] = useState(null);
-  const [identity, setIdentity] = useState(null);
-  const [principal, setPrincipal] = useState(null);
-  const [actor, setActor] = useState(null);
-  const [isLoading, setIsLoading] = useState(true)
+function useWhyDidYouUpdate(name, props) {
+  // create a reference to track the previous data
+  const previousProps = useRef();
 
   useEffect(() => {
-    if (authClient == null) {
-      setIsLoading(true)
-      AuthClient.create().then(async (client) => {
-        updateClient(client);
-      }).finally(() => {
-        setIsLoading(false)
+    if (previousProps.current) {
+      // merge the keys of previous and current data
+      const keys = Object.keys({ ...previousProps.current, ...props });
+
+      // to store what has change
+      const changesObj = {};
+
+      // check what values have changed between the previous and current
+      keys.forEach((key) => {
+        // if both are object
+        if (typeof props[key] === "object" && typeof previousProps.current[key] === "object") {
+          if (JSON.stringify(previousProps.current[key]) !== JSON.stringify(props[key])) {
+            // add to changesObj
+            changesObj[key] = {
+              from: previousProps.current[key],
+              to: props[key],
+            };
+          }
+        } else {
+          // if both are non-object
+          if (previousProps.current[key] !== props[key]) {
+            // add to changesObj
+            changesObj[key] = {
+              from: previousProps.current[key],
+              to: props[key],
+            };
+          }
+        }
       });
+
+      // if changesObj not empty, print the cause
+      if (Object.keys(changesObj).length) {
+        console.log("This is causing re-renders", name, changesObj);
+      }
     }
-  }, []);
 
-  const login = () => {
-    authClient.login({
-      ...options.loginOptions,
-      onSuccess: () => {
-        updateClient(authClient);
-      },
-    });
-  };
-
-  async function updateClient(client) {
-    const isAuthenticated = await client.isAuthenticated();
-    setIsAuthenticated(isAuthenticated);
-    const identity = client.getIdentity();
-    setIdentity(identity);
-    const principal = identity.getPrincipal();
-    setPrincipal(principal);
-    setAuthClient(client);
-    const actor = createActor(canisterId, {
-      agentOptions: {
-        identity,
-      },
-    });
-    setActor(actor);
-  }
-
-  async function logout() {
-    del("childList")
-    del("childGoal")
-    del("rewardList")
-    del("selectedChild")
-    del("selectedChildName")
-    del("taskList")
-    del("transactionList")
-    if(authClient) {
-      await authClient?.logout();
-      await updateClient(authClient);
-    }
-  }
-
-  return {
-    isAuthenticated,
-    login,
-    logout,
-    authClient,
-    identity,
-    principal,
-    actor,
-    isLoading
-  };
-};
+    // update the previous props with the current
+    previousProps.current = props;
+  });
+}
 
 export const AuthProvider = ({ children }) => {
-  const auth = useAuthClient();
-  return <AuthContext.Provider value={auth}>{children}</AuthContext.Provider>;
+  const [actor, setActor] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const identityKit = useIdentityKit();
+
+  console.log(`identityKit`, identityKit);
+  useEffect(() => {
+    if (identityKit.agent) {
+      // const newActor = createActor(canisterId, {
+      //   // agentOptions: {
+      //   //   identity: identityKit.identity,
+      //   // },
+      //   agent: identityKit.agent,
+      // });
+      const newActor = Actor.createActor(idlFactory, { agent: identityKit.agent, canisterId })
+      console.log(`newActor`, newActor);
+      
+      setActor(newActor);
+    }
+    setIsLoading(false);
+  }, [identityKit.agent]);
+
+  const login = useCallback(() => {
+    identityKit.connect();
+  }, [identityKit]);
+
+  const logout = useCallback(async () => {
+    console.log(`not supposed to be here`);
+    
+    await identityKit.disconnect();
+    del("childList");
+    del("childGoal");
+    del("rewardList");
+    del("selectedChild");
+    del("selectedChildName");
+    del("taskList");
+    del("transactionList");
+  }, [identityKit]);
+
+  const authValue = useMemo(() => {
+    return {
+      isAuthenticated: Boolean(identityKit?.accounts?.length),
+      login,
+      logout,
+      identity: identityKit.identity,
+      principal: identityKit.principal,
+      actor,
+      isLoading,
+    };
+  }, [
+    identityKit.accounts,
+    identityKit.identity,
+    identityKit.principal,
+    actor,
+    isLoading,
+    login,
+    logout,
+  ]);
+
+  console.log(`main runs`, authValue);
+
+  return <AuthContext.Provider value={authValue}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => useContext(AuthContext);

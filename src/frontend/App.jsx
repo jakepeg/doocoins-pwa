@@ -4,11 +4,16 @@ import { AuthProvider } from "./use-auth-client";
 
 import "@nfid/identitykit/react/styles.css";
 import { IdentityKitProvider } from "@nfid/identitykit/react";
-import { IdentityKitAuthType } from "@nfid/identitykit"
+import { IdentityKitAuthType, NFIDW } from "@nfid/identitykit";
 
 import "./assets/css/main.css";
 import ChildList from "./screens/ChildList";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import Home from "./screens/Home";
 import Rewards from "./screens/Rewards";
 import Tasks from "./screens/Tasks";
@@ -22,18 +27,12 @@ import ChildProvider from "./contexts/ChildContext";
 import ImageLoader from "./utils/ImageLoader";
 import InviteChild from "./screens/InviteChild";
 import Alerts from "./screens/Alerts";
+import { canisterId } from "../declarations/backend";
 
 function App() {
-
   return (
-    <IdentityKitProvider 
-      onConnectSuccess={(res) => {
-        console.log('logged in successfully', res)
-      }} 
-      theme="light" 
-      authType={IdentityKitAuthType.Delegation}>
     <main id="pageContent">
-    <ImageLoader />
+      <ImageLoader />
       <ChildProvider>
         <Router>
           <Routes>
@@ -115,14 +114,26 @@ function App() {
         </Router>
       </ChildProvider>
     </main>
-    </IdentityKitProvider>
   );
 }
 
 export default () => (
-  <AuthProvider>
-    <ChakraProvider>
-      <App />
-    </ChakraProvider>
-  </AuthProvider>
+  <IdentityKitProvider
+    onConnectSuccess={(res) => {
+      console.log("logged in successfully", res);
+      // return <Navigate to="/" replace />
+    }}
+    signers={[NFIDW]}
+    theme="light"
+    signerClientOptions={{
+      targets: [canisterId],
+    }}
+    authType={IdentityKitAuthType.Delegation}
+  >
+    <AuthProvider>
+      <ChakraProvider>
+        <App />
+      </ChakraProvider>
+    </AuthProvider>
+  </IdentityKitProvider>
 );

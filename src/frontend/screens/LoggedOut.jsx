@@ -1,12 +1,13 @@
 import React from "react";
 import { useAuth } from "../use-auth-client";
 import { ConnectWallet } from "@nfid/identitykit/react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { Box, Button, Link, Text } from "@chakra-ui/react";
 import ICBadge from "../assets/images/ic-badge.svg";
 import ShareIcon from "../assets/images/share-icon.svg";
 import logo from "../assets/images/logo.svg";
 import useClearContextState from "../hooks/useClearContextState";
+import { useIdentityKitAuth } from "../use-auth-client-identitykit";
 
 function checkForIOS() {
   // already installed
@@ -36,16 +37,10 @@ function checkForIOS() {
 function LoggedOut() {
   const { login, isAuthenticated, isLoading, logout } = useAuth();
   const clearContextState = useClearContextState();
+  
   if (!isLoading && isAuthenticated) {
     return <Navigate to="/" replace />;
   }
-
-  React.useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      logout();
-      clearContextState();
-    }
-  }, []);
 
   return (
     <Box
