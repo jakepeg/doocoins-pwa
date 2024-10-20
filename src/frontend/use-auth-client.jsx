@@ -6,7 +6,12 @@ import { del } from "idb-keyval";
 const AuthContext = createContext();
 const APPLICATION_NAME = "DooCoins";
 const APPLICATION_LOGO_URL = "https://nfid.one/icons/favicon-96x96.png";
-const AUTH_PATH = "/authenticate/?applicationName="+APPLICATION_NAME+"&applicationLogo="+APPLICATION_LOGO_URL+"#authorize";
+const AUTH_PATH =
+  "/authenticate/?applicationName=" +
+  APPLICATION_NAME +
+  "&applicationLogo=" +
+  APPLICATION_LOGO_URL +
+  "#authorize";
 const NFID_AUTH_URL = "https://nfid.one" + AUTH_PATH;
 
 const defaultOptions = {
@@ -18,7 +23,7 @@ const defaultOptions = {
   },
   loginOptions: {
     identityProvider: NFID_AUTH_URL,
-    maxTimeToLive: BigInt (30) * BigInt(24) * BigInt(3_600_000_000_000), // 30 days
+    maxTimeToLive: BigInt(30 * 24 * 60 * 60 * 1000 * 1000 * 1000), // 30 days
   },
 };
 
@@ -28,16 +33,22 @@ export const useAuthClient = (options = defaultOptions) => {
   const [identity, setIdentity] = useState(null);
   const [principal, setPrincipal] = useState(null);
   const [actor, setActor] = useState(null);
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (authClient == null) {
-      setIsLoading(true)
-      AuthClient.create().then(async (client) => {
-        updateClient(client);
-      }).finally(() => {
-        setIsLoading(false)
-      });
+      setIsLoading(true);
+      AuthClient.create({
+        idleOptions: {
+          idleTimeout: 1000 * 60 * 60 * 24 * 30,
+          disableIdle: true,
+          disableDefaultIdleCallback: true,
+        },
+      })
+        .then(async (client) => {
+          updateClient(client);
+        })
+        .finally(() => {});
     }
   }, []);
 
@@ -64,17 +75,18 @@ export const useAuthClient = (options = defaultOptions) => {
       },
     });
     setActor(actor);
+    setIsLoading(false);
   }
 
   async function logout() {
-    del("childList")
-    del("childGoal")
-    del("rewardList")
-    del("selectedChild")
-    del("selectedChildName")
-    del("taskList")
-    del("transactionList")
-    if(authClient) {
+    del("childList");
+    del("childGoal");
+    del("rewardList");
+    del("selectedChild");
+    del("selectedChildName");
+    del("taskList");
+    del("transactionList");
+    if (authClient) {
       await authClient?.logout();
       await updateClient(authClient);
     }
@@ -88,7 +100,7 @@ export const useAuthClient = (options = defaultOptions) => {
     identity,
     principal,
     actor,
-    isLoading
+    isLoading,
   };
 };
 
