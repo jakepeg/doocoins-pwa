@@ -51,8 +51,6 @@ function ChildList() {
   React.useEffect(() => {
     getChildren({ callService: false });
   }, [actor]);
-  console.log(`loader`, loader);
-  
 
   function getChildren({ callService = false }) {
     del("selectedChild");
@@ -66,14 +64,10 @@ function ChildList() {
     setLoader((prevState) => ({ ...prevState, init: true }));
     get("childList").then(async (val) => {
       if (val === undefined || callService) {
-        console.log(`actor`, actor);
-        
         setLoader((prevState) => ({ ...prevState, init: true }));
         actor
           ?.getChildren()
           .then(async (returnedChilren) => {
-            console.log(`returnedChilren`, returnedChilren);
-            
             if ("ok" in returnedChilren) {
               const children = Object.values(returnedChilren);
               const updatedChildrenData = await Promise.all(
@@ -91,9 +85,9 @@ function ChildList() {
               console.error(returnedChilren.err);
             }
           })
-          .finally(() =>
+          .finally(() =>{
             setLoader((prevState) => ({ ...prevState, init: false }))
-          );
+          });
       } else {
         const updatedChildrenData = await Promise.all(
           Object.values(val).map(async (child) => {

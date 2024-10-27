@@ -117,23 +117,63 @@ function App() {
   );
 }
 
-export default () => (
-  <IdentityKitProvider
-    onConnectSuccess={(res) => {
-      console.log("logged in successfully", res);
-      // return <Navigate to="/" replace />
-    }}
-    signers={[NFIDW]}
-    theme="light"
-    signerClientOptions={{
-      targets: [canisterId],
-    }}
-    authType={IdentityKitAuthType.Delegation}
-  >
-    <AuthProvider>
-      <ChakraProvider>
-        <App />
-      </ChakraProvider>
-    </AuthProvider>
-  </IdentityKitProvider>
-);
+export default () => {
+  const thirtyDaysInMs = 30 * 24 * 60 * 60 * 1000; // 30 days in milliseconds
+  const thirtyDaysInNs = BigInt(thirtyDaysInMs) * BigInt(1_000_000); // Convert to nanoseconds
+
+  // const testTimeoutMs = 2 * 60 * 1000; // 2 minutes in milliseconds
+  // const testTimeoutNs = BigInt(testTimeoutMs) * BigInt(1_000_000); // Convert to nanoseconds
+
+  const testTimeoutMs = 10 * 60 * 1000; // 10 minutes in milliseconds
+  const testTimeoutNs = BigInt(testTimeoutMs) * BigInt(1_000_000); // Convert to nanoseconds
+
+  const clientOptions = {
+    targets: [canisterId],
+    idleOptions: {
+      // Disable the default idle timeout behavior
+      disableDefaultIdleCallback: false,
+      // Set custom idle timeout
+      idleTimeout: thirtyDaysInMs,
+    },
+    // Set delegation expiration to 30 days
+    maxTimeToLive: thirtyDaysInNs,
+    // Optional: Callback when logout occurs
+    onLogout: () => {
+      // Handle post-logout actions like redirecting to login page
+      console.log("User logged out");
+    },
+  };
+
+  const testClientOptions = {
+    targets: [canisterId],
+    idleOptions: {
+      // Set idle timeout to 2 minutes for testing
+      idleTimeout: testTimeoutMs,
+      disableDefaultIdleCallback: false
+    },
+    // Set delegation expiration to 2 minutes
+    maxTimeToLive: testTimeoutNs
+  };
+
+  return (
+    <IdentityKitProvider
+      onConnectSuccess={(res) => {
+        console.log("logged in successfully", res);
+        // return <Navigate to="/" replace />
+      }}
+      onDisconnect={(res) => {
+        console.log("logged out successfully", res);
+      }}
+      signers={[NFIDW]}
+      theme="light"
+      signerClientOptions={clientOptions}
+      authType={IdentityKitAuthType.Delegation}
+    >
+      <AuthProvider>
+        <ChakraProvider>
+          <App />
+        </ChakraProvider>
+      </AuthProvider>
+    </IdentityKitProvider>
+  );
+};

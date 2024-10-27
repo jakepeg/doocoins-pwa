@@ -10,9 +10,9 @@ import React, {
 } from "react";
 import { canisterId, createActor } from "../declarations/backend";
 import { del } from "idb-keyval";
-import { useIdentityKit } from "@nfid/identitykit/react";
+import { useAgent, useIdentityKit } from "@nfid/identitykit/react";
 import { useCallbackRef } from "@chakra-ui/react";
-import { Actor } from "@dfinity/agent";
+import { Actor, HttpAgent } from "@dfinity/agent";
 import { idlFactory } from "../declarations/backend";
 
 const AuthContext = createContext();
@@ -67,23 +67,28 @@ export const AuthProvider = ({ children }) => {
   const [actor, setActor] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const identityKit = useIdentityKit();
+  const authenticatedAgent = useAgent()
 
-  console.log(`identityKit`, identityKit);
   useEffect(() => {
-    if (identityKit.agent) {
-      // const newActor = createActor(canisterId, {
-      //   // agentOptions: {
-      //   //   identity: identityKit.identity,
-      //   // },
-      //   agent: identityKit.agent,
-      // });
-      const newActor = Actor.createActor(idlFactory, { agent: identityKit.agent, canisterId })
-      console.log(`newActor`, newActor);
+    console.log(`authenticatedAgent`, authenticatedAgent);
+    if (authenticatedAgent) {
+      setIsLoading(true);
+      const isLocal = process.env.NODE_ENV === 'development';
+      const agent = new HttpAgent({
+        host: isLocal ? "http://localhost:4943" : "https://icp-api.io",
+        identity: identityKit.identity,
+        verifyQuerySignatures: !isLocal
+      });
+
+      // const newActor = Actor.createActor(idlFactory, { agent, canisterId })
+      const newActor = Actor.createActor(idlFactory, { agent: authenticatedAgent, canisterId })
       
       setActor(newActor);
+      setIsLoading(false);
+    } else {
+      setIsLoading(false);
     }
-    setIsLoading(false);
-  }, [identityKit.agent]);
+  }, [authenticatedAgent]);
 
   const login = useCallback(() => {
     identityKit.connect();
@@ -104,7 +109,7 @@ export const AuthProvider = ({ children }) => {
 
   const authValue = useMemo(() => {
     return {
-      isAuthenticated: Boolean(identityKit?.accounts?.length),
+      isAuthenticated: !!identityKit.identity,
       login,
       logout,
       identity: identityKit.identity,
