@@ -85,9 +85,9 @@ function ChildList() {
               console.error(returnedChilren.err);
             }
           })
-          .finally(() =>
+          .finally(() =>{
             setLoader((prevState) => ({ ...prevState, init: false }))
-          );
+          });
       } else {
         const updatedChildrenData = await Promise.all(
           Object.values(val).map(async (child) => {
