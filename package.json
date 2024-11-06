@@ -49,7 +49,6 @@
     "@dfinity/utils": "^2.5.2",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
-    "@nfid/embed": "^0.10.3",
     "@nfid/identitykit": "^1.0.0",
     "framer-motion": "^10.12.16",
     "idb-keyval": "^6.2.1",
