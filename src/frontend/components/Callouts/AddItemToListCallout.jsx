@@ -1,5 +1,5 @@
 import React from "react";
-import CalloutIcon from "../../assets/images/Callout-top-right.svg";
+import CalloutIcon from "../../assets/images/callout-top-right.svg";
 import { Box, ScaleFade } from "@chakra-ui/react";
 import { ChildContext } from "../../contexts/ChildContext";
 

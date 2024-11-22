@@ -1,15 +1,15 @@
 import { Box, ScaleFade } from "@chakra-ui/react";
 import React from "react";
-import CalloutIcon from "../../assets/images/Callout-bottom-middle.svg";
+import CalloutIcon from "../../assets/images/callout-bottom-middle.svg";
 import { ChildContext } from "../../contexts/ChildContext";
 import strings from "../../utils/constants";
 
 const WrapperStyles = {
   position: "absolute",
-  width: { base: "80vw", sm: "55vw", md: "35%", lg: '25%' },
+  width: { base: "80vw", sm: "55vw", md: "35%", lg: "25%" },
   zIndex: 9999,
-  left: '50%',
-  bottom: { base: '-5%', sm: "-45%", md: '-40%' },
+  left: "50%",
+  bottom: { base: "-5%", sm: "-45%", md: "-40%" },
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
@@ -46,7 +46,6 @@ const BottomNavCallout = ({ isOpen, onClose }) => {
       }
     };
   }, [isOpen]);
-
 
   return (
     <ScaleFade isOpen={isOpen} initialScale={0.9} in={isOpen}>

@@ -8,31 +8,19 @@
       }
     },
     "frontend": {
-      "dependencies": [
-        "backend",
-        "internet_identity"
-      ],
+      "dependencies": ["backend", "internet_identity"],
       "frontend": {
         "entrypoint": "src/frontend/index.html"
       },
-      "source": [
-        "src/frontend/assets",
-        "src/frontend/dist"
-      ],
+      "source": ["src/frontend/assets", "src/frontend/dist"],
       "type": "assets"
     },
     "frontend_kids": {
-      "dependencies": [
-        "backend",
-        "internet_identity"
-      ],
+      "dependencies": ["backend", "internet_identity"],
       "frontend_kids": {
         "entrypoint": "src/frontend_kids/index.html"
       },
-      "source": [
-        "src/frontend_kids/assets",
-        "src/frontend_kids/dist"
-      ],
+      "source": ["src/frontend_kids/assets"],
       "type": "assets"
     },
     "internet_identity": {
@@ -41,12 +29,12 @@
       "wasm": "https://github.com/dfinity/internet-identity/releases/latest/download/internet_identity_dev.wasm.gz",
       "shrink": false,
       "remote": {
-          "candid": "internet_identity.did",
-          "id": {
-              "ic": "rdmx6-jaaaa-aaaaa-aaadq-cai"
-          }
+        "candid": "internet_identity.did",
+        "id": {
+          "ic": "rdmx6-jaaaa-aaaaa-aaadq-cai"
+        }
       }
-  }
+    }
   },
   "defaults": {
     "build": {
