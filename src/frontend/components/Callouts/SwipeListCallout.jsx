@@ -1,5 +1,5 @@
 import React from "react";
-import CalloutIcon from "../../assets/images/Callout-top-middle.svg";
+import CalloutIcon from "../../assets/images/callout-top-middle.svg";
 import { Box, ScaleFade } from "@chakra-ui/react";
 import { ChildContext } from "../../contexts/ChildContext";
 
@@ -7,7 +7,7 @@ const WrapperStyles = {
   position: "absolute",
   left: { base: "50%" },
   width: { base: "75vw", sm: "45%", md: "35%" },
-  transform: 'translateX(-45%)',
+  transform: "translateX(-45%)",
   zIndex: 9999,
   display: "flex",
   justifyContent: "center",
