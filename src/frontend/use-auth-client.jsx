@@ -10,7 +10,13 @@ import React, {
 } from "react";
 import { canisterId, createActor } from "../declarations/backend";
 import { del } from "idb-keyval";
-import { useAgent, useIdentityKit } from "@nfid/identitykit/react";
+import {
+  useAgent,
+  useIdentityKit,
+  useIdentity,
+  useAuth as useNFIDAuth,
+  useAccounts,
+} from "@nfid/identitykit/react";
 import { useCallbackRef } from "@chakra-ui/react";
 import { Actor, HttpAgent } from "@dfinity/agent";
 import { idlFactory } from "../declarations/backend";
@@ -75,44 +81,84 @@ export const AuthProvider = ({ children }) => {
 
   const isLocal = process.env.NODE_ENV === "development";
 
-  const identityKit = useIdentityKit();
+  // const identityKit = useIdentityKit();
+  const identity = useIdentity();
+  const { connect, disconnect, isConnecting, user } = useNFIDAuth();
+  const accounts = useAccounts();
+
   const authenticatedAgent = useAgent({
     host: isLocal ? "http://localhost:4943" : "https://icp-api.io",
+    identity: identity,
+    verifyQuerySignatures: !isLocal,
+    fetchRootKey: isLocal,
   });
 
+  // useEffect(() => {
+  //   console.log(`authenticatedAgent`, authenticatedAgent);
+  //   if (authenticatedAgent) {
+  //     setIsLoading(true);
+
+  //     console.log("isLocal: ", isLocal);
+  //     // const agent = new HttpAgent({
+  //     //   host: isLocal ? "http://localhost:4943" : "https://icp-api.io",
+  //     //   identity: identityKit.identity,
+  //     //   verifyQuerySignatures: !isLocal,
+  //     // });
+
+  //     // const newActor = Actor.createActor(idlFactory, { agent, canisterId })
+  //     const newActor = Actor.createActor(idlFactory, {
+  //       agent: authenticatedAgent,
+  //       canisterId,
+  //     });
+
+  //     setActor(newActor);
+  //     setIsLoading(false);
+  //   } else {
+  //     setIsLoading(false);
+  //   }
+  // }, [authenticatedAgent, isLocal]);
+
   useEffect(() => {
-    console.log(`authenticatedAgent`, authenticatedAgent);
-    if (authenticatedAgent) {
-      setIsLoading(true);
+    async function initAgent() {
+      if (authenticatedAgent) {
+        setIsLoading(true);
+        console.log("isLocal: ", isLocal);
 
-      console.log("isLocal: ", isLocal);
-      const agent = new HttpAgent({
-        host: isLocal ? "http://localhost:4943" : "https://icp-api.io",
-        identity: identityKit.identity,
-        verifyQuerySignatures: !isLocal,
-      });
+        try {
+          // Fetch root key if in local development
+          if (isLocal) {
+            await authenticatedAgent.fetchRootKey();
+          }
 
-      // const newActor = Actor.createActor(idlFactory, { agent, canisterId })
-      const newActor = Actor.createActor(idlFactory, {
-        agent: authenticatedAgent,
-        canisterId: process.env.CANISTER_ID_BACKEND,
-      });
+          const newActor = Actor.createActor(idlFactory, {
+            agent: authenticatedAgent,
+            canisterId,
+          });
 
-      setActor(newActor);
-      setIsLoading(false);
-    } else {
-      setIsLoading(false);
+          setActor(newActor);
+        } catch (error) {
+          console.error("Error initializing agent:", error);
+        } finally {
+          setIsLoading(false);
+        }
+      } else {
+        setIsLoading(false);
+      }
     }
-  }, [authenticatedAgent]);
+
+    initAgent();
+  }, [authenticatedAgent, isLocal]);
 
   const login = useCallback(() => {
-    identityKit.connect();
-  }, [identityKit]);
+    // identityKit.connect();
+    connect();
+  }, [connect]);
 
   const logout = useCallback(async () => {
     console.log(`not supposed to be here`);
 
-    await identityKit.disconnect();
+    // await identityKit.disconnect();
+    await disconnect();
     del("childList");
     del("childGoal");
     del("rewardList");
@@ -120,22 +166,28 @@ export const AuthProvider = ({ children }) => {
     del("selectedChildName");
     del("taskList");
     del("transactionList");
-  }, [identityKit]);
+  }, [disconnect]);
 
   const authValue = useMemo(() => {
     return {
-      isAuthenticated: !!identityKit.identity,
+      // isAuthenticated: !!identityKit.identity,
+      isAuthenticated: !!identity,
       login,
       logout,
-      identity: identityKit.identity,
-      principal: identityKit.principal,
+      // identity: identityKit.identity,
+      identity: identity,
+      // principal: identityKit.principal,
+      princpal: accounts?.[0]?.principal,
       actor,
       isLoading,
     };
   }, [
-    identityKit.accounts,
-    identityKit.identity,
-    identityKit.principal,
+    // identityKit.accounts,
+    accounts,
+    // identityKit.identity,
+    identity,
+    // identityKit.principal,
+    accounts?.[0]?.principal,
     actor,
     isLoading,
     login,

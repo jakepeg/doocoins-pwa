@@ -49,7 +49,7 @@
     "@dfinity/utils": "^2.5.2",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
-    "@nfid/identitykit": "^1.0.0",
+    "@nfid/identitykit": "^1.0.2",
     "framer-motion": "^10.12.16",
     "idb-keyval": "^6.2.1",
     "lit-html": "^2.4.0",
