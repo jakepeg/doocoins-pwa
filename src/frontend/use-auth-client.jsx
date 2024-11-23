@@ -32,8 +32,14 @@ function useWhyDidYouUpdate(name, props) {
       // check what values have changed between the previous and current
       keys.forEach((key) => {
         // if both are object
-        if (typeof props[key] === "object" && typeof previousProps.current[key] === "object") {
-          if (JSON.stringify(previousProps.current[key]) !== JSON.stringify(props[key])) {
+        if (
+          typeof props[key] === "object" &&
+          typeof previousProps.current[key] === "object"
+        ) {
+          if (
+            JSON.stringify(previousProps.current[key]) !==
+            JSON.stringify(props[key])
+          ) {
             // add to changesObj
             changesObj[key] = {
               from: previousProps.current[key],
@@ -66,23 +72,32 @@ function useWhyDidYouUpdate(name, props) {
 export const AuthProvider = ({ children }) => {
   const [actor, setActor] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  const isLocal = process.env.NODE_ENV === "development";
+
   const identityKit = useIdentityKit();
-  const authenticatedAgent = useAgent()
+  const authenticatedAgent = useAgent({
+    host: isLocal ? "http://localhost:4943" : "https://icp-api.io",
+  });
 
   useEffect(() => {
     console.log(`authenticatedAgent`, authenticatedAgent);
     if (authenticatedAgent) {
       setIsLoading(true);
-      const isLocal = process.env.NODE_ENV === 'development';
+
+      console.log("isLocal: ", isLocal);
       const agent = new HttpAgent({
         host: isLocal ? "http://localhost:4943" : "https://icp-api.io",
         identity: identityKit.identity,
-        verifyQuerySignatures: !isLocal
+        verifyQuerySignatures: !isLocal,
       });
 
       // const newActor = Actor.createActor(idlFactory, { agent, canisterId })
-      const newActor = Actor.createActor(idlFactory, { agent: authenticatedAgent, canisterId })
-      
+      const newActor = Actor.createActor(idlFactory, {
+        agent: authenticatedAgent,
+        canisterId: process.env.CANISTER_ID_BACKEND,
+      });
+
       setActor(newActor);
       setIsLoading(false);
     } else {
@@ -96,7 +111,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = useCallback(async () => {
     console.log(`not supposed to be here`);
-    
+
     await identityKit.disconnect();
     del("childList");
     del("childGoal");
@@ -129,7 +144,9 @@ export const AuthProvider = ({ children }) => {
 
   console.log(`main runs`, authValue);
 
-  return <AuthContext.Provider value={authValue}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={authValue}>{children}</AuthContext.Provider>
+  );
 };
 
 export const useAuth = () => useContext(AuthContext);
