@@ -23,13 +23,13 @@ import strings from "../utils/constants";
 import { useNavigate } from "react-router-dom";
 
 function ChildList() {
-  const { actor } = useAuth();
-  const navigate = useNavigate()
+  const { actor, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   const {
     isNewToSystem: { childList },
     handleUpdateCalloutState,
     setGoal,
-    setChild
+    setChild,
   } = React.useContext(ChildContext);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [children, setChildren] = React.useState(null);
@@ -49,8 +49,10 @@ function ChildList() {
   }, [childList]);
 
   React.useEffect(() => {
-    getChildren({ callService: false });
-  }, [actor]);
+    if (actor && isAuthenticated) {
+      getChildren({ callService: false });
+    }
+  }, [actor, isAuthenticated]);
 
   function getChildren({ callService = false }) {
     del("selectedChild");
@@ -77,7 +79,7 @@ function ChildList() {
                     ...child,
                     balance: parseInt(balance),
                   };
-                })
+                }),
               );
               setChildren(updatedChildrenData);
               set("childList", updatedChildrenData);
@@ -85,8 +87,8 @@ function ChildList() {
               console.error(returnedChilren.err);
             }
           })
-          .finally(() =>{
-            setLoader((prevState) => ({ ...prevState, init: false }))
+          .finally(() => {
+            setLoader((prevState) => ({ ...prevState, init: false }));
           });
       } else {
         const updatedChildrenData = await Promise.all(
@@ -96,7 +98,7 @@ function ChildList() {
               ...child,
               balance: parseInt(balance),
             };
-          })
+          }),
         );
         setChildren(updatedChildrenData);
         setLoader((prevState) => ({ ...prevState, init: false }));
@@ -156,7 +158,7 @@ function ChildList() {
             ...child,
             balance: parseInt(balance),
           };
-        })
+        }),
       );
 
       await set("childList", updatedChildrenData);
@@ -223,7 +225,6 @@ function ChildList() {
           </div>
         </SwipeAction>
 
-
         <SwipeAction
           className="edit"
           onClick={() => handleTogglePopup(true, child, "edit")}
@@ -252,7 +253,7 @@ function ChildList() {
         </SwipeAction>
       </TrailingActions>
     ),
-    []
+    [],
   );
 
   const ChildrenList = React.useMemo(() => {
@@ -322,7 +323,7 @@ function ChildList() {
             ? modelStyles.blur_background
             : undefined
         }`}
-        style={{ background: '#0B334D' }}
+        style={{ background: "#0B334D" }}
       >
         <div className={`child-list-wrapper`} style={{ position: "relative" }}>
           <h2 className="title-button light">

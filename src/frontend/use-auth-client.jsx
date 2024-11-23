@@ -10,7 +10,13 @@ import React, {
 } from "react";
 import { canisterId, createActor } from "../declarations/backend";
 import { del } from "idb-keyval";
-import { useAgent, useIdentityKit } from "@nfid/identitykit/react";
+import {
+  useAgent,
+  useIdentityKit,
+  useIdentity,
+  useAuth as useNFIDAuth,
+  useAccounts,
+} from "@nfid/identitykit/react";
 import { useCallbackRef } from "@chakra-ui/react";
 import { Actor, HttpAgent } from "@dfinity/agent";
 import { idlFactory } from "../declarations/backend";
@@ -32,8 +38,14 @@ function useWhyDidYouUpdate(name, props) {
       // check what values have changed between the previous and current
       keys.forEach((key) => {
         // if both are object
-        if (typeof props[key] === "object" && typeof previousProps.current[key] === "object") {
-          if (JSON.stringify(previousProps.current[key]) !== JSON.stringify(props[key])) {
+        if (
+          typeof props[key] === "object" &&
+          typeof previousProps.current[key] === "object"
+        ) {
+          if (
+            JSON.stringify(previousProps.current[key]) !==
+            JSON.stringify(props[key])
+          ) {
             // add to changesObj
             changesObj[key] = {
               from: previousProps.current[key],
@@ -66,38 +78,87 @@ function useWhyDidYouUpdate(name, props) {
 export const AuthProvider = ({ children }) => {
   const [actor, setActor] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const identityKit = useIdentityKit();
-  const authenticatedAgent = useAgent()
+
+  const isLocal = process.env.NODE_ENV === "development";
+
+  // const identityKit = useIdentityKit();
+  const identity = useIdentity();
+  const { connect, disconnect, isConnecting, user } = useNFIDAuth();
+  const accounts = useAccounts();
+
+  const authenticatedAgent = useAgent({
+    host: isLocal ? "http://localhost:4943" : "https://icp-api.io",
+    identity: identity,
+    verifyQuerySignatures: !isLocal,
+    fetchRootKey: isLocal,
+  });
+
+  // useEffect(() => {
+  //   console.log(`authenticatedAgent`, authenticatedAgent);
+  //   if (authenticatedAgent) {
+  //     setIsLoading(true);
+
+  //     console.log("isLocal: ", isLocal);
+  //     // const agent = new HttpAgent({
+  //     //   host: isLocal ? "http://localhost:4943" : "https://icp-api.io",
+  //     //   identity: identityKit.identity,
+  //     //   verifyQuerySignatures: !isLocal,
+  //     // });
+
+  //     // const newActor = Actor.createActor(idlFactory, { agent, canisterId })
+  //     const newActor = Actor.createActor(idlFactory, {
+  //       agent: authenticatedAgent,
+  //       canisterId,
+  //     });
+
+  //     setActor(newActor);
+  //     setIsLoading(false);
+  //   } else {
+  //     setIsLoading(false);
+  //   }
+  // }, [authenticatedAgent, isLocal]);
 
   useEffect(() => {
-    console.log(`authenticatedAgent`, authenticatedAgent);
-    if (authenticatedAgent) {
-      setIsLoading(true);
-      const isLocal = process.env.NODE_ENV === 'development';
-      const agent = new HttpAgent({
-        host: isLocal ? "http://localhost:4943" : "https://icp-api.io",
-        identity: identityKit.identity,
-        verifyQuerySignatures: !isLocal
-      });
+    async function initAgent() {
+      if (authenticatedAgent) {
+        setIsLoading(true);
+        console.log("isLocal: ", isLocal);
 
-      // const newActor = Actor.createActor(idlFactory, { agent, canisterId })
-      const newActor = Actor.createActor(idlFactory, { agent: authenticatedAgent, canisterId })
-      
-      setActor(newActor);
-      setIsLoading(false);
-    } else {
-      setIsLoading(false);
+        try {
+          // Fetch root key if in local development
+          if (isLocal) {
+            await authenticatedAgent.fetchRootKey();
+          }
+
+          const newActor = Actor.createActor(idlFactory, {
+            agent: authenticatedAgent,
+            canisterId,
+          });
+
+          setActor(newActor);
+        } catch (error) {
+          console.error("Error initializing agent:", error);
+        } finally {
+          setIsLoading(false);
+        }
+      } else {
+        setIsLoading(false);
+      }
     }
-  }, [authenticatedAgent]);
+
+    initAgent();
+  }, [authenticatedAgent, isLocal]);
 
   const login = useCallback(() => {
-    identityKit.connect();
-  }, [identityKit]);
+    // identityKit.connect();
+    connect();
+  }, [connect]);
 
   const logout = useCallback(async () => {
     console.log(`not supposed to be here`);
-    
-    await identityKit.disconnect();
+
+    // await identityKit.disconnect();
+    await disconnect();
     del("childList");
     del("childGoal");
     del("rewardList");
@@ -105,22 +166,28 @@ export const AuthProvider = ({ children }) => {
     del("selectedChildName");
     del("taskList");
     del("transactionList");
-  }, [identityKit]);
+  }, [disconnect]);
 
   const authValue = useMemo(() => {
     return {
-      isAuthenticated: !!identityKit.identity,
+      // isAuthenticated: !!identityKit.identity,
+      isAuthenticated: !!identity,
       login,
       logout,
-      identity: identityKit.identity,
-      principal: identityKit.principal,
+      // identity: identityKit.identity,
+      identity: identity,
+      // principal: identityKit.principal,
+      princpal: accounts?.[0]?.principal,
       actor,
       isLoading,
     };
   }, [
-    identityKit.accounts,
-    identityKit.identity,
-    identityKit.principal,
+    // identityKit.accounts,
+    accounts,
+    // identityKit.identity,
+    identity,
+    // identityKit.principal,
+    accounts?.[0]?.principal,
     actor,
     isLoading,
     login,
@@ -129,7 +196,9 @@ export const AuthProvider = ({ children }) => {
 
   console.log(`main runs`, authValue);
 
-  return <AuthContext.Provider value={authValue}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={authValue}>{children}</AuthContext.Provider>
+  );
 };
 
 export const useAuth = () => useContext(AuthContext);
