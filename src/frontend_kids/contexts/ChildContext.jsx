@@ -146,6 +146,8 @@ export default function ChildProvider({ children }) {
       ?.getBalance(child_id)
       .then(async (returnedBalance) => {
         setChild((prevState) => ({ ...prevState, balance: parseInt(returnedBalance) }));
+
+        set("balance-" + child_id, parseInt(returnedBalance), store);
       });
 
       promises.push(balance);
