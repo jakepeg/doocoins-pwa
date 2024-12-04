@@ -20,7 +20,7 @@
       "frontend_kids": {
         "entrypoint": "src/frontend_kids/index.html"
       },
-      "source": ["src/frontend_kids/assets"],
+      "source": ["src/frontend_kids/assets", "src/frontend_kids/dist"],
       "type": "assets"
     },
     "internet_identity": {
