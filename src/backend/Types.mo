@@ -5,10 +5,17 @@ module {
     name : Text;
     id : Text;
     archived : Bool;
+    parentIds : [Principal];  // Add this field to track multiple parents
   };
 
   public type ChildCall = {
     name : Text;
+  };
+
+  public type ParentChildRelation = {
+    parentId : Principal;
+    childId : Text;
+    relationshipType : Text;  // e.g., "primary", "guardian", etc.
   };
 
   public type Task = {
@@ -68,9 +75,21 @@ module {
 
   };
 
-  public type Profile = Trie.Trie<Principal, Trie.Trie<Text, Child>>;
+  // public type Profile = Trie.Trie<Principal, Trie.Trie<Text, Child>>;
 
-  public type TaskMap = Trie.Trie<Text, Trie.Trie<Nat, Task>>;
+  public type Profile = {
+      children : Trie.Trie<Text, Child>;  // Store all children
+      parents : Trie.Trie<Principal, {name : Text; id : Principal}>;  // Store all parents
+      relationships : Trie.Trie<Text, [ParentChildRelation]>;  // Track parent-child relationships
+  };
+
+  // public type TaskMap = Trie.Trie<Text, Trie.Trie<Nat, Task>>;
+  // TaskMap stores tasks and their assignments
+  public type TaskMap = {
+      tasks : Trie.Trie<Nat, Task>;  // Store all tasks
+      childTasks : Trie.Trie<Text, [Nat]>;  // Map children to their tasks
+      parentTasks : Trie.Trie<Principal, [Nat]>;  // Map parents to tasks they created
+  };
   public type GoalMap = Trie.Trie<Text, Trie.Trie<Nat, Goal>>;
   public type TransactionMap = Trie.Trie<Text, Trie.Trie<Nat, Transaction>>;
   public type TaskReqMap = Trie.Trie<Text, TaskRequest>;

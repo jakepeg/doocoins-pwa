@@ -20,7 +20,12 @@ actor {
   type TimerId = Nat;
   // Reject AnonymousIdentity
   stable var anonIdNew : Text = "2vxsx-fae";
-  stable var profiles : Types.Profile = Trie.empty();
+  // stable var profiles : Types.Profile = Trie.empty();
+  stable var profiles : Types.Profile = {
+    children = Trie.empty();
+    parents = Trie.empty();
+    relationships = Trie.empty();
+};
   stable var childNumber : Nat = 1;
   //for keeping the child to tasks mapping
   stable var childToTasks : Types.TaskMap = Trie.empty();
@@ -188,11 +193,37 @@ actor {
 
     let childId = Principal.toText(callerId) # "-" # Nat.toText(childNumber);
     childNumber += 1;
+
     let finalChild : Types.Child = {
       name = child.name;
       id = childId;
       archived = false;
+      parentIds = [callerId];
     };
+
+    // Add child to children Trie
+    profiles.children := Trie.put(
+        profiles.children,
+        keyText(childId),
+        Text.equal,
+        finalChild
+    ).0;
+
+    // Create initial relationship
+    let relation : Types.ParentChildRelation = {
+        parentId = callerId;
+        childId = childId;
+        relationshipType = "primary";
+        dateAdded = Time.now();
+    };
+
+    // Add to relationships Trie
+    profiles.relationships := Trie.put(
+        profiles.relationships,
+        keyText(childId),
+        Text.equal,
+        [relation]
+    ).0;
 
     //Initializing task number to this child
     // WARNING REMOVE? unused identifier "existingTask"
