@@ -22,9 +22,9 @@ actor {
   stable var anonIdNew : Text = "2vxsx-fae";
   // stable var profiles : Types.Profile = Trie.empty();
   stable var profiles : Types.Profile = {
-    children = Trie.empty();
-    parents = Trie.empty();
-    relationships = Trie.empty();
+    var children = Trie.empty();
+    var parents = Trie.empty();
+    var relationships = Trie.empty();
 };
   stable var childNumber : Nat = 1;
   //for keeping the child to tasks mapping
@@ -201,7 +201,7 @@ actor {
       parentIds = [callerId];
     };
 
-    // Add child to children Trie
+   // Add child to children Trie
     profiles.children := Trie.put(
         profiles.children,
         keyText(childId),
@@ -264,15 +264,15 @@ actor {
     );
     childToTransactionNumber := newChildToTransactionNumber;
 
-    let newProfiles = Trie.put2D(
-      profiles,
-      keyPrincipal(callerId),
-      Principal.equal,
-      keyText(childId),
-      Text.equal,
-      finalChild,
-    );
-    profiles := newProfiles;
+    // let newProfiles = Trie.put2D(
+    //   profiles,
+    //   keyPrincipal(callerId),
+    //   Principal.equal,
+    //   keyText(childId),
+    //   Text.equal,
+    //   finalChild,
+    // );
+    // profiles := newProfiles;
     return #ok(finalChild);
   };
 
@@ -350,18 +350,25 @@ actor {
       return #err(#NotAuthorized);
     };
 
-    let allChildren = Trie.find(
-      profiles,
-      keyPrincipal(callerId),
-      Principal.equal,
-    );
-    let allChildrenFormatted = Option.get(allChildren, Trie.empty());
-    let agnosticArchivedChildList = Trie.toArray(allChildrenFormatted, extractChildren);
+    // let allChildren = Trie.find(
+    //   profiles,
+    //   keyPrincipal(callerId),
+    //   Principal.equal,
+    // );
+    // let allChildrenFormatted = Option.get(allChildren, Trie.empty());
+    // let agnosticArchivedChildList = Trie.toArray(allChildrenFormatted, extractChildren);
 
-    for (child in agnosticArchivedChildList.vals()) {
-      if (child.archived == false) {
-        unArchivedChilds.add(child);
-      };
+    // for (child in agnosticArchivedChildList.vals()) {
+    //   if (child.archived == false) {
+    //     unArchivedChilds.add(child);
+    //   };
+    // };
+
+    // Iterate through all children and check if caller is in parentIds
+    for ((_, child) in Trie.iter(profiles.children)) {
+        if (not child.archived and Array.contains<Principal>(child.parentIds, callerId, Principal.equal)) {
+            unArchivedChilds.add(child);
+        };
     };
 
     return #ok(Buffer.toArray(unArchivedChilds));

@@ -78,9 +78,9 @@ module {
   // public type Profile = Trie.Trie<Principal, Trie.Trie<Text, Child>>;
 
   public type Profile = {
-      children : Trie.Trie<Text, Child>;  // Store all children
-      parents : Trie.Trie<Principal, {name : Text; id : Principal}>;  // Store all parents
-      relationships : Trie.Trie<Text, [ParentChildRelation]>;  // Track parent-child relationships
+      var children : Trie.Trie<Text, Child>;  // Store all children
+      var parents : Trie.Trie<Principal, {name : Text; id : Principal}>;  // Store all parents
+      var relationships : Trie.Trie<Text, [ParentChildRelation]>;  // Track parent-child relationships
   };
 
   // public type TaskMap = Trie.Trie<Text, Trie.Trie<Nat, Task>>;
