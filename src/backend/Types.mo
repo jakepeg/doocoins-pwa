@@ -86,9 +86,9 @@ module {
   // public type TaskMap = Trie.Trie<Text, Trie.Trie<Nat, Task>>;
   // TaskMap stores tasks and their assignments
   public type TaskMap = {
-      tasks : Trie.Trie<Nat, Task>;  // Store all tasks
-      childTasks : Trie.Trie<Text, [Nat]>;  // Map children to their tasks
-      parentTasks : Trie.Trie<Principal, [Nat]>;  // Map parents to tasks they created
+      var tasks : Trie.Trie<Nat, Task>;  // Store all tasks
+      var childTasks : Trie.Trie<Text, [Nat]>;  // Map children to their tasks
+      var parentTasks : Trie.Trie<Principal, [Nat]>;  // Map parents to tasks they created
   };
   public type GoalMap = Trie.Trie<Text, Trie.Trie<Nat, Goal>>;
   public type TransactionMap = Trie.Trie<Text, Trie.Trie<Nat, Transaction>>;

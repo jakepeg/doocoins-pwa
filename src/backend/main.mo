@@ -28,7 +28,12 @@ actor {
 };
   stable var childNumber : Nat = 1;
   //for keeping the child to tasks mapping
-  stable var childToTasks : Types.TaskMap = Trie.empty();
+  // stable var childToTasks : Types.TaskMap = Trie.empty();
+  stable var childToTasks : Types.TaskMap = {
+    var tasks = Trie.empty();
+    var childTasks = Trie.empty();
+    var parentTasks = Trie.empty();
+  };
   stable var childToTaskNumber : Trie.Trie<Text, Nat> = Trie.empty();
   //for keeping the child to transactions mapping
   stable var childToTransactions : Types.TransactionMap = Trie.empty();
@@ -276,6 +281,25 @@ actor {
     return #ok(finalChild);
   };
 
+  private func containsPrincipal(arr: [Principal], val: Principal) : Bool {
+      func isEqual(p: Principal) : Bool { p == val };
+      switch(Array.find<Principal>(arr, isEqual)) {
+          case null false;
+          case (?_) true;
+      };
+  };
+
+  // First, let's add a helper function to check if a principal is authorized for a child
+  private func isAuthorizedForChild(callerId : Principal, childId : Text) : Bool {
+      switch (Trie.find(profiles.children, keyText(childId), Text.equal)) {
+          case null false;
+          case (?child) {
+              // Use our custom helper function instead of contains
+              containsPrincipal(child.parentIds, callerId)
+          };
+      };
+  };
+
   //Add a task
   //Parametes needed: childId and Task (name and value)
   //----------------------------------------------------------------------------------------------------
@@ -284,6 +308,11 @@ actor {
 
     if (Principal.toText(callerId) == anonIdNew) {
       return #err(#NotAuthorized);
+    };
+
+    // Check if caller is authorized for this child
+    if (not isAuthorizedForChild(callerId, childId)) {
+        return #err(#NotAuthorized);
     };
 
     //Getting pointer of current task number of the child
@@ -296,45 +325,86 @@ actor {
     let finalPointer : Nat = if (task.id >= 0) { task.id } else {
       Option.get(currentTaskNumberPointer, 0);
     };
+
     let taskFinal : Types.Task = {
       name = task.name;
       value = task.value;
       id = finalPointer;
       archived = false;
     };
+
     switch (finalPointer) {
       case 0 {
         #err(#NotFound);
       };
       case (v) {
-        // WARNING REMOVE? unused identifier "existing"
-        let (newMap, existing) = Trie.put(
+            // 1. Update task number
+          let (newMap, _) = Trie.put(
           childToTaskNumber,
           keyText(childId),
           Text.equal,
           finalPointer +1,
         );
-
         childToTaskNumber := newMap;
 
-        let newChildToTasks = Trie.put2D(
-          childToTasks,
-          keyText(childId),
-          Text.equal,
-          keyNat(finalPointer),
-          Nat.equal,
-          taskFinal,
-        );
+        // 2. Add task to global tasks Trie
+            let (newTasks, _) = Trie.put(
+                childToTasks.tasks,
+                keyNat(finalPointer),
+                Nat.equal,
+                taskFinal
+            );
+            childToTasks.tasks := newTasks;
 
-        childToTasks := newChildToTasks;
+             // 3. Update child's task list
+            let currentChildTasks = switch (Trie.find(childToTasks.childTasks, keyText(childId), Text.equal)) {
+                case null { [] };
+                case (?tasks) { tasks };
+            };
+            
+            let updatedChildTasks = Array.append(currentChildTasks, [finalPointer]);
+            let (newChildTasks, _) = Trie.put(
+                childToTasks.childTasks,
+                keyText(childId),
+                Text.equal,
+                updatedChildTasks
+            );
+            childToTasks.childTasks := newChildTasks;
 
-        let myChildTasks = Trie.find(
-          childToTasks,
-          keyText(childId),
-          Text.equal,
-        );
-        let myChildTasksFormatted = Option.get(myChildTasks, Trie.empty());
-        return #ok(Trie.toArray(myChildTasksFormatted, extractTasks));
+        // 4. Update parent's task list
+            let currentParentTasks = switch (Trie.find(childToTasks.parentTasks, keyPrincipal(callerId), Principal.equal)) {
+                case null { [] };
+                case (?tasks) { tasks };
+            };
+            
+            let updatedParentTasks = Array.append(currentParentTasks, [finalPointer]);
+            let (newParentTasks, _) = Trie.put(
+                childToTasks.parentTasks,
+                keyPrincipal(callerId),
+                Principal.equal,
+                updatedParentTasks
+            );
+            childToTasks.parentTasks := newParentTasks;
+
+        // 5. Return all tasks for this child
+            let childTaskIds = Option.get(
+                Trie.find(childToTasks.childTasks, keyText(childId), Text.equal),
+                []
+            );
+            
+            let taskBuffer = Buffer.Buffer<Types.Task>(0);
+            for (taskId in childTaskIds.vals()) {
+                switch (Trie.find(childToTasks.tasks, keyNat(taskId), Nat.equal)) {
+                    case (?task) {
+                        if (not task.archived) {
+                            taskBuffer.add(task);
+                        };
+                    };
+                    case null { /* Skip if task not found */ };
+                };
+            };
+            
+            return #ok(Buffer.toArray(taskBuffer));
       };
     };
   };
@@ -364,9 +434,10 @@ actor {
     //   };
     // };
 
-    // Iterate through all children and check if caller is in parentIds
+    // Iterate through all children in the new Profile structure
     for ((_, child) in Trie.iter(profiles.children)) {
-        if (not child.archived and Array.contains<Principal>(child.parentIds, callerId, Principal.equal)) {
+        // Check if child is not archived and the caller is in the child's parentIds
+        if (not child.archived and containsPrincipal(child.parentIds, callerId)) {
             unArchivedChilds.add(child);
         };
     };
@@ -379,23 +450,40 @@ actor {
   //----------------------------------------------------------------------------------------------------
 
   // public shared (msg) func getTasks(childId : Text) : async Result.Result<[Types.Task], Types.Error> {
-  public shared func getTasks(childId : Text) : async Result.Result<[Types.Task], Types.Error> {
-    let unArchivedChildsTasks : Buffer.Buffer<Types.Task> = Buffer.Buffer<Types.Task>(0);
+  public shared (msg) func getTasks(childId : Text) : async Result.Result<[Types.Task], Types.Error> {
+      let callerId = msg.caller;
 
-    let myChildTasks = Trie.find(
-      childToTasks,
-      keyText(childId),
-      Text.equal,
-    );
-    let myChildTasksFormatted = Option.get(myChildTasks, Trie.empty());
-    let agnosticArchivedChildTaskList = Trie.toArray(myChildTasksFormatted, extractTasks);
-
-    for (task in agnosticArchivedChildTaskList.vals()) {
-      if (task.archived == false) {
-        unArchivedChildsTasks.add(task);
+      // First check authorization, since we want to ensure only authorized parents can view tasks
+      if (not isAuthorizedForChild(callerId, childId)) {
+          return #err(#NotAuthorized);
       };
-    };
-    return #ok(Buffer.toArray(unArchivedChildsTasks));
+
+      // Create a buffer to store the unarchived tasks we'll return
+      let unArchivedChildsTasks : Buffer.Buffer<Types.Task> = Buffer.Buffer<Types.Task>(0);
+
+      // Get the array of task IDs associated with this child
+      let childTaskIds = switch (Trie.find(childToTasks.childTasks, keyText(childId), Text.equal)) {
+          case null { [] }; // If no tasks found, return empty array
+          case (?taskIds) { taskIds };
+      };
+
+      // For each task ID, look up the actual task in the global tasks Trie
+      for (taskId in childTaskIds.vals()) {
+          switch (Trie.find(childToTasks.tasks, keyNat(taskId), Nat.equal)) {
+              case (?task) {
+                  // Only add unarchived tasks to our result
+                  if (not task.archived) {
+                      unArchivedChildsTasks.add(task);
+                  };
+              };
+              case null { 
+                  // Skip if task not found - this would indicate a data consistency issue
+                  // In a production system, you might want to log this
+              };
+          };
+      };
+
+      return #ok(Buffer.toArray(unArchivedChildsTasks));
   };
 
   //Add goal
