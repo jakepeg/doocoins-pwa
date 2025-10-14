@@ -3,8 +3,8 @@
  */
 
 export const MigrationConfig = {
-  // V2 Frontend URL - Update this with the actual V2 frontend URL
-  V2_FRONTEND_URL: "https://v2-frontend-url.com",
+  // V2 Frontend URL - Using IC canister URL
+  V2_FRONTEND_URL: "https://zks5c-sqaaa-aaaah-qqf4a-cai.icp0.io",
   
   // Time to wait before showing upgrade notice again after dismissal (in hours)
   REMINDER_INTERVAL_HOURS: 24,
