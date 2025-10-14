@@ -7,6 +7,7 @@ import Balance from "./components/Balance";
 import React from "react";
 import { ChildContext } from "./contexts/ChildContext";
 import useIsMobileLayout from "./hooks/useIsMobileLayout";
+import UpgradeNotice from "./components/UpgradeNotice";
 
 function ProtectedRoute({ children }) {
   const { isAuthenticated, isLoading } = useAuth();
@@ -22,6 +23,7 @@ function ProtectedRoute({ children }) {
       backgroundColor={!showMobileLayout && "#0B334D"}
       gap={0}
     >
+      <UpgradeNotice />
       <Box
         sx={
           showMobileLayout && {

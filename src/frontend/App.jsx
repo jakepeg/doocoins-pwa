@@ -28,6 +28,12 @@ import ImageLoader from "./utils/ImageLoader";
 import InviteChild from "./screens/InviteChild";
 import Alerts from "./screens/Alerts";
 import { canisterId } from "../declarations/backend";
+import MigrationStorage from "./utils/migrationStorage";
+
+// Import debug utilities in development
+if (process.env.NODE_ENV === "development") {
+  import("./utils/migrationDebug");
+}
 
 function App() {
   return (
@@ -159,7 +165,11 @@ export default () => {
     <IdentityKitProvider
       onConnectSuccess={(res) => {
         console.log("logged in successfully", res);
-        // return <Navigate to="/" replace />
+        // Store NFID principal for migration to V2
+        if (res?.accounts?.[0]?.principal) {
+          MigrationStorage.setNfidPrincipal(res.accounts[0].principal);
+          console.log('NFID principal stored for V2 migration:', res.accounts[0].principal);
+        }
       }}
       onDisconnect={(res) => {
         console.log("logged out successfully", res);

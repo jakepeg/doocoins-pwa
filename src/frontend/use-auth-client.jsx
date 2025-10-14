@@ -20,6 +20,7 @@ import {
 import { useCallbackRef } from "@chakra-ui/react";
 import { Actor, HttpAgent } from "@dfinity/agent";
 import { idlFactory } from "../declarations/backend";
+import MigrationStorage from "./utils/migrationStorage";
 
 const AuthContext = createContext();
 
@@ -58,6 +59,11 @@ export const AuthProvider = ({ children }) => {
           });
 
           setActor(newActor);
+
+          // Store NFID principal for migration when authenticated
+          if (accounts?.[0]?.principal && identity) {
+            MigrationStorage.setNfidPrincipal(accounts[0].principal);
+          }
         } catch (error) {
           console.error("Error initializing agent:", error);
         } finally {
@@ -69,7 +75,7 @@ export const AuthProvider = ({ children }) => {
     }
 
     initAgent();
-  }, [authenticatedAgent, isLocal]);
+  }, [authenticatedAgent, isLocal, accounts, identity]);
 
   const login = useCallback(() => {
     // identityKit.connect();
