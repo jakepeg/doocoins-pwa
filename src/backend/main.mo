@@ -9,41 +9,40 @@ import Option "mo:base/Option";
 import Types "./Types";
 import Buffer "mo:base/Buffer";
 import Time "mo:base/Time";
-import Fuzz "mo:fuzz";
 // WARNING REMOVE? unused field "recurringTimer"
 import { setTimer; recurringTimer } = "mo:base/Timer";
 import Int "mo:base/Int";
 import Debug "mo:base/Debug";
 import Array "mo:base/Array";
 
-actor {
+persistent actor {
   type TimerId = Nat;
   // Reject AnonymousIdentity
-  stable var anonIdNew : Text = "2vxsx-fae";
-  stable var profiles : Types.Profile = Trie.empty();
-  stable var childNumber : Nat = 1;
+  var anonIdNew : Text = "2vxsx-fae";
+  var profiles : Types.Profile = Trie.empty();
+  var childNumber : Nat = 1;
   //for keeping the child to tasks mapping
-  stable var childToTasks : Types.TaskMap = Trie.empty();
-  stable var childToTaskNumber : Trie.Trie<Text, Nat> = Trie.empty();
+  var childToTasks : Types.TaskMap = Trie.empty();
+  var childToTaskNumber : Trie.Trie<Text, Nat> = Trie.empty();
   //for keeping the child to transactions mapping
-  stable var childToTransactions : Types.TransactionMap = Trie.empty();
-  stable var childToTransactionNumber : Trie.Trie<Text, Nat> = Trie.empty();
+  var childToTransactions : Types.TransactionMap = Trie.empty();
+  var childToTransactionNumber : Trie.Trie<Text, Nat> = Trie.empty();
   //for keeping the child to goals mapping
-  stable var childToGoals : Types.GoalMap = Trie.empty();
-  stable var childToGoalNumber : Trie.Trie<Text, Nat> = Trie.empty();
+  var childToGoals : Types.GoalMap = Trie.empty();
+  var childToGoalNumber : Trie.Trie<Text, Nat> = Trie.empty();
   //for setting up child's current goal
-  stable var childToCurrentGoal : Trie.Trie<Text, Nat> = Trie.empty();
+  var childToCurrentGoal : Trie.Trie<Text, Nat> = Trie.empty();
 
   // MILESTONE #1
   //for mapping child's doocoins balance to child
-  stable var childToBalance : Trie.Trie<Text, Nat> = Trie.empty();
+  var childToBalance : Trie.Trie<Text, Nat> = Trie.empty();
   //for magicCode child app onboarding OTP
-  stable var childPins : Trie.Trie<Text, Nat> = Trie.empty();
-  stable var childIdsFromPin : Trie.Trie<Nat, Text> = Trie.empty();
+  var childPins : Trie.Trie<Text, Nat> = Trie.empty();
+  var childIdsFromPin : Trie.Trie<Nat, Text> = Trie.empty();
   // MILESTONE #2
   //for child to request task complete and request claim reward
-  stable var childRequestsTasks : Trie.Trie<Text, Types.TaskReqMap> = Trie.empty();
-  stable var childRequestsRewards : Trie.Trie<Text, Types.RewardReqMap> = Trie.empty();
+  var childRequestsTasks : Trie.Trie<Text, Types.TaskReqMap> = Trie.empty();
+  var childRequestsRewards : Trie.Trie<Text, Types.RewardReqMap> = Trie.empty();
 
   //who am I
   //----------------------------------------------------------------------------------------------------
@@ -99,9 +98,9 @@ actor {
   };
   // _randomPin function generates a random 4-digit integer to be used as an OTP.
   func _randomPin() : async Nat {
-    let fuzz = Fuzz.Fuzz();
-    let randInt16 = fuzz.nat.randomRange(1111, 9999);
-    return randInt16;
+    let now = Time.now();
+    let seed = Int.abs(now) % 8889 + 1111; // Simple 4-digit random number between 1111-9999
+    seed;
   };
   // checkMagiCode function checks if a provided OTP (pin) exists in the system and returns the associated child app ID if found.
   // public shared (msg) func checkMagiCode(pin : Nat) : async ?Text {
@@ -281,7 +280,7 @@ actor {
           childToTaskNumber,
           keyText(childId),
           Text.equal,
-          finalPointer +1,
+          finalPointer + 1,
         );
 
         childToTaskNumber := newMap;
@@ -397,7 +396,7 @@ actor {
           childToGoalNumber,
           keyText(childId),
           Text.equal,
-          finalPointer +1,
+          finalPointer + 1,
         );
 
         childToGoalNumber := newMap;
@@ -692,8 +691,7 @@ actor {
   };
 
   private func keyNat(x : Nat) : Trie.Key<Nat> {
-    // WARNING field hash is deprecated: For large `Nat` values consider using a bespoke hash function that considers all of the argument's bits.
-    return { key = x; hash = Hash.hash(x) };
+    return { key = x; hash = Nat.toText(x) |> Text.hash(_) };
   };
 
   // WARNING REMOVE? unused identifier "k"
@@ -1041,11 +1039,11 @@ actor {
       // If it's the first iteration, append the word (principal ID) to the empty string
       if (counter == 0) {
         fromIter := fromIter #word;
-        counter := counter +1;
+        counter := counter + 1;
         // If it's not the first iteration, append "-" and the word (principal ID) to the string
       } else {
         fromIter := fromIter # "-" #word;
-        counter := counter +1;
+        counter := counter + 1;
       };
     };
     // Return the extracted principal ID
