@@ -41,27 +41,48 @@ const UpgradeNotice = () => {
     setIsVisible(shouldShow);
   }, [isAuthenticated, isLoading]);
 
-  const handleUpgradeNow = () => {
-    // Ensure NFID principal is stored
-    const nfidPrincipal = MigrationStorage.getNfidPrincipal();
-    if (!nfidPrincipal) {
-      toast({
-        title: "Error",
-        description: MigrationConfig.MESSAGES.ERROR_NO_PRINCIPAL,
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-      });
-      return;
-    }
+  const handleUpgradeNow = async () => {
+    // Check if user has children to migrate
+    if (actor) {
+      try {
+        const childrenResult = await actor.getChildren();
+        const hasChildren = childrenResult.ok && childrenResult.ok.length > 0;
+        
+        if (hasChildren) {
+          // User has data to migrate - include migration parameters
+          const nfidPrincipal = MigrationStorage.getNfidPrincipal();
+          if (!nfidPrincipal) {
+            toast({
+              title: "Error",
+              description: MigrationConfig.MESSAGES.ERROR_NO_PRINCIPAL,
+              status: "error",
+              duration: 5000,
+              isClosable: true,
+            });
+            return;
+          }
 
-    if (MigrationConfig.ENABLE_LOGGING) {
-      console.log("Redirecting to V2 with NFID principal:", nfidPrincipal);
-    }
+          if (MigrationConfig.ENABLE_LOGGING) {
+            console.log("Redirecting to V2 with NFID principal:", nfidPrincipal);
+          }
 
-    // Redirect to V2 frontend with NFID principal in URL
-    const v2UrlWithPrincipal = `${MigrationConfig.V2_FRONTEND_URL}?migrate=true&nfid=${encodeURIComponent(nfidPrincipal)}`;
-    window.location.href = v2UrlWithPrincipal;
+          // Redirect to V2 frontend with NFID principal in URL
+          const v2UrlWithPrincipal = `${MigrationConfig.V2_FRONTEND_URL}?migrate=true&nfid=${encodeURIComponent(nfidPrincipal)}`;
+          window.location.href = v2UrlWithPrincipal;
+        } else {
+          // User has no data to migrate - redirect without parameters
+          console.log("User has no children, redirecting to V2 without migration parameters");
+          window.location.href = MigrationConfig.V2_FRONTEND_URL;
+        }
+      } catch (error) {
+        console.error("Error checking children:", error);
+        // If we can't check, default to clean redirect
+        window.location.href = MigrationConfig.V2_FRONTEND_URL;
+      }
+    } else {
+      // No actor available, default to clean redirect
+      window.location.href = MigrationConfig.V2_FRONTEND_URL;
+    }
   };
 
   const handleRemindLater = () => {
