@@ -13,18 +13,33 @@ import {
 import useIsMobileLayout from "../../hooks/useIsMobileLayout";
 import MigrationStorage from "../../utils/migrationStorage";
 import MigrationConfig from "../../utils/migrationConfig";
+import { useAuth } from "../../use-auth-client";
 
 const UpgradeNotice = () => {
   const [isVisible, setIsVisible] = useState(false);
+  const [hasChildren, setHasChildren] = useState(false);
   const showMobileLayout = useIsMobileLayout();
   const toast = useToast();
+  const { actor, isAuthenticated, isLoading } = useAuth();
 
   useEffect(() => {
+    // Don't show anything while still loading
+    if (isLoading) {
+      setIsVisible(false);
+      return;
+    }
+
+    // Don't show if not authenticated
+    if (!isAuthenticated) {
+      setIsVisible(false);
+      return;
+    }
+    
+    // Check migration storage logic (still needs NFID principal and dismissal logic)
     const shouldShow = MigrationStorage.shouldShowUpgradeNotice();
     console.log("UpgradeNotice - shouldShow:", shouldShow);
-    console.log("Migration status:", MigrationStorage.getMigrationStatus());
     setIsVisible(shouldShow);
-  }, []);
+  }, [isAuthenticated, isLoading]);
 
   const handleUpgradeNow = () => {
     // Ensure NFID principal is stored

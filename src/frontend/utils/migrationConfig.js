@@ -24,11 +24,11 @@ export const MigrationConfig = {
 
   // Migration status messages
   MESSAGES: {
-    UPGRADE_TITLE: "🎉 We've upgraded DooCoins to make it even more secure.",
-    UPGRADE_DESCRIPTION: "Click the Upgrade button below, you will automatically be transferred where you can login to the new app. If you installed DooCoins to your device homescreen it will need to be reinstalled with the new url after you've been transferred.",
+    UPGRADE_TITLE: "📱 This is an outdated version of DooCoins",
+    UPGRADE_DESCRIPTION: "Click here to use the new updated version with better security and features.",
     ERROR_NO_PRINCIPAL: "Unable to find your NFID account. Please try logging out and logging back in.",
     REMINDER_SET: "We'll remind you about the upgrade in 24 hours.",
-    UPGRADE_BUTTON: "Upgrade",
+    UPGRADE_BUTTON: "Use New Version",
     REMIND_LATER_BUTTON: "Remind Me Later",
   },
 

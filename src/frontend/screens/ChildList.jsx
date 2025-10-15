@@ -18,10 +18,10 @@ import { ReactComponent as DeleteIcon } from "../assets/images/delete.svg";
 import { ReactComponent as InviteIcon } from "../assets/images/invite.svg";
 import { Skeleton, Stack, Text, useDisclosure } from "@chakra-ui/react";
 import AddItemToListCallout from "../components/Callouts/AddItemToListCallout";
+import MigrationConfig from "../utils/migrationConfig";
 import { ChildContext } from "../contexts/ChildContext";
 import strings from "../utils/constants";
 import { useNavigate } from "react-router-dom";
-import MigrationConfig from "../utils/migrationConfig";
 
 function ChildList() {
   const { actor, isAuthenticated } = useAuth();
