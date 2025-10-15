@@ -62,7 +62,10 @@ export const AuthProvider = ({ children }) => {
 
           // Store NFID principal for migration when authenticated
           if (accounts?.[0]?.principal && identity) {
+            console.log("Storing NFID principal for migration:", accounts[0].principal);
             MigrationStorage.setNfidPrincipal(accounts[0].principal);
+          } else {
+            console.log("NFID principal not available yet - accounts:", accounts, "identity:", !!identity);
           }
         } catch (error) {
           console.error("Error initializing agent:", error);
@@ -76,6 +79,42 @@ export const AuthProvider = ({ children }) => {
 
     initAgent();
   }, [authenticatedAgent, isLocal, accounts, identity]);
+
+  // Separate effect to monitor accounts and store principal for migration
+  useEffect(() => {
+    console.log("useEffect - accounts changed:", accounts, "identity:", !!identity);
+    
+    // Try multiple approaches to get the principal
+    let principal = null;
+    
+    // Approach 1: From accounts array
+    if (accounts?.[0]?.principal) {
+      principal = accounts[0].principal;
+      console.log("Principal found in accounts:", principal);
+    }
+    
+    // Approach 2: From identity object directly
+    else if (identity?.getPrincipal) {
+      try {
+        principal = identity.getPrincipal().toString();
+        console.log("Principal found from identity:", principal);
+      } catch (error) {
+        console.log("Error getting principal from identity:", error);
+      }
+    }
+    
+    // Approach 3: From user object if available
+    else if (user?.principal) {
+      principal = user.principal;
+      console.log("Principal found in user object:", principal);
+    }
+    
+    // Store the principal if we found one
+    if (principal && !MigrationStorage.getNfidPrincipal()) {
+      console.log("Storing NFID principal for migration:", principal);
+      MigrationStorage.setNfidPrincipal(principal);
+    }
+  }, [accounts, identity, user]);
 
   const login = useCallback(() => {
     // identityKit.connect();
@@ -95,6 +134,18 @@ export const AuthProvider = ({ children }) => {
   }, [disconnect]);
 
   const authValue = useMemo(() => {
+    // Debug logging for auth state
+    if (identity) {
+      console.log("Auth state debug:", {
+        identity: !!identity,
+        accounts,
+        user,
+        isConnecting,
+        accountPrincipal: accounts?.[0]?.principal,
+        userPrincipal: user?.principal
+      });
+    }
+    
     return {
       // isAuthenticated: !!identityKit.identity,
       isAuthenticated: !!identity,
@@ -114,6 +165,8 @@ export const AuthProvider = ({ children }) => {
     identity,
     // identityKit.principal,
     accounts?.[0]?.principal,
+    user,
+    isConnecting,
     actor,
     isLoading,
     login,

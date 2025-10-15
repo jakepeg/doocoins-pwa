@@ -20,7 +20,10 @@ const UpgradeNotice = () => {
   const toast = useToast();
 
   useEffect(() => {
-    setIsVisible(MigrationStorage.shouldShowUpgradeNotice());
+    const shouldShow = MigrationStorage.shouldShowUpgradeNotice();
+    console.log("UpgradeNotice - shouldShow:", shouldShow);
+    console.log("Migration status:", MigrationStorage.getMigrationStatus());
+    setIsVisible(shouldShow);
   }, []);
 
   const handleUpgradeNow = () => {
@@ -41,8 +44,9 @@ const UpgradeNotice = () => {
       console.log("Redirecting to V2 with NFID principal:", nfidPrincipal);
     }
 
-    // Redirect to V2 frontend
-    window.location.href = MigrationConfig.V2_FRONTEND_URL;
+    // Redirect to V2 frontend with NFID principal in URL
+    const v2UrlWithPrincipal = `${MigrationConfig.V2_FRONTEND_URL}?migrate=true&nfid=${encodeURIComponent(nfidPrincipal)}`;
+    window.location.href = v2UrlWithPrincipal;
   };
 
   const handleRemindLater = () => {
@@ -63,9 +67,12 @@ const UpgradeNotice = () => {
   };
 
   if (!isVisible) {
+    console.log("UpgradeNotice - not visible, returning null");
     return null;
   }
 
+  console.log("UpgradeNotice - rendering banner component");
+  
   return (
     <ScaleFade initialScale={0.9} in={isVisible}>
       <Box

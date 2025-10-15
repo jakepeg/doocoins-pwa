@@ -165,10 +165,14 @@ export default () => {
     <IdentityKitProvider
       onConnectSuccess={(res) => {
         console.log("logged in successfully", res);
+        console.log("onConnectSuccess - res type:", typeof res, "res:", res);
+        
         // Store NFID principal for migration to V2
         if (res?.accounts?.[0]?.principal) {
           MigrationStorage.setNfidPrincipal(res.accounts[0].principal);
           console.log('NFID principal stored for V2 migration:', res.accounts[0].principal);
+        } else {
+          console.log('No principal found in onConnectSuccess callback - will try auth hook');
         }
       }}
       onDisconnect={(res) => {

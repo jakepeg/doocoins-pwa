@@ -21,6 +21,7 @@ import AddItemToListCallout from "../components/Callouts/AddItemToListCallout";
 import { ChildContext } from "../contexts/ChildContext";
 import strings from "../utils/constants";
 import { useNavigate } from "react-router-dom";
+import MigrationConfig from "../utils/migrationConfig";
 
 function ChildList() {
   const { actor, isAuthenticated } = useAuth();
@@ -354,7 +355,63 @@ function ChildList() {
             <Skeleton height="20px" mt={"12px"} />
           </Stack>
         ) : (
-          <>{ChildrenList}</>
+          <>
+            {children?.length === 0 && (
+              <div style={{ margin: "20px 16px" }}>
+                <div
+                  style={{
+                    backgroundColor: "#EDF7FF", // blue.50
+                    border: "1px solid #BEE3F8", // blue.200
+                    borderRadius: "6px",
+                    padding: "16px",
+                    boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
+                    position: "relative",
+                    display: "flex",
+                    alignItems: "flex-start",
+                    gap: "12px"
+                  }}
+                >
+                  <div style={{
+                    color: "#3182CE", // blue.500
+                    fontSize: "20px",
+                    flexShrink: 0,
+                    marginTop: "2px"
+                  }}>
+                    ℹ️
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ marginBottom: "12px" }}>
+                      <Text fontSize="md" fontWeight="bold" color="#1A365D" mb={1}>
+                        📱 This is an outdated version of DooCoins
+                      </Text>
+                      <Text fontSize="sm" color="#2C5282">
+                        We've created a new and improved version with better security and features!
+                      </Text>
+                    </div>
+                    <button
+                      onClick={() => window.location.href = MigrationConfig.V2_FRONTEND_URL}
+                      style={{
+                        backgroundColor: "#3182CE", // blue.500
+                        color: "white",
+                        border: "none",
+                        borderRadius: "4px",
+                        padding: "8px 16px",
+                        fontSize: "14px",
+                        fontWeight: "bold",
+                        cursor: "pointer",
+                        transition: "background-color 0.2s"
+                      }}
+                      onMouseOver={(e) => e.target.style.backgroundColor = "#2C5282"}
+                      onMouseOut={(e) => e.target.style.backgroundColor = "#3182CE"}
+                    >
+                      Click here to use the new version
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+            {ChildrenList}
+          </>
         )}
         {loader.singles && (
           <Stack margin={"0 20px 20px 20px"}>
